@@ -97,6 +97,7 @@ let check_ps l a =
   in
   let vars, l = split_vars l in
   let a = homs (List.map snd l) a in
+  (* Ensure that the declared variables are exactly the free variables *)
   let () =
     let fv a =
       let rec aux fv a =

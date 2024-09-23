@@ -34,7 +34,9 @@ let rec to_string k ?(pa=false) t =
   | Neutral n ->
     let rec aux = function
       | Coh -> "coh"
-      | Var i -> Printf.sprintf "x%d" i
+      | Var i ->
+        (* Printf.sprintf "x%d" i *)
+        String.make 1 (char_of_int (int_of_char 'a' + i))
       | App (n, _) -> aux n
     in
     aux n
