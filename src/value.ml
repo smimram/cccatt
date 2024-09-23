@@ -1,3 +1,6 @@
+(** Values are evaluated expressions. *)
+
+(** A value. *)
 type t =
   | Abs of (t -> t)
   | Obj
@@ -7,6 +10,7 @@ type t =
   | Type
   | Neutral of neutral
 
+(** A neutral value. *)
 and neutral =
   | Coh
   | Var of int
@@ -35,6 +39,7 @@ let rec to_string k ?(pa=false) t =
     in
     aux n
 
+(** String representation of a value. *)
 let to_string ?(k=0) = to_string k
 
 let rec homs l a =
@@ -42,6 +47,7 @@ let rec homs l a =
   | b::l -> Hom (b, homs l a)
   | [] -> a
 
+(** Test for equality of values (default equality should never be used on values). *)
 let rec eq k t t' =
   let rec neutral_eq k t t' =
     match t, t' with
