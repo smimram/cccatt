@@ -1,0 +1,7 @@
+(ocamllex (modules lexer))
+(ocamlyacc (modules parser))
+
+(executable
+ (public_name cccatt)
+ (name cccatt)
+)
