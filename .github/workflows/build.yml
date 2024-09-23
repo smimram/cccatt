@@ -1,0 +1,14 @@
+name: Build
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Install packages
+      run: sudo apt-get -y install ocaml ocaml-dune
+    - name: Build
+      run: make
+    - name: Test
+      run: make test
