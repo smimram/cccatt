@@ -31,7 +31,8 @@ let mk ?pos desc : t =
   { desc; pos }
 
 type command =
-  | Let of string * t
+  | Let of string * t (** declare a value *)
+  | Check of t (** infer the type of an expression *)
   | NCoh of context * t (** ensure that we are *not* coherent *)
 
 (** A program. *)
@@ -211,6 +212,10 @@ let rec exec tenv env p =
     let tenv = (x,a)::tenv in
     let env = (x,v)::env in
     Printf.printf "* defined %s : %s\n%!" x (V.to_string a);
+    exec tenv env p
+  | (Check e)::p ->
+    let a = infer 0 tenv env e in
+    Printf.printf "* check %s : %s\n%!" (Pos.to_string e.pos) (V.to_string a);
     exec tenv env p
   | (NCoh (l, a))::p ->
     check 0 tenv env (pis l a) V.Type;

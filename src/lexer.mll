@@ -13,6 +13,7 @@ rule token = parse
   | "coh" { COH }
   | "ncoh" { NCOH }
   | "let" { LET }
+  | "check" { CHECK }
   | "*" { STAR }
   | "(" { LPAR }
   | ")" { RPAR }

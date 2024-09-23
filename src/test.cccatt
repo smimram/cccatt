@@ -33,6 +33,10 @@ coh ap (a b : *) (t : a → b) (u : a) : b
 
 coh comp (a b c : *) (f : a → b) (g : b → c) : a → c
 
+## Test
+
+check I
+
 ## Testing variables
 
 let id := I

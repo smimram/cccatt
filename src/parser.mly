@@ -15,7 +15,8 @@ let abss ?pos l e =
   aux l
 %}
 
-%token LET COH NCOH HOM EQ EQDEF STAR
+%token LET CHECK NCOH
+%token COH HOM EQ EQDEF STAR
 %token LPAR RPAR COL
 %token <string> IDENT
 %token EOF
@@ -35,6 +36,7 @@ cmd:
   | COH IDENT args COL ty { Let ($2, mk (Coh ($3, $5))) }
   | NCOH args COL ty { NCoh ($2, $4) }
   | LET IDENT args EQDEF expr { Let ($2, abss $3 $5) }
+  | CHECK expr { Check $2 }
 
 ty:
   | LPAR ty RPAR { $2 }
