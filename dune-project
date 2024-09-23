@@ -1,4 +1,4 @@
-(lang dune 3.15)
+(lang dune 2.9)
 (name cccatt)
 (generate_opam_files true)
 (source (github username/reponame))
@@ -6,7 +6,7 @@
 (maintainers "Samuel Mimram")
 (license GPL-3.0)
 (documentation https://url/to/documentation)
-(using menhir 3.0)
+(using menhir 2.1)
 
 (package
  (name cccatt)
