@@ -7,8 +7,28 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Install packages
-      run: sudo apt-get -y install ocaml ocaml-dune
+      run: sudo apt-get -y install ocaml ocaml-dune ocaml-odoc
     - name: Build
       run: make
     - name: Test
       run: make test
+    - name: Build doc
+      run: dune build @doc
+    - name: Upload website artifact
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: _build/default/_doc/_html
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy website
+        id: deployment
+        uses: actions/deploy-pages@v2
+
