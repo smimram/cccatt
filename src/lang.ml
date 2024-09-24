@@ -115,15 +115,15 @@ let check_ps l a =
   (* Ensure that the declared variables are exactly the free variables *)
   let () =
     let fv a =
-      let rec aux fv a =
+      let rec aux a fv =
         match a.desc with
         | Var x -> if not (List.mem x fv) then x::fv else fv
         | Obj -> fv
-        | Hom (a, b) -> aux (aux fv a) b
-        | Id (a, t, u) -> aux (aux (aux fv (Option.get !a)) t) u
+        | Hom (a, b) -> fv |> aux a |> aux b
+        | Id (a, t, u) -> fv |> aux (Option.get !a) |> aux t |> aux u
         | _ -> assert false
       in
-      aux [] a
+      aux a []
     in
     let d = List.diff vars (fv a) in
     if d <> [] then failure a.pos "unused variables: %s" (String.concat ", " d)
