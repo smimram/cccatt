@@ -49,7 +49,7 @@ coh refl (a : *) (x : a) : x = x
 
 # coh sym (a : *) (x y : a) (p : x = y) : y = x
 
-coh ap-I (a : *) (x : a) : ap a a I x = x
+coh ap-I (a : *) (x : a) : ap a a (I a) x = x
 
 ## Curryfication
 
