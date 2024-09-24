@@ -95,7 +95,7 @@ let check_ps a =
       let x = target a in
       if List.mem x vars then failure c.pos "multiple producers for %s" x;
       prove (x::vars) (a::env) b
-    | Id (_, _, _) -> failure c.pos "don't know how to prove equalities (yet...)"
+    | Id _ -> assert false
     | Obj -> assert false
     | _ -> assert false
   in
@@ -111,6 +111,13 @@ let check_ps l a =
     vars, l
   in
   let vars, l = split_vars l in
+  let a =
+    match a.desc with
+    | Id (a, _, _) ->
+      (* An identity is provable when its type is contractible. *)
+      Option.get !a
+    | _ -> a
+  in
   let a = homs (List.map snd l) a in
   (* Ensure that the declared variables are exactly the free variables *)
   let () =
@@ -120,7 +127,7 @@ let check_ps l a =
         | Var x -> if not (List.mem x fv) then x::fv else fv
         | Obj -> fv
         | Hom (a, b) -> fv |> aux a |> aux b
-        | Id (a, t, u) -> fv |> aux (Option.get !a) |> aux t |> aux u
+        | Id (a, _t, _u) -> fv |> aux (Option.get !a) (* |> aux t |> aux u *)
         | _ -> assert false
       in
       aux a []
@@ -222,8 +229,8 @@ let rec infer k tenv env e =
           in
           readback v
         in
-        Printf.printf "infered %s : %s\n%!" (to_string e) (to_string a');
-        Printf.printf "env: %s\n%!" (string_of_context env);
+        (* Printf.printf "infered %s : %s\n%!" (to_string e) (to_string a'); *)
+        (* Printf.printf "env: %s\n%!" (string_of_context env); *)
         a := Some a';
         v
     in
