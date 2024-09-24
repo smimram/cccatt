@@ -166,8 +166,8 @@ let rec eval env e =
 
 (** Infer the type of an expression. *)
 let rec infer k tenv env e =
-  Printf.printf "* infer %s\n%!" (to_string e);
-  Printf.printf "  env : %s\n%!" (string_of_context env);
+  (* Printf.printf "* infer %s\n%!" (to_string e); *)
+  (* Printf.printf "  env : %s\n%!" (string_of_context env); *)
   match e.desc with
   | Coh (l, a) ->
     check k tenv env (pis l a) V.Type;
