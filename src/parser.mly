@@ -9,7 +9,7 @@ let mk ?pos e =
 
 let abss ?pos l e =
   let rec aux = function
-    | (x,a)::l -> mk ?pos (Abs ((x,a),aux l))
+    | (x,a)::l -> mk ?pos (Abs (x, a, aux l))
     | [] -> e
   in
   aux l

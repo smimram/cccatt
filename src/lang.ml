@@ -15,9 +15,9 @@ type t =
 and desc =
   | Coh of context * t
   | Var of string
-  | Abs of (string * t) * t
+  | Abs of string * t * t
   | App of t * t
-  | Pi of (string * t * t)
+  | Pi of string * t * t
   | Obj
   | Hom of t * t
   | Id of (t option ref * t * t)
@@ -25,15 +25,20 @@ and desc =
 
 and context = (string * t) list
 
+(** String representation of an expression. This should mostly be useful for debugging (we want to print values). *)
 let rec to_string e =
   match e.desc with
   | Coh _ -> "coh"
   | Var x -> x
+  | Abs (x, a, t) -> Printf.sprintf "fun (%s : %s) => %s" x (to_string a) (to_string t)
+  | App (t, u) -> Printf.sprintf "%s %s" (to_string t) (to_string u)
+  | Pi (x, a, t) -> Printf.sprintf "(%s : %s) => %s" x (to_string a) (to_string t)
   | Obj -> "*"
   | Hom (t, u) -> Printf.sprintf "(%s -> %s)" (to_string t) (to_string u)
   | Id (_, t, u) -> Printf.sprintf "(%s = %s)" (to_string t) (to_string u)
   | Type -> "Type"
-  | _ -> failwith "TODO"
+
+let string_of_context env = List.map (fun (x,v) -> x ^ " = " ^ V.to_string v) env |> String.concat ","
 
 (** Create an expression from its contents. *)
 let mk ?pos desc : t =
@@ -139,7 +144,7 @@ let rec eval env e =
       | Some v -> v
       | None -> failure e.pos "unexpected error: value for %s not found" x
     )
-  | Abs ((x,_),e) -> V.Abs (fun v -> eval ((x,v)::env) e)
+  | Abs (x,_,e) -> V.Abs (fun v -> eval ((x,v)::env) e)
   | App (t,u) ->
     (
       match eval env t with
@@ -160,6 +165,8 @@ let rec eval env e =
 
 (** Infer the type of an expression. *)
 let rec infer k tenv env e =
+  Printf.printf "* infer %s\n%!" (to_string e);
+  Printf.printf "  env : %s\n%!" (string_of_context env);
   match e.desc with
   | Coh (l, a) ->
     check k tenv env (pis l a) V.Type;
@@ -177,9 +184,10 @@ let rec infer k tenv env e =
       | Some a -> a
       | None -> failure e.pos "unknown variable %s" x
     )
-  | Abs ((x,a),t) ->
+  | Abs (x,a,t) ->
     check k tenv env a V.Type;
     let a = eval env a in
+    (* TODO: this is plain wrong: *)
     let b v = eval ((x,v)::env) t in
     V.Pi (a, b)
   | App (t, u) ->
@@ -211,6 +219,7 @@ let rec infer k tenv env e =
           readback v
         in
         Printf.printf "infered %s : %s\n%!" (to_string e) (to_string a');
+        Printf.printf "env: %s\n%!" (string_of_context env);
         a := Some a';
         v
     in
