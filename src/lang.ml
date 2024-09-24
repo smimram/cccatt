@@ -35,7 +35,13 @@ let rec to_string e =
   | Pi (x, a, t) -> Printf.sprintf "(%s : %s) => %s" x (to_string a) (to_string t)
   | Obj -> "*"
   | Hom (t, u) -> Printf.sprintf "(%s -> %s)" (to_string t) (to_string u)
-  | Id (_, t, u) -> Printf.sprintf "(%s = %s)" (to_string t) (to_string u)
+  | Id (a, t, u) ->
+    let a =
+      match !a with
+      | Some a -> "[" ^ to_string a ^ "]"
+      | None -> ""
+    in
+    Printf.sprintf "(%s =%s %s)" (to_string t) a (to_string u)
   | Type -> "Type"
 
 let string_of_context env = List.map (fun (x,v) -> x ^ " = " ^ V.to_string v) env |> String.concat ","
@@ -67,10 +73,12 @@ let rec pis ?pos l t =
 
 (** Check whether a type is a pasting scheme. *)
 let check_ps a =
+  Printf.printf "check_ps %s\n%!" (to_string a);
   let rec target a =
     match a.desc with
     | Var x -> x
     | Hom (_, b) -> target b
+    | Id _ -> failure a.pos "identities are not handled here yet"
     | _ -> assert false
   in
   let rec arguments a =
@@ -127,7 +135,7 @@ let check_ps l a =
         | Var x -> if not (List.mem x fv) then x::fv else fv
         | Obj -> fv
         | Hom (a, b) -> fv |> aux a |> aux b
-        | Id (a, _t, _u) -> fv |> aux (Option.get !a) (* |> aux t |> aux u *)
+        | Id (a, t, u) -> fv |> aux (Option.get !a) |> aux t |> aux u
         | _ -> assert false
       in
       aux a []
@@ -222,9 +230,10 @@ let rec infer k tenv env e =
         let v = infer k tenv env t in
         let a' =
           let mk = mk ~pos:e.pos in
-          let readback = function
+          let rec readback = function
             | V.Obj -> mk Obj
             | V.Neutral (V.Var _) as var -> mk (Var (List.assoc' var env))
+            | V.Hom (a, b) -> mk (Hom (readback a, readback b))
             | v -> failwith ("unhandled readback: " ^ V.to_string v)
           in
           readback v
