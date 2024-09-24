@@ -60,6 +60,7 @@ let rec eq k t t' =
   in
   match t, t' with
   | Neutral t, Neutral u -> neutral_eq k t u
+  | Hom (a, b), Hom (a' , b') -> eq k a a' && eq k b b'
   | Obj, Obj
   | Type, Type -> true
   | _ -> false

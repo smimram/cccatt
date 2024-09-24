@@ -118,8 +118,9 @@ let check_ps l a =
       let rec aux fv a =
         match a.desc with
         | Var x -> if not (List.mem x fv) then x::fv else fv
-        | Hom (a, b) -> aux (aux fv a) b
         | Obj -> fv
+        | Hom (a, b) -> aux (aux fv a) b
+        | Id (a, t, u) -> aux (aux (aux fv (Option.get !a)) t) u
         | _ -> assert false
       in
       aux [] a
@@ -187,8 +188,11 @@ let rec infer k tenv env e =
   | Abs (x,a,t) ->
     check k tenv env a V.Type;
     let a = eval env a in
-    (* TODO: this is plain wrong: *)
-    let b v = eval ((x,v)::env) t in
+    let _ =
+      let x' = V.var k in
+      infer (k+1) ((x, a)::tenv) ((x, x')::env) t
+    in
+    let b v = infer k ((x,a)::tenv) ((x,v)::env) t in
     V.Pi (a, b)
   | App (t, u) ->
     (
@@ -201,7 +205,7 @@ let rec infer k tenv env e =
     )
   | Pi (x, a, b) ->
     check k tenv env a V.Type;
-    check k ((x, eval env a)::tenv) ((x, V.var k)::env) b V.Type;
+    check (k+1) ((x, eval env a)::tenv) ((x, V.var k)::env) b V.Type;
     V.Type
   | Id (a, t, u) ->
     let a : V.t =
