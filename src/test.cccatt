@@ -45,7 +45,7 @@ let id (a : *) (x : a) := ap a a (I a) x
 
 ## Testing identities
 
-# coh refl (a : *) (x : a) : x = x : a
+coh refl (a : *) (x : a) : x = x
 
 # coh ap-I (a : *) (x : a) : ap I
 

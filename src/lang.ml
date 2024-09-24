@@ -20,10 +20,20 @@ and desc =
   | Pi of (string * t * t)
   | Obj
   | Hom of t * t
-  | Id of t * t
+  | Id of (t option ref * t * t)
   | Type
 
 and context = (string * t) list
+
+let rec to_string e =
+  match e.desc with
+  | Coh _ -> "coh"
+  | Var x -> x
+  | Obj -> "*"
+  | Hom (t, u) -> Printf.sprintf "(%s -> %s)" (to_string t) (to_string u)
+  | Id (_, t, u) -> Printf.sprintf "(%s = %s)" (to_string t) (to_string u)
+  | Type -> "Type"
+  | _ -> failwith "TODO"
 
 (** Create an expression from its contents. *)
 let mk ?pos desc : t =
@@ -80,7 +90,7 @@ let check_ps a =
       let x = target a in
       if List.mem x vars then failure c.pos "multiple producers for %s" x;
       prove (x::vars) (a::env) b
-    | Id (_, _) -> failure c.pos "don't know how to prove equalities (yet...)"
+    | Id (_, _, _) -> failure c.pos "don't know how to prove equalities (yet...)"
     | Obj -> assert false
     | _ -> assert false
   in
@@ -140,10 +150,10 @@ let rec eval env e =
     let a = eval env a in
     let b v = eval ((x,v)::env) b in
     V.Pi (a, b)
-  | Id (a, b) ->
-    let a = eval env a in
-    let b = eval env b in
-    V.Id (a, b) 
+  | Id (_, t, u) ->
+    let t = eval env t in
+    let u = eval env u in
+    V.Id (t, u)
   | Obj -> V.Obj
   | Hom (a, b) -> V.Hom (eval env a, eval env b)
   | Type -> V.Type
@@ -185,9 +195,26 @@ let rec infer k tenv env e =
     check k tenv env a V.Type;
     check k ((x, eval env a)::tenv) ((x, V.var k)::env) b V.Type;
     V.Type
-  | Id (t, u) ->
-    let a = infer k tenv env t in
-    (* TODO: check that a is an object... *)
+  | Id (a, t, u) ->
+    let a : V.t =
+      match !a with
+      | Some a -> eval env a
+      | None ->
+        let v = infer k tenv env t in
+        let a' =
+          let mk = mk ~pos:e.pos in
+          let readback = function
+            | V.Obj -> mk Obj
+            | V.Neutral (V.Var _) as var -> mk (Var (List.assoc' var env))
+            | v -> failwith ("unhandled readback: " ^ V.to_string v)
+          in
+          readback v
+        in
+        Printf.printf "infered %s : %s\n%!" (to_string e) (to_string a');
+        a := Some a';
+        v
+    in
+    check k tenv env t a;
     check k tenv env u a;
     V.Type
   | Obj -> V.Type

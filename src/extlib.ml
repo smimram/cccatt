@@ -1,6 +1,12 @@
 module List = struct
   include List
 
+  (** Like assoc, but key is the second component. *)
+  let rec assoc' x = function
+    | (v,y)::_ when x = y -> v
+    | _::l -> assoc' x l
+    | [] -> raise Not_found
+
   let rec find_and_remove_opt p = function
     | x::l ->
       if p x then Some (x, l)

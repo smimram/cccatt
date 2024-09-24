@@ -43,7 +43,7 @@ ty:
   | STAR { mk Obj }
   | IDENT { mk (Var $1) }
   | ty HOM ty { mk (Hom ($1, $3)) }
-  | ty EQ ty { mk (Id ($1, $3)) }
+  | ty EQ ty { mk (Id (ref None, $1, $3)) }
 
 expr:
   | aexpr { $1 }
