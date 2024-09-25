@@ -21,6 +21,8 @@ ncoh (a b : *) : (b → a) → a → a
 # Deterministic but not a coherence
 ncoh (a b : *) : b → b → a → a
 
+ncoh (a b : *) (f g : a -> b) : f = g
+
 ## Useful stuff
 
 coh I (a : *) : a → a
@@ -53,7 +55,7 @@ coh refl (a : *) (x : a) : x = x
 
 # coh ap-cong (a b : *) (t t' : a -> b) (u u' : a) (p : t = t') (q : u = u') : ap a b t u = ap a b t' u'
 
-coh ap-I (a : *) (x : a) : ap a a (I a) x = x
+# coh ap-I (a : *) (x : a) : ap a a (I a) x = x
 
 ## Curryfication
 
