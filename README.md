@@ -1,2 +1,3 @@
-# cccatt1
-An unbiased type theory for cartesian closed categories.
+# CCCaTT
+
+A type theory for unbiased cartesian closed categories.
