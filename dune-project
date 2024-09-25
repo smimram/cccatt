@@ -5,7 +5,7 @@
 (authors "Samuel Mimram <samuel.mimram@polytechnique.edu>")
 (maintainers "Samuel Mimram <samuel.mimram@polytechnique.edu>")
 (license GPL-3.0)
-(documentation https://url/to/documentation)
+(documentation https://smimram.github.io/cccatt/)
 (using menhir 2.1)
 
 (package
