@@ -21,6 +21,8 @@ ncoh (a b : *) : (b → a) → a → a
 # Deterministic but not a coherence
 ncoh (a b : *) : b → b → a → a
 
+ncoh (a b : *) : a = b
+
 ncoh (a b : *) (f g : a -> b) : f = g
 
 ## Useful stuff
