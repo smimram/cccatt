@@ -73,7 +73,7 @@ let rec pis ?pos l t =
 
 (** Check whether a type is a pasting scheme. *)
 let check_ps a =
-  Printf.printf "check_ps %s\n%!" (to_string a);
+  (* Printf.printf "check_ps %s\n%!" (to_string a); *)
   let rec target a =
     match a.desc with
     | Var x -> x
@@ -111,18 +111,57 @@ let check_ps a =
 
 (** Whether a type in a context is a pasting scheme. *)
 let check_ps l a =
+  (* Printf.printf "**** check_ps: %s\n%!" (to_string (pis l a)); *)
   (* Remove variable declarations from the context. *)
-  let split_vars l =
-    let is_obj a = a.desc = Obj in
-    let vars = List.filter_map (fun (x,a) -> if is_obj a then Some x else None) l in
-    let l = List.filter (fun (_,a) -> not (is_obj a)) l in
-    vars, l
+  let vars, l =
+    let split_vars l =
+      let is_obj a = a.desc = Obj in
+      let vars = List.filter_map (fun (x,a) -> if is_obj a then Some x else None) l in
+      let l = List.filter (fun (_,a) -> not (is_obj a)) l in
+      vars, l
+    in
+    split_vars l
   in
-  let vars, l = split_vars l in
+  (* Remove indentities in arguments. *)
+  let vars, l, a =
+    (* Apply rewriting rules. *)
+    let rec rewrite rw e =
+      let rewrite = rewrite rw in
+      let mk = mk ~pos:e.pos in
+      match e.desc with
+      | Var x ->
+        (
+          match List.assoc_opt x rw with
+          | Some e' -> mk e'.desc
+          | None -> e
+        )
+      | Hom (a, b) -> mk (Hom (rewrite a, rewrite b))
+      | Id (a, t, u) -> mk (Id (Option.map rewrite !a |> ref, rewrite t, rewrite u))
+      | Obj -> e
+      | _ -> failwith (Printf.sprintf "TODO: handle %s" (to_string e))
+    in
+    (* Orient identities on variables as rewriting rules and normalize l. *)
+    let rec aux rw = function
+      | (_, {desc = Id (_, {desc = Var x; _}, t); _})::l
+      | (_, {desc = Id (_, t, {desc = Var x; _}); _})::l -> aux ((x,rewrite rw t)::rw) l
+      | (_, {desc = Id _; pos})::_ -> failure pos "could not eliminate identity"
+      | (x, a)::l ->
+        let a = rewrite rw a in
+        let rw, l = aux rw l in
+        rw, (x,a)::l
+      | [] -> rw, []
+    in
+    let rw, l = aux [] l in
+    (* Remove rewritten variables. *)
+    let l = List.filter (fun (x,_) -> not (List.mem_assoc x rw)) l in
+    let vars = List.diff vars (List.map fst rw) in
+    vars, l, rewrite rw a
+  in
+  (* Printf.printf "  after removal: %s\n%!" (to_string (pis l a)); *)
+  (* An identity is provable when its type is contractible. *)
   let a =
     match a.desc with
     | Id (a, _, _) ->
-      (* An identity is provable when its type is contractible. *)
       Option.get !a
     | _ -> a
   in

@@ -51,7 +51,7 @@ let id (a : *) (x : a) := ap a a (I a) x
 
 coh refl (a : *) (x : a) : x = x
 
-# coh sym (a : *) (x y : a) (p : x = y) : y = x
+coh sym (a : *) (x y : a) (p : x = y) : y = x
 
 # coh trans (a b c : *) (p : a = b) (q : b = c) : a = c
 
