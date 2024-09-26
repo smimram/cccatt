@@ -1,59 +1,59 @@
-## Sanity checks
+# ## Sanity checks
 
-# Not habited
-ncoh (a : *) : a
+# # Not habited
+# ncoh (a : *) : a
 
-# Not habited
-ncoh (a b : *) : a → b
+# # Not habited
+# ncoh (a b : *) : a → b
 
-# Not habited and non-terminating
-ncoh (a : *) : (a → a) → a
+# # Not habited and non-terminating
+# ncoh (a : *) : (a → a) → a
 
-# Not contractible
-ncoh (a : *) : a → a → a
+# # Not contractible
+# ncoh (a : *) : a → a → a
 
-# Not contractible
-ncoh (a : *) : (a → a) → a → a
+# # Not contractible
+# ncoh (a : *) : (a → a) → a → a
 
-# Contractible but not a coherence
-ncoh (a b : *) : (b → a) → a → a
+# # Contractible but not a coherence
+# ncoh (a b : *) : (b → a) → a → a
 
-# Deterministic but not a coherence
-ncoh (a b : *) : b → b → a → a
+# # Deterministic but not a coherence
+# ncoh (a b : *) : b → b → a → a
 
-ncoh (a b : *) : a = b
+# ncoh (a b : *) : a = b
 
-ncoh (a b : *) (f g : a -> b) : f = g
+# ncoh (a b : *) (f g : a -> b) : f = g
 
-## Useful stuff
+# ## Useful stuff
 
-coh I (a : *) : a → a
+# coh I (a : *) : a → a
 
-coh K (a b : *) : a → b → a
+# coh K (a b : *) : a → b → a
 
-coh S (a b c : *) : (a → b → c) → (a → b) → a → c
+# coh S (a b c : *) : (a → b → c) → (a → b) → a → c
 
-coh ap (a b : *) (t : a → b) (u : a) : b
+# coh ap (a b : *) (t : a → b) (u : a) : b
 
-coh comp (a b c : *) (f : a → b) (g : b → c) : a → c
+# coh comp (a b c : *) (f : a → b) (g : b → c) : a → c
 
-## Test
+# ## Test
 
-check I
+# check I
 
-## Testing variables
+# ## Testing variables
 
-let id := I
+# let id := I
 
-let id (a : *) (x : a) := ap a a (I a) x
+# let id (a : *) (x : a) := ap a a (I a) x
 
-## Testing identities
+# ## Testing identities
 
-coh refl (a : *) (x : a) : x = x
+coh refl (a : *) (x : *) : x = x
 
-coh sym (a : *) (x y : a) (p : x = y) : y = x
+# coh sym (a : *) (x y : a) (p : x = y) : y = x
 
-# coh trans (a b c : *) (p : a = b) (q : b = c) : a = c
+# coh trans (a : *) (x y z : *) (p : x = y) (q : y = z) : x = z
 
 # coh ap-cong (a b : *) (t t' : a -> b) (u u' : a) (p : t = t') (q : u = u') : ap a b t u = ap a b t' u'
 

@@ -104,14 +104,14 @@ let check_ps a =
       if List.mem x vars then failure c.pos "multiple producers for %s" x;
       prove (x::vars) (a::env) b
     | Id _ -> assert false
-    | Obj -> assert false
+    | Obj -> failure c.pos "cannot prove identities between objects"
     | _ -> assert false
   in
   prove [] [] a
 
 (** Whether a type in a context is a pasting scheme. *)
 let check_ps l a =
-  (* Printf.printf "**** check_ps: %s\n%!" (to_string (pis l a)); *)
+  Printf.printf "**** check_ps: %s\n%!" (to_string (pis l a));
   (* Remove variable declarations from the context. *)
   let vars, l =
     let split_vars l =
@@ -140,10 +140,24 @@ let check_ps l a =
       | Obj -> e
       | _ -> failwith (Printf.sprintf "TODO: handle %s" (to_string e))
     in
+    (* Test whether an expression has a free variable. *)
+    let rec has_fv x e =
+      match e.desc with
+      | Var y -> x = y
+      | Hom (a, b) -> has_fv x a || has_fv x b
+      | Id (a, t, u) -> (Option.map (has_fv x) !a |> Option.value ~default:false) || has_fv x t || has_fv x u
+      | Obj -> false
+      | _ -> assert false
+    in
     (* Orient identities on variables as rewriting rules and normalize l. *)
     let rec aux rw = function
       | (_, {desc = Id (_, {desc = Var x; _}, t); _})::l
-      | (_, {desc = Id (_, t, {desc = Var x; _}); _})::l -> aux ((x,rewrite rw t)::rw) l
+      | (_, {desc = Id (_, t, {desc = Var x; _}); _})::l ->
+        assert (not (has_fv x t));
+        let t = rewrite rw t in
+        let rw = List.map (fun (y,u) -> y, rewrite [x,t] u) rw in
+        Printf.printf "rewrite: %s -> %s\n%!" x (to_string t);
+        aux ((x,t)::rw) l
       | (_, {desc = Id _; pos})::_ -> failure pos "could not eliminate identity"
       | (x, a)::l ->
         let a = rewrite rw a in
@@ -152,22 +166,16 @@ let check_ps l a =
       | [] -> rw, []
     in
     let rw, l = aux [] l in
+    Printf.printf "rw: %s\n%!" (List.map (fun (x,t) -> Printf.sprintf "%s -> %s" x (to_string t)) rw |> String.concat ", ");
     (* Remove rewritten variables. *)
     let l = List.filter (fun (x,_) -> not (List.mem_assoc x rw)) l in
     let vars = List.diff vars (List.map fst rw) in
     vars, l, rewrite rw a
   in
-  (* Printf.printf "  after removal: %s\n%!" (to_string (pis l a)); *)
-  (* An identity is provable when its type is contractible. *)
-  let a =
-    match a.desc with
-    | Id (a, _, _) ->
-      Option.get !a
-    | _ -> a
-  in
-  let a = homs (List.map snd l) a in
+  Printf.printf "**** after removal: %s\n%!" (to_string (pis l a));
   (* Ensure that the declared variables are exactly the free variables *)
   let () =
+    let a = homs (List.map snd l) a in
     let fv a =
       let rec aux a fv =
         match a.desc with
@@ -182,6 +190,13 @@ let check_ps l a =
     let d = List.diff vars (fv a) in
     if d <> [] then failure a.pos "unused variables: %s" (String.concat ", " d)
   in
+  (* An identity is provable when its type is contractible. *)
+  let a =
+    match a.desc with
+    | Id (a, _, _) -> Option.get !a
+    | _ -> a
+  in
+  let a = homs (List.map snd l) a in
   check_ps a
 
 (** Evaluate an expression to a value. *)
@@ -282,6 +297,7 @@ let rec infer k tenv env e =
         a := Some a';
         v
     in
+    (* check k tenv env t V.Obj; *)
     check k tenv env t a;
     check k tenv env u a;
     V.Type
