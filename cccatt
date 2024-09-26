@@ -1,0 +1,3 @@
+#!/bin/sh
+
+opam exec dune -- exec -- src/cccatt.exe $@
