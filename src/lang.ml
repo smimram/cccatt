@@ -138,7 +138,8 @@ let check_ps l a =
       | Hom (a, b) -> mk (Hom (rewrite a, rewrite b))
       | Id (a, t, u) -> mk (Id (Option.map rewrite !a |> ref, rewrite t, rewrite u))
       | Obj -> e
-      | _ -> failwith (Printf.sprintf "TODO: handle %s" (to_string e))
+      | App (t, u) -> mk (App (rewrite t, rewrite u))
+      | _ -> failwith (Printf.sprintf "TODO: in rewrite handle %s" (to_string e))
     in
     (* Test whether an expression has a free variable. *)
     let rec has_fv x e =
@@ -183,7 +184,8 @@ let check_ps l a =
         | Obj -> fv
         | Hom (a, b) -> fv |> aux a |> aux b
         | Id (a, t, u) -> fv |> aux (Option.get !a) |> aux t |> aux u
-        | _ -> assert false
+        | App (t, u) -> fv |> aux t |> aux u
+        | _ -> failwith (Printf.sprintf "TODO: fv handle %s" (to_string a))
       in
       aux a []
     in
