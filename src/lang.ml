@@ -111,7 +111,7 @@ let check_ps a =
 
 (** Whether a type in a context is a pasting scheme. *)
 let check_ps l a =
-  Printf.printf "**** check_ps: %s\n%!" (to_string (pis l a));
+  (* Printf.printf "**** check_ps: %s\n%!" (to_string (pis l a)); *)
   (* Remove variable declarations from the context. *)
   let vars, l =
     let split_vars l =
@@ -156,7 +156,7 @@ let check_ps l a =
         assert (not (has_fv x t));
         let t = rewrite rw t in
         let rw = List.map (fun (y,u) -> y, rewrite [x,t] u) rw in
-        Printf.printf "rewrite: %s -> %s\n%!" x (to_string t);
+        (* Printf.printf "rewrite: %s -> %s\n%!" x (to_string t); *)
         aux ((x,t)::rw) l
       | (_, {desc = Id _; pos})::_ -> failure pos "could not eliminate identity"
       | (x, a)::l ->
@@ -166,13 +166,13 @@ let check_ps l a =
       | [] -> rw, []
     in
     let rw, l = aux [] l in
-    Printf.printf "rw: %s\n%!" (List.map (fun (x,t) -> Printf.sprintf "%s -> %s" x (to_string t)) rw |> String.concat ", ");
+    (* Printf.printf "rw: %s\n%!" (List.map (fun (x,t) -> Printf.sprintf "%s -> %s" x (to_string t)) rw |> String.concat ", "); *)
     (* Remove rewritten variables. *)
     let l = List.filter (fun (x,_) -> not (List.mem_assoc x rw)) l in
     let vars = List.diff vars (List.map fst rw) in
     vars, l, rewrite rw a
   in
-  Printf.printf "**** after removal: %s\n%!" (to_string (pis l a));
+  (* Printf.printf "**** after removal: %s\n%!" (to_string (pis l a)); *)
   (* Ensure that the declared variables are exactly the free variables *)
   let () =
     let a = homs (List.map snd l) a in
@@ -277,9 +277,9 @@ let rec infer k tenv env e =
     check (k+1) ((x, eval env a)::tenv) ((x, V.var k)::env) b V.Type;
     V.Type
   | Id (a, t, u) ->
-    let a : V.t =
+    let a =
       match !a with
-      | Some a -> eval env a
+      | Some a -> a
       | None ->
         let v = infer k tenv env t in
         let a' =
@@ -295,11 +295,12 @@ let rec infer k tenv env e =
         (* Printf.printf "infered %s : %s\n%!" (to_string e) (to_string a'); *)
         (* Printf.printf "env: %s\n%!" (string_of_context env); *)
         a := Some a';
-        v
+        a'
     in
-    (* check k tenv env t V.Obj; *)
-    check k tenv env t a;
-    check k tenv env u a;
+    let a' = eval env a in
+    check k tenv env a V.Obj;
+    check k tenv env t a';
+    check k tenv env u a';
     V.Type
   | Obj -> V.Type
   | Hom (a, b) ->
