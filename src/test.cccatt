@@ -59,9 +59,21 @@ coh ap-cong (a b : *) (t t' : a → b) (u u' : a) (p : t = t') (q : u = u') : ap
 
 coh ap-I (a : *) (x : a) : ap a a (I a) x = x
 
+# coh ap-comp (a b c : *) (f : a -> b) (g : b -> c)
+
 ## Church natural numbers
 
-# ....
+let nat (a : *) := (a -> a) -> a -> a
+
+let zero (a : *) (f : a -> a) (x : a) := x
+
+let one (a : *) (f : a -> a) (x : a) := ap a a f x
+
+let two (a : *) (f : a -> a) (x : a) := ap a a f (ap a a f x)
+
+let three (a : *) (f : a -> a) (x : a) := ap a a f (ap a a f (ap a a f x))
+
+# let add (a : *) (m n : nat a) (f : a -> a) (x : a) := ap a a n
 
 ## Products
 
