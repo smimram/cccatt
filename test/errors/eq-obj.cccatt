@@ -1,2 +1,2 @@
 # Identities cannot be between objects
-coh bla (a : *) : a = a
+coh bla (a : .) : a = a

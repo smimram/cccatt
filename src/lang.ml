@@ -34,7 +34,7 @@ let rec to_string e =
   | Abs (x, a, t) -> Printf.sprintf "fun (%s : %s) => %s" x (to_string a) (to_string t)
   | App (t, u) -> Printf.sprintf "%s %s" (to_string t) (to_string u)
   | Pi (x, a, t) -> Printf.sprintf "(%s : %s) => %s" x (to_string a) (to_string t)
-  | Obj -> "*"
+  | Obj -> "."
   | Hom (a, b) -> Printf.sprintf "(%s -> %s)" (to_string a) (to_string b)
   | Prod (a, b) -> Printf.sprintf "(%s × %s)" (to_string a) (to_string b)
   | Id (a, t, u) ->

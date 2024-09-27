@@ -1,41 +1,41 @@
 ## Sanity checks
 
 # Not habited
-ncoh (a : *) : a
+ncoh (a : .) : a
 
 # Not habited
-ncoh (a b : *) : a → b
+ncoh (a b : .) : a → b
 
 # Not habited and non-terminating
-ncoh (a : *) : (a → a) → a
+ncoh (a : .) : (a → a) → a
 
 # Not contractible
-ncoh (a : *) : a → a → a
+ncoh (a : .) : a → a → a
 
 # Not contractible
-ncoh (a : *) : (a → a) → a → a
+ncoh (a : .) : (a → a) → a → a
 
 # Contractible but not a coherence
-ncoh (a b : *) : (b → a) → a → a
+ncoh (a b : .) : (b → a) → a → a
 
 # Deterministic but not a coherence
-ncoh (a b : *) : b → b → a → a
+ncoh (a b : .) : b → b → a → a
 
-ncoh (a : *) (x y : a) : x = y
+ncoh (a : .) (x y : a) : x = y
 
-ncoh (a b : *) (f g : a → b) : f = g
+ncoh (a b : .) (f g : a → b) : f = g
 
 ## Useful stuff
 
-coh I (a : *) : a → a
+coh I (a : .) : a → a
 
-coh K (a b : *) : a → b → a
+coh K (a b : .) : a → b → a
 
-coh S (a b c : *) : (a → b → c) → (a → b) → a → c
+coh S (a b c : .) : (a → b → c) → (a → b) → a → c
 
-coh ap (a b : *) (t : a → b) (u : a) : b
+coh ap (a b : .) (t : a → b) (u : a) : b
 
-coh comp (a b c : *) (f : a → b) (g : b → c) : a → c
+coh comp (a b c : .) (f : a → b) (g : b → c) : a → c
 
 ## Test
 
@@ -45,54 +45,54 @@ check I
 
 let id := I
 
-let id (a : *) (x : a) := ap a a (I a) x
+let id (a : .) (x : a) := ap a a (I a) x
 
 ## Testing identities
 
-coh refl (a : *) (x : a) : x = x
+coh refl (a : .) (x : a) : x = x
 
-coh sym (a : *) (x y : a) (p : x = y) : y = x
+coh sym (a : .) (x y : a) (p : x = y) : y = x
 
-coh trans (a : *) (x y z : a) (p : x = y) (q : y = z) : x = z
+coh trans (a : .) (x y z : a) (p : x = y) (q : y = z) : x = z
 
-coh ap-cong (a b : *) (t t' : a → b) (u u' : a) (p : t = t') (q : u = u') : ap a b t u = ap a b t' u'
+coh ap-cong (a b : .) (t t' : a → b) (u u' : a) (p : t = t') (q : u = u') : ap a b t u = ap a b t' u'
 
-coh ap-I (a : *) (x : a) : ap a a (I a) x = x
+coh ap-I (a : .) (x : a) : ap a a (I a) x = x
 
-# coh ap-comp (a b c : *) (f : a -> b) (g : b -> c)
+# coh ap-comp (a b c : .) (f : a -> b) (g : b -> c)
 
 ## Church natural numbers
 
-let nat (a : *) := (a -> a) -> a -> a
+let nat (a : .) := (a -> a) -> a -> a
 
-let zero (a : *) (f : a -> a) (x : a) := x
+let zero (a : .) (f : a -> a) (x : a) := x
 
-let one (a : *) (f : a -> a) (x : a) := ap a a f x
+let one (a : .) (f : a -> a) (x : a) := ap a a f x
 
-let two (a : *) (f : a -> a) (x : a) := ap a a f (ap a a f x)
+let two (a : .) (f : a -> a) (x : a) := ap a a f (ap a a f x)
 
-let three (a : *) (f : a -> a) (x : a) := ap a a f (ap a a f (ap a a f x))
+let three (a : .) (f : a -> a) (x : a) := ap a a f (ap a a f (ap a a f x))
 
-# let add (a : *) (m n : nat a) (f : a -> a) (x : a) := ap a a n
+# let add (a : .) (m n : nat a) (f : a -> a) (x : a) := ap a a n
 
 ## Products
 
-coh fst (a b : *) (_ : a × b) : a
+coh fst (a b : .) (_ : a × b) : a
 
-coh snd (a b : *) (_ : a × b) : b
+coh snd (a b : .) (_ : a × b) : b
 
-coh pair (a b : *) (_ : a) (_ : b) : a × b
+coh pair (a b : .) (_ : a) (_ : b) : a × b
 
-coh fst-pair (a b : *) (x : a) (y : b) : fst a b (pair a b x y) = x
+coh fst-pair (a b : .) (x : a) (y : b) : fst a b (pair a b x y) = x
 
-coh snd-pair (a b : *) (x : a) (y : b) : fst a b (pair a b x y) = x
+coh snd-pair (a b : .) (x : a) (y : b) : fst a b (pair a b x y) = x
 
-coh pair-sym (a b : *) (_ : a × b) : (b × a)
+coh pair-sym (a b : .) (_ : a × b) : (b × a)
 
-let pair-sym' (a b : *) (x : a × b) := pair b a (snd a b x) (fst a b x)
+let pair-sym' (a b : .) (x : a × b) := pair b a (snd a b x) (fst a b x)
 
-coh pair-syms (a b : *) (x : a × b) : pair-sym a b x = pair-sym' a b x
+coh pair-syms (a b : .) (x : a × b) : pair-sym a b x = pair-sym' a b x
 
 ## Curryfication
 
-# coh f (a b c : *) : a 
+# coh f (a b c : .) : a 

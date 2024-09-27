@@ -25,9 +25,9 @@ let rec to_string k ?(pa=false) t =
   | Abs t ->
     let x = var k in
     Printf.sprintf "fun %s -> %s" (to_string k x) (to_string (k+1) (t x)) |> pa
-  | Obj -> "*"
+  | Obj -> "."
   | Hom (a, b) -> Printf.sprintf "%s -> %s" (to_string ~pa:true k a) (to_string k b) |> pa
-  | Prod (a, b) -> Printf.sprintf "%s × %s" (to_string ~pa:true k a) (to_string k b) |> pa
+  | Prod (a, b) -> Printf.sprintf "%s * %s" (to_string ~pa:true k a) (to_string k b) |> pa
   | Pi (a, b) ->
     let x = var k in
     Printf.sprintf "(%s : %s) => %s" (to_string k x) (to_string k a) (to_string (k+1) (b x)) |> pa

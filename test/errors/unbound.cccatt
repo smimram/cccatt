@@ -1,1 +1,1 @@
-coh unbound (a : *) : x -> x
+coh unbound (a : .) : x -> x
