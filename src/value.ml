@@ -64,6 +64,8 @@ let rec eq k t t' =
   | Neutral t, Neutral u -> neutral_eq k t u
   | Hom (a, b), Hom (a' , b') -> eq k a a' && eq k b b'
   | Prod (a, b), Prod (a' , b') -> eq k a a' && eq k b b'
+  | Abs t, Abs t' -> let x = var k in eq (k+1) (t x) (t' x)
+  | Pi (a, t), Pi (a', t') -> let x = var k in eq k a a' && eq (k+1) (t x) (t' x)
   | Obj, Obj
   | Type, Type -> true
   | _ -> false

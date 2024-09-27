@@ -33,9 +33,16 @@ coh K (a b : .) : a → b → a
 
 coh S (a b c : .) : (a → b → c) → (a → b) → a → c
 
+# also known as B
 coh ap (a b : .) (t : a → b) (u : a) : b
 
 coh comp (a b c : .) (f : a → b) (g : b → c) : a → c
+
+coh W (a b : .) : (a -> a -> b) -> (a -> b)
+
+coh C (a b c : .) : (a -> b -> c) -> b -> a -> c
+
+let K' (a b : .) : a -> b -> b := ap (b -> b) (a -> (b -> b)) (K (b -> b) a) (I b)
 
 ## Test
 
