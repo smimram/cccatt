@@ -34,10 +34,14 @@ prog:
   | EOF { [] }
 
 cmd:
-  | COH IDENT args COL expr { Let ($2, mk (Coh ($3, $5))) }
+  | COH IDENT args COL expr { Let ($2, None, mk (Coh ($3, $5))) }
   | NCOH args COL expr { NCoh ($2, $4) }
-  | LET IDENT args EQDEF expr { Let ($2, abss $3 $5) }
+  | LET IDENT args type_opt EQDEF expr { Let ($2, $4, abss $3 $6) }
   | CHECK expr { Check $2 }
+
+type_opt:
+  | COL expr { Some $2 }
+  | { None }
 
 expr:
   | expr HOM expr { mk (Hom ($1, $3)) }

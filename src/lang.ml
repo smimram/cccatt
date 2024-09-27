@@ -54,7 +54,7 @@ let mk ?pos desc : t =
   { desc; pos }
 
 type command =
-  | Let of string * t (** declare a value *)
+  | Let of string * t option * t (** declare a value *)
   | Check of t (** infer the type of an expression *)
   | NCoh of context * t (** ensure that we are *not* coherent *)
 
@@ -346,10 +346,18 @@ and check k tenv env e a =
 (** Execute a program. *)
 let rec exec tenv env p =
   match p with
-  | (Let (x, e))::p ->
+  | (Let (x, a, e))::p ->
     (* Printf.printf "*** let %s\n%!" x; *)
     (* print_endline "inferring"; *)
-    let a = infer 0 tenv env e in
+    let a =
+      match a with
+      | Some a ->
+        let a = eval env a in
+        check 0 tenv env e a;
+        a
+      | None ->
+        infer 0 tenv env e
+    in
     (* print_endline "checking"; *)
     let v = eval env e in
     let tenv = (x,a)::tenv in
