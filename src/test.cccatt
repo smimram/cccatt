@@ -59,11 +59,27 @@ coh ap-cong (a b : *) (t t' : a → b) (u u' : a) (p : t = t') (q : u = u') : ap
 
 coh ap-I (a : *) (x : a) : ap a a (I a) x = x
 
+## Church natural numbers
+
+# ....
+
 ## Products
 
-coh fst (a : *) (a b : *) (_ : a × b) : a
+coh fst (a b : *) (_ : a × b) : a
 
-coh snd (a : *) (a b : *) (_ : a × b) : a
+coh snd (a b : *) (_ : a × b) : b
+
+coh pair (a b : *) (_ : a) (_ : b) : a × b
+
+coh fst-pair (a b : *) (x : a) (y : b) : fst a b (pair a b x y) = x
+
+coh snd-pair (a b : *) (x : a) (y : b) : fst a b (pair a b x y) = x
+
+coh pair-sym (a b : *) (_ : a × b) : (b × a)
+
+let pair-sym' (a b : *) (x : a × b) := pair b a (snd a b x) (fst a b x)
+
+coh pair-syms (a b : *) (x : a × b) : pair-sym a b x = pair-sym' a b x
 
 ## Curryfication
 

@@ -313,6 +313,7 @@ let rec infer k tenv env e =
             | V.Obj -> mk Obj
             | V.Neutral (V.Var _) as var -> mk (Var (List.assoc' var env))
             | V.Hom (a, b) -> mk (Hom (readback a, readback b))
+            | V.Prod (a, b) -> mk (Prod (readback a, readback b))
             | v -> failwith ("unhandled readback: " ^ V.to_string v)
           in
           readback v
