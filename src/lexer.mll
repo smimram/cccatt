@@ -13,7 +13,9 @@ rule token = parse
   | "coh" { COH }
   | "ncoh" { NCOH }
   | "let" { LET }
+  | "fun" { FUN }
   | "check" { CHECK }
+  | "=>" { TO }
   | "." { OBJ }
   | "(" { LPAR }
   | ")" { RPAR }

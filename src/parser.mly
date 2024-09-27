@@ -15,12 +15,13 @@ let abss ?pos l e =
   aux l
 %}
 
-%token LET CHECK NCOH
+%token LET CHECK NCOH FUN TO
 %token COH HOM EQ EQDEF OBJ TIMES
 %token LPAR RPAR COL
 %token <string> IDENT
 %token EOF
 
+%right TO
 %right HOM
 %right TIMES
 %right EQ
@@ -44,6 +45,7 @@ type_opt:
   | { None }
 
 expr:
+  | FUN LPAR IDENT COL expr RPAR TO expr { mk (Abs ($3, $5, $8)) }
   | expr HOM expr { mk (Hom ($1, $3)) }
   | expr EQ expr { mk (Id (ref None, $1, $3)) }
   | expr TIMES expr { mk (Prod ($1, $3)) }
@@ -54,7 +56,7 @@ aexpr:
   | sexpr { $1 }
 
 /* Simple expression */
-sexpr:
+ sexpr:
   | OBJ { mk Obj }
   | IDENT { mk (Var $1) }
   | LPAR expr RPAR { $2 }
