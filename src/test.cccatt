@@ -33,7 +33,8 @@ coh K (a b : .) : a → b → a
 
 coh S (a b c : .) : (a → b → c) → (a → b) → a → c
 
-# also known as B
+coh B (a b : .) : (a -> b) -> a -> b
+
 coh ap (a b : .) (t : a → b) (u : a) : b
 
 coh comp (a b c : .) (f : a → b) (g : b → c) : a → c
@@ -70,13 +71,9 @@ coh ap-I (a : .) (x : a) : ap a a (I a) x = x
 
 coh ap-comp (a b c : .) (f : a -> b) (g : b -> c) (x : a) : ap a c (comp a b c f g) x = ap b c g (ap a b f x)
 
-## Church natural numbers
-
-let nat (a : .) := (a -> a) -> a -> a
+## Church numerals with pi-types
 
 let zero (a : .) (f : a -> a) (x : a) := x
-
-# let zero (a : .) : nat a := fun (f : a -> a) (x : a) => x
 
 let one (a : .) (f : a -> a) (x : a) := ap a a f x
 
@@ -84,7 +81,15 @@ let two (a : .) (f : a -> a) (x : a) := ap a a f (ap a a f x)
 
 let three (a : .) (f : a -> a) (x : a) := ap a a f (ap a a f (ap a a f x))
 
-let add (a : .) (m n : nat a) (f : a -> a) (x : a) := ap a a (ap (a -> a) (a -> a) m f) (ap a a (ap (a -> a) (a -> a) n f) x)
+## Church numerals
+
+let nat (a : .) := (a -> a) -> a -> a
+
+let zero (a : .) : nat a := K' (a -> a) a
+
+# let one (a : .) : nat a := ap 
+
+# let add (a : .) (m n : nat a) (f : a -> a) (x : a) := ap a a (ap (a -> a) (a -> a) m f) (ap a a (ap (a -> a) (a -> a) n f) x)
 
 # let add-zero (a : .) (n : nat a) : add a (zero a) n = n
 
