@@ -73,7 +73,9 @@ let two (a : .) (f : a -> a) (x : a) := ap a a f (ap a a f x)
 
 let three (a : .) (f : a -> a) (x : a) := ap a a f (ap a a f (ap a a f x))
 
-# let add (a : .) (m n : nat a) (f : a -> a) (x : a) := ap a a n
+let add (a : .) (m n : nat a) (f : a -> a) (x : a) := ap a a (ap (a -> a) (a -> a) m f) (ap a a (ap (a -> a) (a -> a) n f) x)
+
+# let add-zero (a : .) (n : nat a) : add a (zero a) n = n
 
 ## Products
 
