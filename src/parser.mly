@@ -13,6 +13,10 @@ let abss ?pos l e =
     | [] -> e
   in
   aux l
+
+let pis ?pos l a =
+  let pos = Option.value ~default:(defpos ()) pos in
+  pis ~pos l a
 %}
 
 %token LET CHECK NCOH FUN TO
@@ -37,7 +41,7 @@ prog:
 cmd:
   | COH IDENT args COL expr { Let ($2, None, mk (Coh ($3, $5))) }
   | NCOH args COL expr { NCoh ($2, $4) }
-  | LET IDENT args type_opt EQDEF expr { Let ($2, $4, abss $3 $6) }
+  | LET IDENT args type_opt EQDEF expr { Let ($2, Option.map (pis $3) $4, abss $3 $6) }
   | CHECK expr { Check $2 }
 
 type_opt:
@@ -45,7 +49,7 @@ type_opt:
   | { None }
 
 expr:
-  | FUN LPAR IDENT COL expr RPAR TO expr { mk (Abs ($3, $5, $8)) }
+  | FUN args TO expr { abss $2 $4 }
   | expr HOM expr { mk (Hom ($1, $3)) }
   | expr EQ expr { mk (Id (ref None, $1, $3)) }
   | expr TIMES expr { mk (Prod ($1, $3)) }

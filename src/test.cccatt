@@ -67,6 +67,8 @@ let nat (a : .) := (a -> a) -> a -> a
 
 let zero (a : .) (f : a -> a) (x : a) := x
 
+# let zero (a : .) : nat a := fun (f : a -> a) (x : a) => x
+
 let one (a : .) (f : a -> a) (x : a) := ap a a f x
 
 let two (a : .) (f : a -> a) (x : a) := ap a a f (ap a a f x)

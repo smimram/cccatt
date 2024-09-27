@@ -347,7 +347,7 @@ and check k tenv env e a =
 let rec exec tenv env p =
   match p with
   | (Let (x, a, e))::p ->
-    (* Printf.printf "*** let %s\n%!" x; *)
+    (* Printf.printf "*** let %s := %s\n%!" x (to_string e); *)
     (* print_endline "inferring"; *)
     let a =
       match a with
