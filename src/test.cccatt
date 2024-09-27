@@ -59,7 +59,7 @@ coh ap-cong (a b : .) (t t' : a → b) (u u' : a) (p : t = t') (q : u = u') : ap
 
 coh ap-I (a : .) (x : a) : ap a a (I a) x = x
 
-# coh ap-comp (a b c : .) (f : a -> b) (g : b -> c)
+coh ap-comp (a b c : .) (f : a -> b) (g : b -> c) (x : a) : ap a c (comp a b c f g) x = ap b c g (ap a b f x)
 
 ## Church natural numbers
 
