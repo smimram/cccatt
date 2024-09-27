@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CCCaTT</title>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="cccatt.css"/>
+    <script type="text/javascript" src="cccatt.bc.js"></script>
+  </head>
+  <body>
+    <h1>CCCaTT<br/>=^.^=</h1>
+    <p style="text-align: center">
+      Unbiased cartesian closed categories.
+    </p>
+
+    <div id="toplevel"></div>
+
+    <script type="text/javascript">
+      function ku(event) {
+        if (event.keyCode == 13)
+          document.getElementById("send").click();
+      }
+      function init() {
+        document.getElementById("input").onkeyup = ku;
+      }
+    </script>
+
+<h2>Examples</h2>
+    <p>
+      If you don't feel inspired, here is a sample session:
+<pre>
+coh K (a b : .) : a -> b -> a
+</pre>
+    </p>
+
+    <h2>More details</h2>
+    <p>
+      The <a href="https://github.com/smimram/cccatt">source code</a>.
+    </p>
+  </body>
+</html>
