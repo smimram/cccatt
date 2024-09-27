@@ -19,7 +19,7 @@ let pis ?pos l a =
   pis ~pos l a
 %}
 
-%token LET CHECK NCOH FUN TO
+%token LET CHECK NCOH FUN TO HOLE
 %token COH HOM EQ EQDEF OBJ TIMES
 %token LPAR RPAR COL
 %token <string> IDENT

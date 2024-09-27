@@ -23,6 +23,7 @@ and desc =
   | Hom of t * t
   | Prod of t * t
   | Id of (t option ref * t * t)
+  | Hole
   | Type
 
 and context = (string * t) list
@@ -45,6 +46,7 @@ let rec to_string e =
       | None -> ""
     in
     Printf.sprintf "(%s =%s %s)" (to_string t) a (to_string u)
+  | Hole -> "?"
   | Type -> "Type"
 
 let string_of_context env = List.map (fun (x,v) -> x ^ " = " ^ V.to_string v) env |> String.concat ","
@@ -258,6 +260,7 @@ let rec eval env e =
   | Hom (a, b) -> V.Hom (eval env a, eval env b)
   | Prod (a, b) -> V.Prod (eval env a, eval env b)
   | Type -> V.Type
+  | Hole -> V.Hole (ref None)
 
 (** Infer the type of an expression. *)
 let rec infer k tenv env e =
@@ -339,10 +342,14 @@ let rec infer k tenv env e =
     check k tenv env b V.Obj;
     V.Obj
   | Type -> V.Type
+  | Hole -> failwith "TODO"
 
 and check k tenv env e a =
   let b = infer k tenv env e in
-  if not (V.eq k b a || (b = V.Obj && a = V.Type)) then failure e.pos "got %s but %s expected" (V.to_string b) (V.to_string a)
+  try
+    if not (b = V.Obj && a = V.Type) then V.unify k b a
+  with
+  | V.Unification -> failure e.pos "got %s but %s expected" (V.to_string b) (V.to_string a)
 
 let exec_command (tenv, env) p =
   match p with

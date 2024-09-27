@@ -9,6 +9,7 @@ type t =
   | Pi of t * (t -> t) (** a meta-arrow *)
   | Id of t * t
   | Type
+  | Hole of t option ref
   | Neutral of neutral
 
 (** A neutral value. *)
@@ -33,6 +34,12 @@ let rec to_string k ?(pa=false) t =
     Printf.sprintf "(%s : %s) => %s" (to_string k x) (to_string k a) (to_string (k+1) (b x)) |> pa
   | Id (a, b) -> Printf.sprintf "%s = %s" (to_string k a) (to_string k b) |> pa
   | Type -> "Type"
+  | Hole t ->
+    (
+      match !t with
+      | Some t -> Printf.sprintf "[%s]" (to_string k t)
+      | None -> "?"
+    )
   | Neutral n ->
     let rec aux = function
       | Coh -> "coh"
@@ -51,21 +58,23 @@ let rec homs l a =
   | b::l -> Hom (b, homs l a)
   | [] -> a
 
-(** Test for equality of values (default equality should never be used on values). *)
-let rec eq k t t' =
-  let rec neutral_eq k t t' =
+exception Unification
+
+(** Make sure that two values are equal (and raise [Unification] if this cannot be the case). *)
+let rec unify k t t' =
+  let rec neutral k t t' =
     match t, t' with
-    | App (t, u), App (t', u') -> neutral_eq k t t' && eq k u u'
-    | Var i, Var j -> i = j
-    | Coh, Coh -> true
-    | _ -> false
+    | App (t, u), App (t', u') -> neutral k t t'; unify k u u'
+    | Var i, Var j -> if i <> j then raise Unification
+    | Coh, Coh -> ()
+    | _ -> raise Unification
   in
   match t, t' with
-  | Neutral t, Neutral u -> neutral_eq k t u
-  | Hom (a, b), Hom (a' , b') -> eq k a a' && eq k b b'
-  | Prod (a, b), Prod (a' , b') -> eq k a a' && eq k b b'
-  | Abs t, Abs t' -> let x = var k in eq (k+1) (t x) (t' x)
-  | Pi (a, t), Pi (a', t') -> let x = var k in eq k a a' && eq (k+1) (t x) (t' x)
+  | Neutral t, Neutral u -> neutral k t u
+  | Hom (a, b), Hom (a' , b') -> unify k a a'; unify k b b'
+  | Prod (a, b), Prod (a' , b') -> unify k a a'; unify k b b'
+  | Abs t, Abs t' -> let x = var k in unify (k+1) (t x) (t' x)
+  | Pi (a, t), Pi (a', t') -> let x = var k in unify k a a'; unify (k+1) (t x) (t' x)
   | Obj, Obj
-  | Type, Type -> true
-  | _ -> false
+  | Type, Type -> ()
+  | _ -> raise Unification

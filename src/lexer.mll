@@ -26,6 +26,7 @@ rule token = parse
   | "×" { utf8 lexbuf; TIMES }
   | "=" { EQ }
   | ":=" { EQDEF }
+  | "?" { HOLE }
   | (['_''a'-'z''A'-'Z']['-''+''a'-'z''A'-'Z''0'-'9''_']*['\'''-''+''!']* as str) { IDENT str }
   | space+ { token lexbuf }
   | "#"[^'\n']* { token lexbuf }
