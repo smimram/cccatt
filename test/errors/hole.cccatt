@@ -1,0 +1,11 @@
+coh ap (a b : .) (t : a → b) (u : a) : b
+coh refl (a : .) (x : a) : x = x
+coh I (a : .) : a → a
+
+# TODO: find a decent test for holes...
+
+# let test (a : .) := ap _ _ (I _) (refl _ _)
+
+# let test (a : .) := ap _ _ (I _) (refl _ _)
+
+fail...

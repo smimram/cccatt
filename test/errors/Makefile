@@ -5,7 +5,7 @@ all: test
 test:
 	@for i in $(wildcard *.cccatt); do \
 	  if $(CCCATT) $$i ; then \
-	    echo "- passed: $$i"; \
+	    echo "- passed unexpectedly: $$i"; \
 	    exit 1; \
           else \
             echo "- failed as expected: $$i"; \
