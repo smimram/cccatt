@@ -113,4 +113,8 @@ coh pair-syms (a b : .) (x : a × b) : pair-sym a b x = pair-sym' a b x
 
 ## Curryfication
 
-# coh f (a b c : .) : a 
+coh curry (a b c : .) : (a * b -> c) -> (a -> b -> c)
+
+coh uncurry (a b c : .) : (a -> b -> c) -> (a * b -> c)
+
+# coh uncurry-curry (a b c : .) : comp (a * b -> c) (a -> b -> c) (a * b -> c) curry uncurry = I (a * b -> c)
