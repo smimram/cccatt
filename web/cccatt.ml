@@ -61,23 +61,12 @@ let run _ =
     button
       "Send"
       (fun () ->
-        let s = read () in
-        let s =
-          let s = ref s in
-          let remove_last () =
-            if !s = "" then false else
-              let c = !s.[String.length !s - 1] in
-              c = '\n' || c = '\r'
-          in
-          while remove_last () do
-            (* remove trailing \n *)
-            s := String.sub !s 0 (String.length !s - 1)
-          done;
-          !s
-        in
-        loop s;
-        textbox##focus;
-        doc##.documentElement##.scrollTop := doc##.body##.scrollHeight)
+         let s = read () |> String.trim in
+         print "\n";
+         loop s;
+         print "\n";
+         textbox##focus;
+         doc##.documentElement##.scrollTop := doc##.body##.scrollHeight)
   in
   b##.id := Js.string "send";
   Dom.appendChild top b;

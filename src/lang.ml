@@ -362,11 +362,11 @@ let exec_command (tenv, env) p =
     let v = eval env e in
     let tenv = (x,a)::tenv in
     let env = (x,v)::env in
-    printf "* defined %s : %s\n%!" x (V.to_string a);
+    printf "=^.^= defined %s : %s\n%!" x (V.to_string a);
     tenv, env
   | Check e ->
     let a = infer 0 tenv env e in
-    printf "* check %s : %s\n%!" (Pos.to_string e.pos) (V.to_string a);
+    printf "=^.^= check %s : %s\n%!" (Pos.to_string e.pos) (V.to_string a);
     tenv, env
   | NCoh (l, a) ->
     check 0 tenv env (pis l a) V.Type;
