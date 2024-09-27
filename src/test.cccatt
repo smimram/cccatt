@@ -23,7 +23,7 @@ ncoh (a b : *) : b → b → a → a
 
 ncoh (a : *) (x y : a) : x = y
 
-ncoh (a b : *) (f g : a -> b) : f = g
+ncoh (a b : *) (f g : a → b) : f = g
 
 ## Useful stuff
 
@@ -55,9 +55,13 @@ coh sym (a : *) (x y : a) (p : x = y) : y = x
 
 coh trans (a : *) (x y z : a) (p : x = y) (q : y = z) : x = z
 
-coh ap-cong (a b : *) (t t' : a -> b) (u u' : a) (p : t = t') (q : u = u') : ap a b t u = ap a b t' u'
+coh ap-cong (a b : *) (t t' : a → b) (u u' : a) (p : t = t') (q : u = u') : ap a b t u = ap a b t' u'
 
 coh ap-I (a : *) (x : a) : ap a a (I a) x = x
+
+## Products
+
+# coh ×-sym (a : *) (a b : *) : a × b = b × a
 
 ## Curryfication
 
