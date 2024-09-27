@@ -20,6 +20,8 @@ and neutral =
 
 let var k = Neutral (Var k)
 
+let hole () = Hole (ref None)
+
 let rec to_string k ?(pa=false) t =
   let pa s = if pa then "(" ^ s ^ ")" else s in
   match t with
@@ -38,7 +40,7 @@ let rec to_string k ?(pa=false) t =
     (
       match !t with
       | Some t -> Printf.sprintf "[%s]" (to_string k t)
-      | None -> "?"
+      | None -> "_"
     )
   | Neutral n ->
     let rec aux = function
@@ -77,4 +79,8 @@ let rec unify k t t' =
   | Pi (a, t), Pi (a', t') -> let x = var k in unify k a a'; unify (k+1) (t x) (t' x)
   | Obj, Obj
   | Type, Type -> ()
+  | Hole { contents = Some t }, _ -> unify k t t'
+  | _, Hole { contents = Some t'} -> unify k t t'
+  | Hole x, t
+  | t, Hole x -> x := Some t
   | _ -> raise Unification

@@ -57,6 +57,10 @@ let id := I
 
 let id (a : .) (x : a) := ap a a (I a) x
 
+## Testing holes
+
+let id (a : .) (x : a) := ap _ _ (I _) x
+
 ## Testing identities
 
 coh refl (a : .) (x : a) : x = x

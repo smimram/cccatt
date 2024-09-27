@@ -342,7 +342,7 @@ let rec infer k tenv env e =
     check k tenv env b V.Obj;
     V.Obj
   | Type -> V.Type
-  | Hole -> failwith "TODO"
+  | Hole -> V.hole ()
 
 and check k tenv env e a =
   let b = infer k tenv env e in

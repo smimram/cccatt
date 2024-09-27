@@ -60,15 +60,20 @@ aexpr:
   | sexpr { $1 }
 
 /* Simple expression */
- sexpr:
+sexpr:
   | OBJ { mk Obj }
   | IDENT { mk (Var $1) }
+  | HOLE { mk Hole }
   | LPAR expr RPAR { $2 }
 
 args:
   | LPAR idents COL expr RPAR args { (List.map (fun x -> x, $4) $2)@$6 }
   | { [] }
 
+ident:
+  | HOLE { "_" }
+  | IDENT { $1 }
+
 idents:
-  | IDENT { [$1] }
-  | IDENT idents { $1::$2 }
+  | ident { [$1] }
+  | ident idents { $1::$2 }
