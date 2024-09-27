@@ -8,3 +8,7 @@ let error ?pos e =
     | Some pos -> Pos.to_string pos ^ ": "
   in
   Printf.ksprintf (fun s -> Printf.printf "[EE]: %s%s.\n%!" pos s; exit 1) e
+
+let print_fun = ref print_string
+
+let printf fmt = Printf.ksprintf (fun s -> !print_fun s) fmt

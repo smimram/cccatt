@@ -1,4 +1,5 @@
 open Extlib
+open Common
 
 module V = Value
 
@@ -75,7 +76,7 @@ let rec pis ?pos l t =
 
 (** Check whether a type is a pasting scheme. *)
 let check_ps a =
-  (* Printf.printf "check_ps %s\n%!" (to_string a); *)
+  (* printf "check_ps %s\n%!" (to_string a); *)
   let rec target a =
     match a.desc with
     | Var x -> x
@@ -113,7 +114,7 @@ let check_ps a =
 
 (** Whether a type in a context is a pasting scheme. *)
 let check_ps l a =
-  (* Printf.printf "**** check_ps: %s\n%!" (to_string (pis l a)); *)
+  (* printf "**** check_ps: %s\n%!" (to_string (pis l a)); *)
   (* Remove variable declarations from the context. *)
   let vars, l =
     let split_vars l =
@@ -161,7 +162,7 @@ let check_ps l a =
         assert (not (has_fv x t));
         let t = rewrite rw t in
         let rw = List.map (fun (y,u) -> y, rewrite [x,t] u) rw in
-        (* Printf.printf "rewrite: %s -> %s\n%!" x (to_string t); *)
+        (* printf "rewrite: %s -> %s\n%!" x (to_string t); *)
         aux ((x,t)::rw) l
       | (_, {desc = Id _; pos})::_ -> failure pos "could not eliminate identity"
       | (x, a)::l ->
@@ -171,13 +172,13 @@ let check_ps l a =
       | [] -> rw, []
     in
     let rw, l = aux [] l in
-    (* Printf.printf "rw: %s\n%!" (List.map (fun (x,t) -> Printf.sprintf "%s -> %s" x (to_string t)) rw |> String.concat ", "); *)
+    (* printf "rw: %s\n%!" (List.map (fun (x,t) -> Printf.sprintf "%s -> %s" x (to_string t)) rw |> String.concat ", "); *)
     (* Remove rewritten variables. *)
     let l = List.filter (fun (x,_) -> not (List.mem_assoc x rw)) l in
     let vars = List.diff vars (List.map fst rw) in
     vars, l, rewrite rw a
   in
-  (* Printf.printf "**** after removal: %s\n%!" (to_string (pis l a)); *)
+  (* printf "**** after removal: %s\n%!" (to_string (pis l a)); *)
   (* Ensure that the declared variables are exactly the free variables *)
   let () =
     let a = homs (List.map snd l) a in
@@ -260,8 +261,8 @@ let rec eval env e =
 
 (** Infer the type of an expression. *)
 let rec infer k tenv env e =
-  (* Printf.printf "* infer %s\n%!" (to_string e); *)
-  (* Printf.printf "  env : %s\n%!" (string_of_context env); *)
+  (* printf "* infer %s\n%!" (to_string e); *)
+  (* printf "  env : %s\n%!" (string_of_context env); *)
   match e.desc with
   | Coh (l, a) ->
     check k tenv env (pis l a) V.Type;
@@ -318,8 +319,8 @@ let rec infer k tenv env e =
           in
           readback v
         in
-        (* Printf.printf "infered %s : %s\n%!" (to_string e) (to_string a'); *)
-        (* Printf.printf "env: %s\n%!" (string_of_context env); *)
+        (* printf "infered %s : %s\n%!" (to_string e) (to_string a'); *)
+        (* printf "env: %s\n%!" (string_of_context env); *)
         a := Some a';
         a'
     in
@@ -346,7 +347,7 @@ and check k tenv env e a =
 let exec_command (tenv, env) p =
   match p with
   | Let (x, a, e) ->
-    (* Printf.printf "*** let %s := %s\n%!" x (to_string e); *)
+    (* printf "*** let %s := %s\n%!" x (to_string e); *)
     (* print_endline "inferring"; *)
     let a =
       match a with
@@ -361,11 +362,11 @@ let exec_command (tenv, env) p =
     let v = eval env e in
     let tenv = (x,a)::tenv in
     let env = (x,v)::env in
-    Printf.printf "* defined %s : %s\n%!" x (V.to_string a);
+    printf "* defined %s : %s\n%!" x (V.to_string a);
     tenv, env
   | Check e ->
     let a = infer 0 tenv env e in
-    Printf.printf "* check %s : %s\n%!" (Pos.to_string e.pos) (V.to_string a);
+    printf "* check %s : %s\n%!" (Pos.to_string e.pos) (V.to_string a);
     tenv, env
   | NCoh (l, a) ->
     check 0 tenv env (pis l a) V.Type;
