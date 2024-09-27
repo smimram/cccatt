@@ -1,7 +1,15 @@
 (ocamllex (modules lexer))
 (ocamlyacc (modules parser))
 
+(library
+ (public_name cccatt)
+ (modules extlib common value lang parser lexer prover)
+ (wrapped false)
+)
+
 (executable
  (public_name cccatt)
  (name cccatt)
+ (libraries cccatt)
+ (modules cccatt)
 )
