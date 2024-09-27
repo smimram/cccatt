@@ -75,6 +75,9 @@ coh ap-I (a : .) (x : a) : ap a a (I a) x = x
 
 coh ap-comp (a b c : .) (f : a -> b) (g : b -> c) (x : a) : ap a c (comp a b c f g) x = ap b c g (ap a b f x)
 
+# I is derivable
+# coh SKK (a : .) : ap _ _ (ap _ _ (S _ _ _) (K _ _)) (K _ _) = I a
+
 ## Church numerals with pi-types
 
 let zero (a : .) (f : a -> a) (x : a) := x
