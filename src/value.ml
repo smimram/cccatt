@@ -5,6 +5,7 @@ type t =
   | Abs of (t -> t)
   | Obj
   | Hom of t * t
+  | Prod of t * t
   | Pi of t * (t -> t) (** a meta-arrow *)
   | Id of t * t
   | Type
@@ -26,6 +27,7 @@ let rec to_string k ?(pa=false) t =
     Printf.sprintf "fun %s -> %s" (to_string k x) (to_string (k+1) (t x)) |> pa
   | Obj -> "*"
   | Hom (a, b) -> Printf.sprintf "%s -> %s" (to_string ~pa:true k a) (to_string k b) |> pa
+  | Prod (a, b) -> Printf.sprintf "%s × %s" (to_string ~pa:true k a) (to_string k b) |> pa
   | Pi (a, b) ->
     let x = var k in
     Printf.sprintf "(%s : %s) => %s" (to_string k x) (to_string k a) (to_string (k+1) (b x)) |> pa
@@ -61,6 +63,7 @@ let rec eq k t t' =
   match t, t' with
   | Neutral t, Neutral u -> neutral_eq k t u
   | Hom (a, b), Hom (a' , b') -> eq k a a' && eq k b b'
+  | Prod (a, b), Prod (a' , b') -> eq k a a' && eq k b b'
   | Obj, Obj
   | Type, Type -> true
   | _ -> false

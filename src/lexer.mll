@@ -14,12 +14,13 @@ rule token = parse
   | "ncoh" { NCOH }
   | "let" { LET }
   | "check" { CHECK }
-  | "*" { STAR }
+  | "*" { OBJ }
   | "(" { LPAR }
   | ")" { RPAR }
   | ":" { COL }
   | "->" { HOM }
   | "→" { utf8 ~n:2 lexbuf; HOM }
+  | "×" { utf8 lexbuf; TIMES }
   | "=" { EQ }
   | ":=" { EQDEF }
   | (['_''a'-'z''A'-'Z']['-''+''a'-'z''A'-'Z''0'-'9''_']*['\'''-''+''!']* as str) { IDENT str }

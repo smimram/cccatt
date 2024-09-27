@@ -61,7 +61,9 @@ coh ap-I (a : *) (x : a) : ap a a (I a) x = x
 
 ## Products
 
-# coh ×-sym (a : *) (a b : *) : a × b = b × a
+coh fst (a : *) (a b : *) (_ : a × b) : a
+
+coh snd (a : *) (a b : *) (_ : a × b) : a
 
 ## Curryfication
 

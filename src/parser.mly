@@ -16,12 +16,13 @@ let abss ?pos l e =
 %}
 
 %token LET CHECK NCOH
-%token COH HOM EQ EQDEF STAR
+%token COH HOM EQ EQDEF OBJ TIMES
 %token LPAR RPAR COL
 %token <string> IDENT
 %token EOF
 
 %right HOM
+%right TIMES
 %right EQ
 
 %start prog
@@ -41,6 +42,7 @@ cmd:
 expr:
   | expr HOM expr { mk (Hom ($1, $3)) }
   | expr EQ expr { mk (Id (ref None, $1, $3)) }
+  | expr TIMES expr { mk (Prod ($1, $3)) }
   | aexpr { $1 }
 
 aexpr:
@@ -49,7 +51,7 @@ aexpr:
 
 /* Simple expression */
 sexpr:
-  | STAR { mk Obj }
+  | OBJ { mk Obj }
   | IDENT { mk (Var $1) }
   | LPAR expr RPAR { $2 }
 

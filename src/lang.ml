@@ -20,6 +20,7 @@ and desc =
   | Pi of string * t * t
   | Obj
   | Hom of t * t
+  | Prod of t * t
   | Id of (t option ref * t * t)
   | Type
 
@@ -34,7 +35,8 @@ let rec to_string e =
   | App (t, u) -> Printf.sprintf "%s %s" (to_string t) (to_string u)
   | Pi (x, a, t) -> Printf.sprintf "(%s : %s) => %s" x (to_string a) (to_string t)
   | Obj -> "*"
-  | Hom (t, u) -> Printf.sprintf "(%s -> %s)" (to_string t) (to_string u)
+  | Hom (a, b) -> Printf.sprintf "(%s -> %s)" (to_string a) (to_string b)
+  | Prod (a, b) -> Printf.sprintf "(%s × %s)" (to_string a) (to_string b)
   | Id (a, t, u) ->
     let a =
       match !a with
@@ -136,6 +138,7 @@ let check_ps l a =
           | None -> e
         )
       | Hom (a, b) -> mk (Hom (rewrite a, rewrite b))
+      | Prod (a, b) -> mk (Prod (rewrite a, rewrite b))
       | Id (a, t, u) -> mk (Id (Option.map rewrite !a |> ref, rewrite t, rewrite u))
       | Obj -> e
       | App (t, u) -> mk (App (rewrite t, rewrite u))
@@ -146,6 +149,7 @@ let check_ps l a =
       match e.desc with
       | Var y -> x = y
       | Hom (a, b) -> has_fv x a || has_fv x b
+      | Prod (a, b) -> has_fv x a || has_fv x b
       | Id (a, t, u) -> (Option.map (has_fv x) !a |> Option.value ~default:false) || has_fv x t || has_fv x u
       | Obj -> false
       | _ -> assert false
@@ -183,6 +187,7 @@ let check_ps l a =
         | Var x -> if not (List.mem x fv) then x::fv else fv
         | Obj -> fv
         | Hom (a, b) -> fv |> aux a |> aux b
+        | Prod (a, b) -> fv |> aux a |> aux b
         | Id (a, t, u) -> fv |> aux (Option.get !a) |> aux t |> aux u
         | App (t, u) -> fv |> aux t |> aux u
         | _ -> failwith (Printf.sprintf "TODO: fv handle %s" (to_string a))
@@ -198,8 +203,25 @@ let check_ps l a =
     | Id (a, _, _) -> Option.get !a
     | _ -> a
   in
-  let a = homs (List.map snd l) a in
-  check_ps a
+  (* Turn products into arrows. *)
+  let rec deproduct e =
+    match e.desc with
+    | Hom (a, b) ->
+      let aa = deproduct a in
+      let bb = deproduct b in
+      List.map (fun b -> homs ~pos:e.pos aa b) bb
+    | Prod (a, b) ->
+      (deproduct a)@(deproduct b)
+    | Var _
+    | Obj -> [e]
+    | _ -> failwith (Printf.sprintf "TODO: deproduct handle %s" (to_string e))
+  in
+  let aa =
+    let l = List.map snd l in
+    let l = List.map deproduct l |> List.flatten in
+    List.map (homs l) (deproduct a)
+  in
+  List.iter check_ps aa
 
 (** Evaluate an expression to a value. *)
 let rec eval env e =
@@ -233,6 +255,7 @@ let rec eval env e =
     V.Id (t, u)
   | Obj -> V.Obj
   | Hom (a, b) -> V.Hom (eval env a, eval env b)
+  | Prod (a, b) -> V.Prod (eval env a, eval env b)
   | Type -> V.Type
 
 (** Infer the type of an expression. *)
@@ -306,6 +329,10 @@ let rec infer k tenv env e =
     V.Type
   | Obj -> V.Type
   | Hom (a, b) ->
+    check k tenv env a V.Obj;
+    check k tenv env b V.Obj;
+    V.Obj
+  | Prod (a, b) ->
     check k tenv env a V.Obj;
     check k tenv env b V.Obj;
     V.Obj
