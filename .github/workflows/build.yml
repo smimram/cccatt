@@ -20,7 +20,7 @@ jobs:
       run: |
         mkdir website
         cp -r _build/default/_doc/_html website/doc
-        cp _build/default/web/*.js _build/default/web/*.html website
+        cp _build/default/web/*.html _build/default/web/*.js _build/default/web/*.css website
     - name: Upload website artifact
       uses: actions/upload-pages-artifact@v2
       with:
