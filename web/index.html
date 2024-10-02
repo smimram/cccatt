@@ -27,14 +27,12 @@
 <h2>Examples</h2>
     <p>
       If you don't feel inspired, here is a sample session:
-      <pre>
-coh K (a b : .) : a -> b -> a
+    </p>
+      <pre>coh K (a b : .) : a -> b -> a
 
 coh ap (a b : .) (t : a -> b) (u : a) : b
 
-coh ap-K (a b : .) (x : a) (y : b) : ap b a (ap a (b -> a) (K a b) x) y = x
-      </pre>
-    </p>
+coh ap-K (a b : .) (x : a) (y : b) : ap b a (ap a (b -> a) (K a b) x) y = x </pre>
 
     <h2>More details</h2>
     <ul>

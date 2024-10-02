@@ -1,43 +1,45 @@
 body {
-    margin: 2% 10%;
-    font-family: sans-serif;
-    font-size: 11pt;
+  margin: 2% 10%;
+  font-family: sans-serif;
+  font-size: 11pt;
 }
 
 a {
-    color: darkblue;
-    text-decoration: none;
+  color: darkblue;
+  text-decoration: none;
 }
 
 a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 h1 {
-    text-align: center;
+  text-align: center;
 }
 
-#send {
-    visibility: hidden;
-}
-
-#toplevel {
-    text-align: center;
+#areas {
+  text-align: center;
 }
 
 textarea {
-    color: lightgreen;
-    background-color: black;
-    width: 100%;
-    font-size: 11pt;
-    font-weight: bold;
+  font-size: 11pt;
+}
+
+#input {
+  width: 45%;
+}
+
+#output{
+  width: 45%;
+  /* color: #333; */
+  /* font-weight: bold; */
 }
 
 pre {
-    color: darkred;
-    background: whitesmoke;
-    font-size: 11pt;
-    width: 100%;
-    overflow-x: scroll;
-    overflow-y: visible;
+  color: darkred;
+  background: whitesmoke;
+  font-size: 11pt;
+  width: 100%;
+  overflow-x: scroll;
+  overflow-y: visible;
 }

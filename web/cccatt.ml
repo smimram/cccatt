@@ -24,56 +24,55 @@ let loop s =
 let run _ =
   let top =
     Js.Opt.get
-      (doc##getElementById(Js.string "toplevel"))
+      (doc##getElementById (Js.string "toplevel"))
       (fun () -> assert false)
   in
 
-  let output = Html.createDiv doc in
+  let areas = Html.createDiv doc in
+  Dom.appendChild top areas;
+
+  let input = Html.createTextarea doc in
+  input##.id := Js.string "input";
+  input##.cols := 80;
+  input##.rows := 25;
+  input##.placeholder := Js.string "Write CCCaTT code here...";
+  Dom.appendChild areas input;
+
+  let output = Html.createTextarea doc in
   output##.id := Js.string "output";
-  output##.style##.whiteSpace := Js.string "pre";
-  Dom.appendChild top output;
+  output##.cols := 80;
+  output##.rows := 25;
+  output##.placeholder := Js.string "Output";
+  output##.readOnly := Js.bool true;
+  Dom.appendChild areas output;
 
-  let textbox = Html.createTextarea doc in
-  textbox##.id := Js.string "input";
-  textbox##.cols := 80;
-  textbox##.rows := 25;
-  (* textbox##value := Js.string "# "; *)
-
-  (* Current offset in textbox. *)
-  let tb_off = ref 0 in
   let print s =
-    let s = Js.to_string textbox##.value ^ s in
-    tb_off := String.length s;
-    textbox##.value := Js.string s;
-    (* Scroll down. *)
-    Js.Unsafe.set textbox (Js.string "scrollTop") (Js.Unsafe.get textbox (Js.string "scrollHeight"))
+    let s = Js.to_string output##.value ^ s in
+    output##.value := Js.string s
   in
   let read () =
-    let s = Js.to_string textbox##.value in
-    let cmd = String.sub s !tb_off (String.length s - !tb_off) in
-    tb_off := String.length s;
-    cmd
+    Js.to_string input##.value
   in
 
   Common.print_fun := print;
 
-  let b =
+  Dom.appendChild top (Html.createBr doc);
+
+  let send =
     button
       "Send"
       (fun () ->
          let s = read () |> String.trim in
-         print "\n";
+         output##.value := Js.string "";
          loop s;
-         print "\n";
-         textbox##focus;
-         doc##.documentElement##.scrollTop := doc##.body##.scrollHeight)
+         input##focus;
+         doc##.documentElement##.scrollTop := doc##.body##.scrollHeight
+      )
   in
-  b##.id := Js.string "send";
-  Dom.appendChild top b;
-  Dom.appendChild top textbox;
-  Dom.appendChild top (Html.createBr doc);
-  textbox##focus;
-  textbox##select;
+  send##.id := Js.string "send";
+  Dom.appendChild top send;
+  input##focus;
+  input##select;
 
   ignore (Js.Unsafe.eval_string "init();");
 
