@@ -1,5 +1,5 @@
 %{
-(** Parser for the CCaTT language. *))
+(** Parser for the CCaTT language. *)
 
 open Lang
 
