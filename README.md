@@ -1,6 +1,8 @@
 # CCCaTT
 
-A type theory for unbiased cartesian closed categories.
+A type theory for **unbiased cartesian closed categories**.
+
+The theory should come up soon.
 
 ## Emacs mode
 
