@@ -1,4 +1,4 @@
-(** Values are evaluated expressions. *)
+(** Values (i.e. evaluated expressions). *)
 
 (** A value. *)
 type t =

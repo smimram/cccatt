@@ -1,3 +1,5 @@
+(** The CCaTT language. *)
+
 open Extlib
 open Common
 

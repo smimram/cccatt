@@ -1,4 +1,6 @@
 %{
+(** Parser for the CCaTT language. *))
+
 open Lang
 
 let defpos () = Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()

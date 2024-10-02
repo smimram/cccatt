@@ -1,3 +1,5 @@
+(** Prover. *)
+
 (** Parse a string. *)
 let parse s =
   let lexbuf = Lexing.from_string s in

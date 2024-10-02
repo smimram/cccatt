@@ -1,3 +1,6 @@
+(** Our own extension of the standard library. *)
+
+(** Lists. *)
 module List = struct
   include List
 
@@ -20,7 +23,7 @@ module List = struct
     List.filter (fun x -> not (List.mem x l2)) l1
 end
 
-(** Position in source code. *)
+(** Positions in the source code. *)
 module Pos = struct
   type t = Lexing.position * Lexing.position
 
