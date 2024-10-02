@@ -62,11 +62,8 @@ let run _ =
     button
       "Send"
       (fun () ->
-         let s = read () |> String.trim in
          output##.value := Js.string "";
-         loop s;
-         input##focus;
-         doc##.documentElement##.scrollTop := doc##.body##.scrollHeight
+         read () |> String.trim |> loop
       )
   in
   send##.id := Js.string "send";
