@@ -316,7 +316,7 @@ let rec infer k tenv env e =
         let a' =
           let mk = mk ~pos:e.pos in
           let rec readback = function
-            | V.Meta { contents = Some a } -> readback a
+            | V.Meta { value = Some a; _ } -> readback a
             | V.Obj -> mk Obj
             | V.Neutral (V.Var _) as var -> mk (Var (List.assoc' var env))
             | V.Hom (a, b) -> mk (Hom (readback a, readback b))
@@ -345,9 +345,10 @@ let rec infer k tenv env e =
     check k tenv env b V.Obj;
     V.Obj
   | Type -> V.Type
-  | Hole -> V.metavariable ()
+  | Hole -> V.metavariable ~pos:e.pos ()
 
 and check k tenv env e a =
+  (* printf "*** check %s : %s\n%!" (to_string e) (V.to_string a); *)
   let b = infer k tenv env e in
   try
     if not (b = V.Obj && a = V.Type) then V.unify k b a

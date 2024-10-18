@@ -83,7 +83,7 @@ coh ap-comp (a b c : .) (f : a -> b) (g : b -> c) (x : a) : ap a c (comp a b c f
 
 coh ax3 (a b : .) : ap (a -> b -> b) ((a -> b) -> a -> b) (S a b b) (ap (b -> b) (a -> b -> b) (K (b -> b) a) (I b)) = I (a -> b)
 
-coh ax3 (a b : .) : ap (a -> b -> b) ((a -> b) -> a -> b) (S a b b) (ap (b -> b) (a -> b -> b) (K (b -> b) a) (I b)) = I (a -> b)
+# coh ax3 (a b : .) : ap (a -> b -> b) ((a -> b) -> a -> b) (S a b b) (ap (b -> b) (a -> b -> b) (K (b -> b) a) (I b)) = I _
 
 # coh ax4 (a b c : .) : ap
 
