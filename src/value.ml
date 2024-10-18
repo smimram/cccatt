@@ -9,7 +9,7 @@ type t =
   | Pi of t * (t -> t) (** a meta-arrow *)
   | Id of t * t
   | Type
-  | Hole of t option ref
+  | Meta of t option ref (** a metavariable *)
   | Neutral of neutral
 
 (** A neutral value. *)
@@ -20,7 +20,7 @@ and neutral =
 
 let var k = Neutral (Var k)
 
-let hole () = Hole (ref None)
+let metavariable () = Meta (ref None)
 
 let rec to_string k ?(pa=false) t =
   let pa s = if pa then "(" ^ s ^ ")" else s in
@@ -36,7 +36,7 @@ let rec to_string k ?(pa=false) t =
     Printf.sprintf "(%s : %s) => %s" (to_string k x) (to_string k a) (to_string (k+1) (b x)) |> pa
   | Id (a, b) -> Printf.sprintf "%s = %s" (to_string k a) (to_string k b) |> pa
   | Type -> "Type"
-  | Hole t ->
+  | Meta t ->
     (
       match !t with
       | Some t -> Printf.sprintf "[%s]" (to_string k t)
@@ -79,8 +79,8 @@ let rec unify k t t' =
   | Pi (a, t), Pi (a', t') -> let x = var k in unify k a a'; unify (k+1) (t x) (t' x)
   | Obj, Obj
   | Type, Type -> ()
-  | Hole { contents = Some t }, _ -> unify k t t'
-  | _, Hole { contents = Some t'} -> unify k t t'
-  | Hole x, t
-  | t, Hole x -> x := Some t
+  | Meta { contents = Some t }, _ -> unify k t t'
+  | _, Meta { contents = Some t'} -> unify k t t'
+  | Meta x, t
+  | t, Meta x -> x := Some t
   | _ -> raise Unification

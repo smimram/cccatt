@@ -262,7 +262,7 @@ let rec eval env e =
   | Hom (a, b) -> V.Hom (eval env a, eval env b)
   | Prod (a, b) -> V.Prod (eval env a, eval env b)
   | Type -> V.Type
-  | Hole -> V.Hole (ref None)
+  | Hole -> V.metavariable ()
 
 (** Infer the type of an expression. *)
 let rec infer k tenv env e =
@@ -344,7 +344,7 @@ let rec infer k tenv env e =
     check k tenv env b V.Obj;
     V.Obj
   | Type -> V.Type
-  | Hole -> V.hole ()
+  | Hole -> V.metavariable ()
 
 and check k tenv env e a =
   let b = infer k tenv env e in
