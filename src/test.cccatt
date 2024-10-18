@@ -77,7 +77,11 @@ coh ap-K (a b : .) (x : a) (y : b) : ap b a (ap a (b -> a) (K a b) x) y = x
 
 coh ap-comp (a b c : .) (f : a -> b) (g : b -> c) (x : a) : ap a c (comp a b c f g) x = ap b c g (ap a b f x)
 
-# I is derivable
+## Curry's identities
+
+coh ax3 (a b : .) : ap (a -> b -> b) ((a -> b) -> a -> b) (S a b b) (ap (b -> b) (a -> b -> b) (K (b -> b) a) (I b)) = I (a -> b)
+
+# # I is derivable
 # coh SKK (a : .) : ap _ _ (ap _ _ (S _ _ _) (K _ _)) (K _ _) = I a
 
 ## Church numerals with pi-types
