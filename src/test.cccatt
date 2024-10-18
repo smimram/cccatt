@@ -39,6 +39,8 @@ coh ap (a b : .) (t : a → b) (u : a) : b
 
 coh comp (a b c : .) (f : a → b) (g : b → c) : a → c
 
+coh comp' (a b c : .) : (a -> b) -> (b -> c) -> a -> c
+
 coh W (a b : .) : (a -> a -> b) -> (a -> b)
 
 coh C (a b c : .) : (a -> b -> c) -> b -> a -> c
@@ -100,7 +102,9 @@ let nat (a : .) := (a -> a) -> a -> a
 
 let zero (a : .) : nat a := K' (a -> a) a
 
-# let one (a : .) : nat a := ap 
+let one (a : .) : nat a := I (a -> a)
+
+let two (a : .) : nat a := ap ((a -> a) -> (a -> a) -> (a -> a)) ((a -> a) -> (a -> a)) (W (a -> a) (a -> a)) (comp' a a a)
 
 # let add (a : .) (m n : nat a) (f : a -> a) (x : a) := ap a a (ap (a -> a) (a -> a) m f) (ap a a (ap (a -> a) (a -> a) n f) x)
 
