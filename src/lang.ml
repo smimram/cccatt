@@ -316,6 +316,7 @@ let rec infer k tenv env e =
         let a' =
           let mk = mk ~pos:e.pos in
           let rec readback = function
+            | V.Meta { contents = Some a } -> readback a
             | V.Obj -> mk Obj
             | V.Neutral (V.Var _) as var -> mk (Var (List.assoc' var env))
             | V.Hom (a, b) -> mk (Hom (readback a, readback b))
