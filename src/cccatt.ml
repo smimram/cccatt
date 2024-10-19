@@ -18,4 +18,5 @@ let () =
       | Failure e -> e
       | e -> Printexc.to_string e
     in
-    Printf.printf "\nError: %s\n\n%s%!" e bt
+    Printf.printf "\nError: %s\n\n%s%!" e bt;
+    exit 1
