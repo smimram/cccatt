@@ -29,7 +29,9 @@ and neutral =
 
 let var k = Neutral (Var k)
 
-let metavariable ?pos () = Meta { pos; value = None }
+let metavariable ?pos () =
+  if pos <> None then printf "new metavariable at %s\n" (Pos.to_string (Option.get pos));
+  Meta { pos; value = None }
 
 let rec to_string k ?(pa=false) t =
   let pa s = if pa then "(" ^ s ^ ")" else s in
@@ -62,9 +64,9 @@ let rec to_string k ?(pa=false) t =
     aux n
 
 let rec has_metavariable = function
+  | Meta { value = None; _ } -> true
   | Obj
-  | Type
-  | Meta { value = None; _ } -> false
+  | Type -> false
   | Hom (a, b)
   | Prod (a, b)
   | Id (a, b) -> has_metavariable a || has_metavariable b
@@ -106,11 +108,10 @@ let rec unify k t t' =
   | Pi (a, t), Pi (a', t') -> let x = var k in unify k a a'; unify (k+1) (t x) (t' x)
   | Obj, Obj
   | Type, Type -> ()
-  | Meta { value = Some t; _ }, _ -> unify k t t'
-  | _, Meta { value = Some t'; _ } -> unify k t t'
+  | Meta { value = Some t; _ }, t' -> unify k t t'
+  | t, Meta { value = Some t'; _ } -> unify k t t'
   | Meta m, t
   | t, Meta m ->
-    if m.pos <> None && not (has_metavariable t) then
-      printf "... at %s, elaborated to %s\n" (Pos.to_string (Option.get m.pos)) (to_string t);
+    if m.pos <> None && not (has_metavariable t) then printf "... at %s, elaborated to %s\n" (Pos.to_string (Option.get m.pos)) (to_string t);
     m.value <- Some t
   | _ -> raise Unification

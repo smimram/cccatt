@@ -262,7 +262,7 @@ let rec eval env e =
   | Hom (a, b) -> V.Hom (eval env a, eval env b)
   | Prod (a, b) -> V.Prod (eval env a, eval env b)
   | Type -> V.Type
-  | Hole -> V.metavariable ()
+  | Hole -> V.metavariable ~pos:e.pos ()
 
 (** Infer the type of an expression. *)
 let rec infer k tenv env e =
@@ -345,7 +345,7 @@ let rec infer k tenv env e =
     check k tenv env b V.Obj;
     V.Obj
   | Type -> V.Type
-  | Hole -> V.metavariable ~pos:e.pos ()
+  | Hole -> V.metavariable ()
 
 and check k tenv env e a =
   (* printf "*** check %s : %s\n%!" (to_string e) (V.to_string a); *)
