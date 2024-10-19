@@ -25,7 +25,7 @@ and desc =
   | Hom of t * t
   | Prod of t * t
   | Id of (t option ref * t * t)
-  | Hole
+  | Hole of V.meta
   | Type
 
 and context = (string * t) list
@@ -48,7 +48,7 @@ let rec to_string e =
       | None -> ""
     in
     Printf.sprintf "(%s =%s %s)" (to_string t) a (to_string u)
-  | Hole -> "?"
+  | Hole _ -> "_"
   | Type -> "Type"
 
 let string_of_context env = List.map (fun (x,v) -> x ^ " = " ^ V.to_string v) env |> String.concat ","
@@ -262,7 +262,7 @@ let rec eval env e =
   | Hom (a, b) -> V.Hom (eval env a, eval env b)
   | Prod (a, b) -> V.Prod (eval env a, eval env b)
   | Type -> V.Type
-  | Hole -> V.metavariable ~pos:e.pos ()
+  | Hole m -> V.Meta m
 
 (** Infer the type of an expression. *)
 let rec infer k tenv env e =
@@ -345,7 +345,7 @@ let rec infer k tenv env e =
     check k tenv env b V.Obj;
     V.Obj
   | Type -> V.Type
-  | Hole -> V.metavariable ()
+  | Hole _ -> V.metavariable ()
 
 and check k tenv env e a =
   (* printf "*** check %s : %s\n%!" (to_string e) (V.to_string a); *)

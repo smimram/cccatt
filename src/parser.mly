@@ -65,7 +65,7 @@ aexpr:
 sexpr:
   | OBJ { mk Obj }
   | IDENT { mk (Var $1) }
-  | HOLE { mk Hole }
+  | HOLE { mk (Hole (V.meta ~pos:(defpos ()) ())) }
   | LPAR expr RPAR { $2 }
 
 args:

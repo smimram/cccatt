@@ -29,9 +29,9 @@ and neutral =
 
 let var k = Neutral (Var k)
 
-let metavariable ?pos () =
-  (* if pos <> None then printf "new metavariable at %s\n" (Pos.to_string (Option.get pos)); *)
-  Meta { pos; value = None }
+let meta ?pos () = { pos; value = None }
+
+let metavariable ?pos () = Meta (meta ?pos ())
 
 let rec to_string k ?(pa=false) t =
   let pa s = if pa then "(" ^ s ^ ")" else s in
