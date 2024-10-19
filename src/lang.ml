@@ -364,6 +364,7 @@ let exec_command (tenv, env) p =
       match a with
       | Some a ->
         let a = eval env a in
+        V.print_metavariables_elaboration a;
         check 0 tenv env e a;
         a
       | None ->
@@ -371,6 +372,7 @@ let exec_command (tenv, env) p =
     in
     (* print_endline "checking"; *)
     let v = eval env e in
+    V.print_metavariables_elaboration v;
     let tenv = (x,a)::tenv in
     let env = (x,v)::env in
     printf "=^.^= defined %s : %s\n%!" x (V.to_string a);

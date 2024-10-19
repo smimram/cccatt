@@ -30,7 +30,7 @@ and neutral =
 let var k = Neutral (Var k)
 
 let metavariable ?pos () =
-  if pos <> None then printf "new metavariable at %s\n" (Pos.to_string (Option.get pos));
+  (* if pos <> None then printf "new metavariable at %s\n" (Pos.to_string (Option.get pos)); *)
   Meta { pos; value = None }
 
 let rec to_string k ?(pa=false) t =
@@ -63,26 +63,31 @@ let rec to_string k ?(pa=false) t =
     in
     aux n
 
-let rec has_metavariable = function
-  | Meta { value = None; _ } -> true
+let rec metavariables = function
+  | Meta m -> [m]
   | Obj
-  | Type -> false
+  | Type -> []
   | Hom (a, b)
   | Prod (a, b)
-  | Id (a, b) -> has_metavariable a || has_metavariable b
-  | Abs t -> has_metavariable (t (var 0))
-  | Pi (a, b) -> has_metavariable a || has_metavariable (b (var 0))
-  | Meta { value = Some a; _ } -> has_metavariable a
+  | Id (a, b) -> metavariables a @ metavariables b
+  | Abs t -> metavariables (t (var 0))
+  | Pi (a, b) -> metavariables a @ metavariables (b (var 0))
   | Neutral n ->
     let rec aux = function
       | Coh
-      | Var _ -> false
-      | App (n, a) -> aux n || has_metavariable a
+      | Var _ -> []
+      | App (n, a) -> aux n @ metavariables a
     in
     aux n
 
 (** String representation of a value. *)
 let to_string ?(k=0) = to_string k
+
+let print_metavariables_elaboration t =
+  metavariables t |> List.iter
+    (fun m ->
+       if m.pos <> None then printf "... at %s, elaborated to %s\n" (Pos.to_string (Option.get m.pos)) (to_string t)
+    )
 
 let rec homs l a =
   match l with
@@ -111,7 +116,5 @@ let rec unify k t t' =
   | Meta { value = Some t; _ }, t' -> unify k t t'
   | t, Meta { value = Some t'; _ } -> unify k t t'
   | Meta m, t
-  | t, Meta m ->
-    if m.pos <> None && not (has_metavariable t) then printf "... at %s, elaborated to %s\n" (Pos.to_string (Option.get m.pos)) (to_string t);
-    m.value <- Some t
+  | t, Meta m -> m.value <- Some t
   | _ -> raise Unification
