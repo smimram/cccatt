@@ -8,4 +8,14 @@ let () =
     (fun s -> files := s::!files)
     usage;
   if !files = [] then (print_endline usage; exit 0);
+  try
   List.fold_left (fun envs f -> Lang.exec envs (Prover.parse_file f)) ([], []) !files |> ignore
+  with
+  | e ->
+    let bt = Printexc.get_raw_backtrace () |> Printexc.raw_backtrace_to_string in
+    let e =
+      match e with
+      | Failure e -> e
+      | e -> Printexc.to_string e
+    in
+    Printf.printf "\nError: %s\n\n%s%!" e bt
