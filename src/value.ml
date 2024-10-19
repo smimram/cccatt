@@ -86,7 +86,12 @@ let to_string ?(k=0) = to_string k
 let print_metavariables_elaboration t =
   metavariables t |> List.iter
     (fun m ->
-       if m.pos <> None then printf "... at %s, elaborated to %s\n" (Pos.to_string (Option.get m.pos)) (to_string t)
+       let v =
+         match m.value with
+         | Some v -> to_string v
+         | None -> "?"
+       in
+       if m.pos <> None then printf "... at %s, elaborated to %s\n" (Pos.to_string (Option.get m.pos)) v
     )
 
 let rec homs l a =
