@@ -16,6 +16,7 @@
 
 (rule
  (alias runtest)
+ (deps test.cccatt curry.cccatt)
  (action
    (progn
     (run ./cccatt.exe test.cccatt)
