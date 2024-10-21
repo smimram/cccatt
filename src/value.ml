@@ -18,6 +18,7 @@ type t =
 and meta =
   {
     pos : Pos.t option;
+    id : int;
     mutable value : t option;
   }
 
@@ -29,7 +30,12 @@ and neutral =
 
 let var k = Neutral (Var k)
 
-let meta ?pos () = { pos; value = None }
+let meta =
+  let id = ref 0 in
+  fun ?pos () ->
+    incr id;
+    let id = !id in
+    { pos; id; value = None }
 
 let metavariable ?pos () = Meta (meta ?pos ())
 
@@ -51,7 +57,7 @@ let rec to_string k ?(pa=false) t =
     (
       match m.value with
       | Some t -> Printf.sprintf "[%s]" (to_string k t)
-      | None -> "_"
+      | None -> Printf.sprintf "?%d" m.id
     )
   | Neutral n ->
     let rec aux = function
@@ -91,7 +97,7 @@ let print_metavariables_elaboration t =
          | Some v -> to_string v
          | None -> "?"
        in
-       if m.pos <> None then printf "... at %s, elaborated to %s\n" (Pos.to_string (Option.get m.pos)) v
+       if m.pos <> None then printf "... at %s, ?%d elaborated to %s\n" (Pos.to_string (Option.get m.pos)) m.id v
     )
 
 let rec homs l a =
@@ -103,6 +109,7 @@ exception Unification
 
 (** Make sure that two values are equal (and raise [Unification] if this cannot be the case). *)
 let rec unify k t t' =
+  (* Printf.printf "unify %s with %s\n" (to_string t) (to_string t'); *)
   let rec neutral k t t' =
     match t, t' with
     | App (t, u), App (t', u') -> neutral k t t'; unify k u u'
@@ -121,5 +128,7 @@ let rec unify k t t' =
   | Meta { value = Some t; _ }, t' -> unify k t t'
   | t, Meta { value = Some t'; _ } -> unify k t t'
   | Meta m, t
-  | t, Meta m -> m.value <- Some t
+  | t, Meta m ->
+    (* printf "... ?%d becomes %s\n" m.id (to_string t); *)
+    m.value <- Some t
   | _ -> raise Unification

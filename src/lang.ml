@@ -233,6 +233,7 @@ let check_ps l a =
 
 (** Evaluate an expression to a value. *)
 let rec eval env e =
+  (* Printf.printf "* eval: %s\n" (to_string e); *)
   match e.desc with
   | Coh (l,_) ->
     let rec aux t = function
@@ -262,7 +263,10 @@ let rec eval env e =
     let u = eval env u in
     V.Id (t, u)
   | Obj -> V.Obj
-  | Hom (a, b) -> V.Hom (eval env a, eval env b)
+  | Hom (a, b) ->
+    (* Printf.printf "Hom : %s / %s\n%!" (to_string a) (to_string b); *)
+    (* Printf.printf "env : %s\n" (string_of_context env); *)
+    V.Hom (eval env a, eval env b)
   | Prod (a, b) -> V.Prod (eval env a, eval env b)
   | Type -> V.Type
   | Hole (m, _) -> V.Meta m
@@ -270,6 +274,7 @@ let rec eval env e =
 (** Infer the type of an expression. *)
 let rec infer k tenv env e =
   (* printf "* infer %s\n%!" (to_string e); *)
+  (* printf "  tenv : %s\n\n%!" (string_of_context tenv); *)
   (* printf "  env : %s\n%!" (string_of_context env); *)
   match e.desc with
   | Coh (l, a) ->
@@ -290,10 +295,13 @@ let rec infer k tenv env e =
     )
   | Abs (x,a,t) ->
     check k tenv env a V.Type;
+    (* Printf.printf "   started with %s : %s\n%!" x (to_string a); *)
     let a = eval env a in
+    (* Printf.printf "   type evaluates to %s\n%!" (V.to_string a); *)
     let _ =
       let x' = V.var k in
-      infer (k+1) ((x, a)::tenv) ((x, x')::env) t
+      (* Printf.printf "   *** add %s : %s\n" x (V.to_string a); *)
+      infer (k+1) ((x,a)::tenv) ((x,x')::env) t
     in
     let b v = infer k ((x,a)::tenv) ((x,v)::env) t in
     V.Pi (a, b)
@@ -351,7 +359,7 @@ let rec infer k tenv env e =
   | Hole (_, a) -> a
 
 and check k tenv env e a =
-  (* printf "*** check %s : %s\n%!" (to_string e) (V.to_string a); *)
+  (* printf "* check %s : %s\n%!" (to_string e) (V.to_string a); *)
   let b = infer k tenv env e in
   try
     if not (b = V.Obj && a = V.Type) then V.unify k b a
