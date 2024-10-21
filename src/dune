@@ -13,3 +13,13 @@
  (libraries cccatt)
  (modules cccatt)
 )
+
+(rule
+ (alias runtest)
+ (action
+   (progn
+    (run ./cccatt.exe test.cccatt)
+    (run ./cccatt.exe curry.cccatt)
+   )
+ )
+)

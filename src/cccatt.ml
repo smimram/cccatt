@@ -9,7 +9,11 @@ let () =
     usage;
   if !files = [] then (print_endline usage; exit 0);
   try
-  List.fold_left (fun envs f -> Lang.exec envs (Prover.parse_file f)) ([], []) !files |> ignore
+    List.fold_left
+      (fun envs f ->
+         Printf.printf "=^.^= checking %s\n" f;
+         Lang.exec envs (Prover.parse_file f)
+      ) ([], []) !files |> ignore
   with
   | e ->
     let bt = Printexc.get_raw_backtrace () |> Printexc.raw_backtrace_to_string in

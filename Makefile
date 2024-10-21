@@ -1,5 +1,5 @@
 all test:
-	make -C src $@
+	@dune runtest
 	make -C test $@
 
 .PHONY: test
