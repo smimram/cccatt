@@ -234,6 +234,7 @@ let check_ps l a =
 (** Evaluate an expression to a value. *)
 let rec eval env e =
   (* Printf.printf "* eval: %s\n" (to_string e); *)
+  (* Printf.printf "  env : %s\n" (string_of_context env); *)
   match e.desc with
   | Coh (l,_) ->
     let rec aux t = function

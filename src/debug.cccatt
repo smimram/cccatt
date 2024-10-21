@@ -1,0 +1,5 @@
+coh I (a : .) : a → a
+
+coh ap (a b : .) (t : a → b) (u : a) : b
+
+let ap' (a b : .) (x : a) (f : a -> b) := ap _ _ f x
