@@ -2,4 +2,4 @@
 
 coh ap (a b : .) (t : a → b) (u : a) : b
 
-let ap' (a b : .) (x : a) (f : a -> b) := ap _ _ f x
+let ap' (A B : .) (x : A) (f : A -> B) := ap _ _ f x

@@ -275,8 +275,9 @@ let rec eval env e =
 (** Infer the type of an expression. *)
 let rec infer k tenv env e =
   (* printf "* infer %s\n%!" (to_string e); *)
-  (* printf "  tenv : %s\n\n%!" (string_of_context tenv); *)
+  (* printf "  tenv : %s\n%!" (string_of_context tenv); *)
   (* printf "  env : %s\n%!" (string_of_context env); *)
+  (* printf "  %d\n" k; *)
   match e.desc with
   | Coh (l, a) ->
     check k tenv env (pis l a) V.Type;
@@ -300,8 +301,12 @@ let rec infer k tenv env e =
     let a = eval env a in
     (* Printf.printf "   type evaluates to %s\n%!" (V.to_string a); *)
     (* Printf.printf "   *** add %s : %s\n" x (V.to_string a); *)
+    (* Printf.printf "   *** add %s : %s\n" x (V.to_string (V.var k)); *)
     ignore (infer (k+1) ((x,a)::tenv) ((x, V.var k)::env) t);
-    let b v = infer k ((x,a)::tenv) ((x,v)::env) t in
+    let b v =
+      (* We need (k+1) here because the variable generated on the above line might propagate with metavariables... *)
+      infer (k+1) ((x,a)::tenv) ((x,v)::env) t
+    in
     V.Pi (a, b)
   | App (t, u) ->
     (
