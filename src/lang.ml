@@ -299,11 +299,8 @@ let rec infer k tenv env e =
     (* Printf.printf "   started with %s : %s\n%!" x (to_string a); *)
     let a = eval env a in
     (* Printf.printf "   type evaluates to %s\n%!" (V.to_string a); *)
-    let _ =
-      let x' = V.var k in
-      (* Printf.printf "   *** add %s : %s\n" x (V.to_string a); *)
-      infer (k+1) ((x,a)::tenv) ((x,x')::env) t
-    in
+    (* Printf.printf "   *** add %s : %s\n" x (V.to_string a); *)
+    ignore (infer (k+1) ((x,a)::tenv) ((x, V.var k)::env) t);
     let b v = infer k ((x,a)::tenv) ((x,v)::env) t in
     V.Pi (a, b)
   | App (t, u) ->
