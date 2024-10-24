@@ -1,4 +1,4 @@
-coh I (a : .) : a → a
+# coh I (a : .) : a → a
 
 coh ap (a b : .) (t : a → b) (u : a) : b
 

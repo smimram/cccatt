@@ -61,9 +61,9 @@ let id (a : .) (x : a) := ap a a (I a) x
 
 ## Testing holes
 
-# let id' (a : .) (x : a) := ap _ _ (I _) x
+let id' (a : .) (x : a) := ap _ _ (I _) x
 
-# let ap' (a b : .) (x : a) (f : a -> b) := ap _ _ f x
+let ap' (a b : .) (x : a) (f : a -> b) := ap _ _ f x
 
 ## Testing identities
 

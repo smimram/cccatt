@@ -128,8 +128,10 @@ let rec unify k t t' =
   | Type, Type -> ()
   | Meta { value = Some t; _ }, t' -> unify k t t'
   | t, Meta { value = Some t'; _ } -> unify k t t'
+  | Meta m, Meta m' when m == m' -> ()
   | Meta m, t
   | t, Meta m ->
+    assert (not (List.memq m (metavariables t)));
     (* printf "... ?%d becomes %s\n" m.id (to_string t); *)
     m.value <- Some t
   | _ -> raise Unification
