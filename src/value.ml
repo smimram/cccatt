@@ -30,15 +30,14 @@ and neutral =
 
 let var k = Neutral (Var k)
 
-let metavariable =
+let meta =
   let id = ref 0 in
   fun ?pos () ->
-    let m =
-      incr id;
-      let id = !id in
-      { pos; id; value = None }
-    in
-    Meta m
+    incr id;
+    let id = !id in
+    { pos; id; value = None }
+
+let metavariable ?pos () = Meta (meta ?pos ())
 
 let rec to_string k ?(pa=false) t =
   let pa s = if pa then "(" ^ s ^ ")" else s in

@@ -25,7 +25,7 @@ and desc =
   | Hom of t * t
   | Prod of t * t
   | Id of (t option ref * t * t)
-  | Hole of (V.t * V.t) option ref (** hole along with its type *)
+  | Hole of (V.meta * V.t) (** hole along with its type *)
   | Type
 
 and context = (string * t) list
@@ -59,12 +59,7 @@ let mk ?pos desc : t =
   { desc; pos }
 
 let hole ?pos () =
-  mk ?pos (Hole (ref None))
-
-let hole_content ?pos _env =
-  let t = V.metavariable ?pos () in
-  let a = V.metavariable () in
-  (t, a)
+  mk ?pos (Hole (V.meta ?pos (), V.metavariable ()))
 
 type command =
   | Let of string * t option * t (** declare a value *)
@@ -275,9 +270,7 @@ let rec eval env e =
     V.Hom (eval env a, eval env b)
   | Prod (a, b) -> V.Prod (eval env a, eval env b)
   | Type -> V.Type
-  | Hole h ->
-    let h = Option.get !h in
-    fst h
+  | Hole (m, _) -> V.Meta m
 
 (** Infer the type of an expression. *)
 let rec infer k tenv env e =
@@ -364,10 +357,7 @@ let rec infer k tenv env e =
     check k tenv env b V.Obj;
     V.Obj
   | Type -> V.Type
-  | Hole h ->
-    if !h = None then h := Some (hole_content ~pos:e.pos tenv);
-    let h = Option.get !h in
-    snd h
+  | Hole (_, a) -> a
 
 and check k tenv env e a =
   (* printf "* check %s : %s\n%!" (to_string e) (V.to_string a); *)
