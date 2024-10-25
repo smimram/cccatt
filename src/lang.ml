@@ -292,6 +292,13 @@ let rec subst x v e =
   | Meta { contents = None } -> e
   | Type -> e
 
+(*
+let subst x v e =
+  let e' = subst x v e in
+  Printf.printf "%s[%s/%s] = %s\n" (to_string e) (to_string v) x (to_string e');
+  e'
+*)
+   
 exception Unification
 
 (** Make sure that two values are equal (and raise [Unification] if this cannot be the case). *)
@@ -301,6 +308,7 @@ let rec unify t t' =
   | Hom (a, b), Hom (a', b') -> unify a a'; unify b b'
   | Obj, Obj -> ()
   | Type, Type -> ()
+  | Pi (x, a, b), Pi (x', a', b') -> unify a a'; unify b (subst x' (var x) b')
   | Hole (t, _), _ -> unify t t'
   | _, Hole (t', _) -> unify t t'
   | Meta { contents = Some t }, _ -> unify t t'
@@ -334,14 +342,18 @@ let rec eval env e =
       | Some v -> v
       | None -> failure e.pos "unexpected error: value for %s not found" x
     )
-  | Abs (x,a,e) -> mk (Abs (x, eval env a, eval ((x,var x)::env) e))
+  | Abs (x,a,e) ->
+    let x' = if List.mem_assoc x env then fresh_var_name () else x in
+    mk (Abs (x', eval env a, eval ((x,var x')::env) e))
   | App (t,u) ->
     (
       match (eval env t).desc with
       | Abs (x,_,t) -> subst x u t
       | _ -> assert false
     )
-  | Pi (x, a, b) -> mk (Pi (x, eval env a, eval ((x,var x)::env) b))
+  | Pi (x, a, b) ->
+    let x' = if List.mem_assoc x env then fresh_var_name () else x in
+    mk (Pi (x', eval env a, eval ((x,var x')::env) b))
   | Id (a, t, u) -> mk (Id (eval env a, eval env t, eval env u))
   | Obj -> mk Obj
   | Hom (a, b) -> mk (Hom (eval env a, eval env b))
@@ -355,10 +367,10 @@ let rec eval env e =
 
 (** Infer the type of an expression. *)
 let rec infer tenv env e =
-  (* printf "* infer %s\n\n%!" (to_string e); *)
+  (* printf "* infer %s\n%!" (to_string e); *)
   (* printf "  tenv : %s\n%!" (string_of_context tenv); *)
   (* printf "  env : %s\n%!" (string_of_context env); *)
-  (* printf "  %d\n" k; *)
+  (* printf "\n"; *)
   match e.desc with
   | Coh (l, a) ->
     check tenv env (pis l a) (mk Type);

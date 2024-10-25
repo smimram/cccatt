@@ -47,6 +47,8 @@ coh W (a b : .) : (a -> a -> b) -> (a -> b)
 
 coh C (a b c : .) : (a -> b -> c) -> b -> a -> c
 
+let test (a b : .) : b -> a -> b := K b a
+
 # this can be obtained directly or defined
 coh K' (a b : .) : a -> b -> b
 let K' (a b : .) : a -> b -> b := ap (b -> b) (a -> b -> b) (K (b -> b) a) (I b)
