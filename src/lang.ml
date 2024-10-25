@@ -32,7 +32,7 @@ and context = (string * t) list
 (** String representation of an expression. This should mostly be useful for debugging (we want to print values). *)
 let rec to_string e =
   match e.desc with
-  | Coh _ -> "coh"
+  | Coh (l, a) -> Printf.sprintf "coh[%s|%s]" (List.map (fun (x,a) -> Printf.sprintf "%s:%s" x (to_string a)) l |> String.concat ",") (to_string a)
   | Var x -> x
   | Abs (x, a, t) -> Printf.sprintf "fun (%s : %s) => %s" x (to_string a) (to_string t)
   | App (t, u) -> Printf.sprintf "%s %s" (to_string t) (to_string u)
