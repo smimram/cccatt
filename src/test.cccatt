@@ -35,8 +35,6 @@ coh S (a b c : .) : (a → b → c) → (a → b) → a → c
 
 coh ap (a b : .) (t : a → b) (u : a) : b
 
-# let id (a : .) (x : a) := ap a a (I a) x
-
 coh comp (a b c : .) (f : a → b) (g : b → c) : a → c
 
 coh B (a b c : .) : (b -> c) -> (a -> b) -> a -> c
