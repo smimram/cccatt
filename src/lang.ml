@@ -30,18 +30,19 @@ and desc =
 and context = (string * t) list
 
 (** String representation of an expression. This should mostly be useful for debugging (we want to print values). *)
-let rec to_string e =
+let rec to_string ?(pa=false) e =
+  let pa s = if pa then "(" ^ s ^ ")" else s in
   match e.desc with
   | Coh (l, a) -> Printf.sprintf "coh[%s|%s]" (List.map (fun (x,a) -> Printf.sprintf "%s:%s" x (to_string a)) l |> String.concat ",") (to_string a)
   | Var x -> x
   | Abs (x, a, t) -> Printf.sprintf "fun (%s : %s) => %s" x (to_string a) (to_string t)
-  | App (t, u) -> Printf.sprintf "%s %s" (to_string t) (to_string u)
+  | App (t, u) -> Printf.sprintf "%s %s" (to_string t) (to_string ~pa:true u)
   | Pi (x, a, t) -> Printf.sprintf "(%s : %s) => %s" x (to_string a) (to_string t)
   | Obj -> "."
-  | Hom (a, b) -> Printf.sprintf "(%s → %s)" (to_string a) (to_string b)
-  | Prod (a, b) -> Printf.sprintf "(%s × %s)" (to_string a) (to_string b)
+  | Hom (a, b) -> Printf.sprintf "%s → %s" (to_string ~pa:true a) (to_string b) |> pa
+  | Prod (a, b) -> Printf.sprintf "%s × %s" (to_string ~pa:true a) (to_string b) |> pa
   | Id (a, t, u) ->
-    Printf.sprintf "(%s =%s %s)" (to_string t) (to_string a) (to_string u)
+    Printf.sprintf "%s =%s %s" (to_string ~pa:true t) (to_string ~pa:true a) (to_string ~pa:true u) |> pa
   | Hole (t, _) -> Printf.sprintf "[%s]" (to_string t)
   | Meta t ->
     (
@@ -108,8 +109,11 @@ let rec has_fv x e =
   | Hom (a, b) -> has_fv x a || has_fv x b
   | Prod (a, b) -> has_fv x a || has_fv x b
   | Id (a, t, u) -> has_fv x a || has_fv x t || has_fv x u
+  | App (t, u) -> has_fv x t || has_fv x u
+  | Hole (t, a) -> has_fv x t || has_fv x a
+  | Meta { contents = Some t } -> has_fv x t
   | Obj -> false
-  | _ -> assert false
+  | _ -> error ~pos:e.pos "has_fv: handle %s" (to_string e)
 
 
 (** Check whether a type is a pasting scheme. *)
@@ -181,6 +185,8 @@ let check_ps l a =
       | Id (a, t, u) -> mk (Id (rewrite a, rewrite t, rewrite u))
       | Obj -> e
       | App (t, u) -> mk (App (rewrite t, rewrite u))
+      | Hole (t, _) -> rewrite t
+      | Meta { contents = Some t } -> rewrite t
       | _ -> failwith (Printf.sprintf "TODO: in rewrite handle %s" (to_string e))
     in
     (* Orient identities on variables as rewriting rules and normalize l. *)

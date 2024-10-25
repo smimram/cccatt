@@ -35,6 +35,8 @@ coh S (a b c : .) : (a → b → c) → (a → b) → a → c
 
 coh ap (a b : .) (t : a → b) (u : a) : b
 
+# let id (a : .) (x : a) := ap a a (I a) x
+
 coh comp (a b c : .) (f : a → b) (g : b → c) : a → c
 
 coh B (a b c : .) : (b -> c) -> (a -> b) -> a -> c
@@ -47,7 +49,7 @@ coh C (a b c : .) : (a -> b -> c) -> b -> a -> c
 
 # this can be obtained directly or defined
 coh K' (a b : .) : a -> b -> b
-let K' (a b : .) : a -> b -> b := ap (b -> b) (a -> (b -> b)) (K (b -> b) a) (I b)
+let K' (a b : .) : a -> b -> b := ap (b -> b) (a -> b -> b) (K (b -> b) a) (I b)
 
 ## Test
 
