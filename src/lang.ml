@@ -24,10 +24,12 @@ and desc =
   | Prod of t * t (** product type *)
   | Id of t * t * t (** identity type *)
   | Hole of t * t (** hole along with its type *)
-  | Meta of t option ref (** a variable to be unified *)
+  | Meta of meta (** a variable to be unified *)
   | Type (** the type of types *)
 
 and context = (string * t) list
+
+and meta = t option ref
 
 (** String representation of an expression. This should mostly be useful for debugging (we want to print values). *)
 let rec to_string ?(pa=false) e =
@@ -64,7 +66,7 @@ let var ?pos x = mk ?pos (Var x)
 
 let hole ?pos () =
   let t = mk ?pos (Meta (ref None)) in
-  let a = mk ?pos (Meta (ref None)) in
+  let a = mk (Meta (ref None)) in
   mk ?pos (Hole (t, a))
 
 (** Create coherence with abstracted arguments. *)
@@ -435,6 +437,24 @@ and check tenv env e a =
     if not (b.desc = Obj && a.desc = Type) then unify b a
   with
   | Unification -> failure e.pos "got %s but %s expected" (to_string b) (to_string a)
+
+let metavariables e =
+  let rec aux e acc =
+  match e.desc with
+  | Coh (l, a) -> List.fold_left (fun acc (_, a) -> aux a acc) acc l |> aux a
+  | Var _ -> []
+  | Abs (_, a, t) -> acc |> aux a |> aux t
+  | App (t, u) -> acc |> aux t |> aux u
+  | Obj -> []
+  | Pi (_, a, b)
+  | Hom (a, b)
+  | Prod (a, b) -> acc |> aux a |> aux b
+  | Id (a, t, u) -> acc |> aux a |> aux t |> aux u
+  | Hole (t, a) -> acc |> aux t |> aux a
+  | Meta m -> if List.memq m acc then acc else m::acc
+  | Type -> acc
+  in
+  aux e []
 
 let exec_command (tenv, env) p =
   match p with

@@ -112,6 +112,7 @@ let zero (a : .) : nat a := K' (a -> a) a
 let one (a : .) : nat a := I (a -> a)
 
 let two (a : .) : nat a := ap ((a -> a) -> (a -> a) -> (a -> a)) ((a -> a) -> (a -> a)) (W (a -> a) (a -> a)) (B a a a)
+# let two (a : .) : nat a := ap _ _ (W _ _) (B a a a)
 
 # [n f x].f(n f x)
 # [nf].B(nf)
