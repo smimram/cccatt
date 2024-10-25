@@ -33,7 +33,8 @@ and context = (string * t) list
 let rec to_string ?(pa=false) e =
   let pa s = if pa then "(" ^ s ^ ")" else s in
   match e.desc with
-  | Coh (l, a) -> Printf.sprintf "coh[%s|%s]" (List.map (fun (x,a) -> Printf.sprintf "%s:%s" x (to_string a)) l |> String.concat ",") (to_string a)
+  (* | Coh (l, a) -> Printf.sprintf "coh[%s|%s]" (List.map (fun (x,a) -> Printf.sprintf "%s:%s" x (to_string a)) l |> String.concat ",") (to_string a) *)
+  | Coh _ -> "coh"
   | Var x -> x
   | Abs (x, a, t) -> Printf.sprintf "fun (%s : %s) => %s" x (to_string a) (to_string t)
   | App (t, u) -> Printf.sprintf "%s %s" (to_string t) (to_string ~pa:true u)
