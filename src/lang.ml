@@ -130,7 +130,7 @@ let rec has_fv x e =
 
 
 (** Check whether a type is a pasting scheme. *)
-let check_ps a =
+let check_ps_type a =
   (* printf "* check_ps %s\n%!" (to_string a); *)
   let rec target a =
     match a.desc with
@@ -168,7 +168,7 @@ let check_ps a =
   prove [] [] a
 
 (** Whether a type in a context is a pasting scheme. *)
-let check_ps l a =
+let check_ps ?pos l a =
   (* printf "* check_ps: %s\n%!" (to_string (pis l a)); *)
   (* Remove variable declarations from the context. *)
   let vars, l =
@@ -228,7 +228,7 @@ let check_ps l a =
   (* printf "**** after removal: %s\n%!" (to_string (pis l a)); *)
   (* Ensure that the declared variables are exactly the free variables *)
   let () =
-    let a = homs (List.map snd l) a in
+    let a = homs ?pos (List.map snd l) a in
     let fv a =
       let rec aux a fv =
         match a.desc with
@@ -269,7 +269,7 @@ let check_ps l a =
     let l = List.map deproduct l |> List.flatten in
     List.map (homs l) (deproduct a)
   in
-  List.iter check_ps aa
+  List.iter check_ps_type aa
 
 (** Replace variable x by v in e. *)
 let rec subst x v e =
@@ -392,7 +392,7 @@ let rec infer tenv env e =
   match e.desc with
   | Coh (l, a) ->
     check tenv env (pis l a) (mk Type);
-    check_ps l a;
+    check_ps ~pos:e.pos l a;
     eval env a
   | Var x ->
     (
@@ -506,7 +506,7 @@ let exec_command (tenv, env) p =
     tenv, env
   | NCoh (l, a) ->
     check tenv env (pis l a) (mk Type);
-    (try check_ps l a; failure a.pos "expression accepted as a coherence" with _ -> ());
+    (try check_ps ~pos:a.pos l a; failure a.pos "expression accepted as a coherence" with _ -> ());
     tenv, env
 
 (** Execute a program. *)

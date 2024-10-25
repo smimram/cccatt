@@ -135,6 +135,8 @@ coh pair (a b : .) (_ : a) (_ : b) : a × b
 
 coh diag (a : .) : a -> a * a
 
+coh diag-pair (a : .) (x : a) : ap _ _ (diag a) x = pair a a x x
+
 coh fst-pair (a b : .) (x : a) (y : b) : fst a b (pair a b x y) = x
 
 coh snd-pair (a b : .) (x : a) (y : b) : fst a b (pair a b x y) = x
