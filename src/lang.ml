@@ -308,6 +308,7 @@ let rec unify t t' =
   | Hom (a, b), Hom (a', b') -> unify a a'; unify b b'
   | Obj, Obj -> ()
   | Type, Type -> ()
+  | Prod (a, b), Prod (a', b') -> unify a a'; unify b b'
   | Pi (x, a, b), Pi (x', a', b') -> unify a a'; unify b (subst x' (var x) b')
   | Hole (t, _), _ -> unify t t'
   | _, Hole (t', _) -> unify t t'
