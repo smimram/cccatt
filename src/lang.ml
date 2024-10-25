@@ -43,7 +43,7 @@ let rec to_string ?(pa=false) e =
   | Hom (a, b) -> Printf.sprintf "%s → %s" (to_string ~pa:true a) (to_string b) |> pa
   | Prod (a, b) -> Printf.sprintf "%s × %s" (to_string ~pa:true a) (to_string b) |> pa
   | Id (a, t, u) ->
-    Printf.sprintf "%s =%s %s" (to_string ~pa:true t) (to_string ~pa:true a) (to_string ~pa:true u) |> pa
+    Printf.sprintf "(%s = %s : %s)" (to_string ~pa:true t) (to_string ~pa:true u) (to_string ~pa:true a) |> pa
   | Hole (t, _) -> Printf.sprintf "[%s]" (to_string t)
   | Meta t ->
     (
