@@ -65,6 +65,15 @@ let hole ?pos () =
   let a = mk ?pos (Meta (ref None)) in
   mk ?pos (Hole (t, a))
 
+(** Create coherence with abstracted arguments. *)
+let abs_coh ?pos l a =
+  let mk = mk ?pos in
+  let rec aux = function
+    | (x,a)::l -> mk (Abs (x, a, aux l))
+    | [] -> mk (Coh (l, a))
+  in
+  aux l
+
 (** Commands a toplevel actions. *)
 type command =
   | Let of string * t option * t (** declare a value *)
