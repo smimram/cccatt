@@ -132,6 +132,6 @@ let rec unify k t t' =
   | Meta m, t
   | t, Meta m ->
     assert (not (List.memq m (metavariables t)));
-    (* printf "... ?%d becomes %s\n" m.id (to_string t); *)
+    (* printf "... ?%d (%s) becomes %s\n" m.id (m.pos |> Option.map Pos.to_string |> Option.value ~default:"") (to_string t); *)
     m.value <- Some t
   | _ -> raise Unification

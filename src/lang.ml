@@ -48,7 +48,7 @@ let rec to_string e =
       | None -> ""
     in
     Printf.sprintf "(%s =%s %s)" (to_string t) a (to_string u)
-  | Hole _ -> "_"
+  | Hole (t, _) -> Printf.sprintf "_(%s)" (V.to_string t)
   | Type -> "Type"
 
 let string_of_context env = List.map (fun (x,v) -> x ^ " = " ^ V.to_string v) env |> String.concat ","
@@ -83,7 +83,7 @@ let rec pis ?pos l t =
 
 (** Check whether a type is a pasting scheme. *)
 let check_ps a =
-  (* printf "check_ps %s\n%!" (to_string a); *)
+  (* printf "* check_ps %s\n%!" (to_string a); *)
   let rec target a =
     match a.desc with
     | Var x -> x
@@ -121,7 +121,7 @@ let check_ps a =
 
 (** Whether a type in a context is a pasting scheme. *)
 let check_ps l a =
-  (* printf "**** check_ps: %s\n%!" (to_string (pis l a)); *)
+  printf "* check_ps: %s\n%!" (to_string (pis l a));
   (* Remove variable declarations from the context. *)
   let vars, l =
     let split_vars l =
@@ -274,7 +274,7 @@ let rec eval env e =
 
 (** Infer the type of an expression. *)
 let rec infer k tenv env e =
-  (* printf "* infer %s\n%!" (to_string e); *)
+  (* printf "* infer %s\n\n%!" (to_string e); *)
   (* printf "  tenv : %s\n%!" (string_of_context tenv); *)
   (* printf "  env : %s\n%!" (string_of_context env); *)
   (* printf "  %d\n" k; *)
