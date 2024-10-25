@@ -438,14 +438,15 @@ and check tenv env e a =
   with
   | Unification -> failure e.pos "got %s but %s expected" (to_string b) (to_string a)
 
+(** All metavariables of a term. *)
 let metavariables e =
   let rec aux e acc =
   match e.desc with
   | Coh (l, a) -> List.fold_left (fun acc (_, a) -> aux a acc) acc l |> aux a
-  | Var _ -> []
+  | Var _ -> acc
   | Abs (_, a, t) -> acc |> aux a |> aux t
   | App (t, u) -> acc |> aux t |> aux u
-  | Obj -> []
+  | Obj -> acc
   | Pi (_, a, b)
   | Hom (a, b)
   | Prod (a, b) -> acc |> aux a |> aux b
@@ -456,6 +457,17 @@ let metavariables e =
   in
   aux e []
 
+let print_metavariables_elaboration e =
+  List.iter
+    (fun m ->
+       let v =
+         match !m with
+         | Some v -> to_string v
+         | None -> "?"
+       in
+       printf "... at %s, elaborated to %s\n" (Pos.to_string e.pos) v
+    ) (metavariables e)
+
 let exec_command (tenv, env) p =
   match p with
   | Let (x, a, e) ->
@@ -465,7 +477,7 @@ let exec_command (tenv, env) p =
       match a with
       | Some a ->
         let a = eval env a in
-        (* print_metavariables_elaboration a; *)
+        print_metavariables_elaboration a;
         check tenv env e a;
         a
       | None ->
@@ -473,7 +485,7 @@ let exec_command (tenv, env) p =
     in
     (* print_endline "checking"; *)
     let v = eval env e in
-    (* print_metavariables_elaboration v; *)
+    print_metavariables_elaboration v;
     let tenv = (x,a)::tenv in
     let env = (x,v)::env in
     printf "=^.^= defined %s : %s\n%!" x (to_string a);
