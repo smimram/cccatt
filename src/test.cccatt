@@ -79,6 +79,8 @@ coh trans (a : .) (x y z : a) (p : x = y) (q : y = z) : x = z
 
 coh ap-cong (a b : .) (t t' : a → b) (u u' : a) (p : t = t') (q : u = u') : ap a b t u = ap a b t' u'
 
+coh comp-cong (a b c : .) (f f' : a -> b) (g g' : b -> c) (p : f = f') (q : g = g') : comp _ _ _ f g = comp _ _ _ f' g'
+
 coh ap-I (a : .) (x : a) : ap a a (I a) x = x
 
 coh ap-K (a b : .) (x : a) (y : b) : ap b a (ap a (b -> a) (K a b) x) y = x

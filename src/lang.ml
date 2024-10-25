@@ -267,7 +267,7 @@ let check_ps ?pos l a =
   let aa =
     let l = List.map snd l in
     let l = List.map deproduct l |> List.flatten in
-    List.map (homs l) (deproduct a)
+    List.map (homs ?pos l) (deproduct a)
   in
   List.iter check_ps_type aa
 
