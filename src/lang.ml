@@ -273,6 +273,19 @@ let rec eval env e =
   | Type -> V.Type
   | Hole (t, _) -> t
 
+(** Convert a value back to an expression. *)
+let readback ?pos env v =
+  let mk = mk ?pos in
+  let rec readback = function
+    | V.Meta { value = Some a; _ } -> readback a
+    | V.Obj -> mk Obj
+    | V.Neutral (V.Var _) as var -> mk (Var (List.assoc' var env))
+    | V.Hom (a, b) -> mk (Hom (readback a, readback b))
+    | V.Prod (a, b) -> mk (Prod (readback a, readback b))
+    | v -> failwith ("unhandled readback: " ^ V.to_string v)
+  in
+  readback v
+
 (** Infer the type of an expression. *)
 let rec infer k tenv env e =
   (* printf "* infer %s\n\n%!" (to_string e); *)
@@ -328,18 +341,7 @@ let rec infer k tenv env e =
       | Some a -> a
       | None ->
         let v = infer k tenv env t in
-        let a' =
-          let mk = mk ~pos:e.pos in
-          let rec readback = function
-            | V.Meta { value = Some a; _ } -> readback a
-            | V.Obj -> mk Obj
-            | V.Neutral (V.Var _) as var -> mk (Var (List.assoc' var env))
-            | V.Hom (a, b) -> mk (Hom (readback a, readback b))
-            | V.Prod (a, b) -> mk (Prod (readback a, readback b))
-            | v -> failwith ("unhandled readback: " ^ V.to_string v)
-          in
-          readback v
-        in
+        let a' = readback ~pos:e.pos env v in
         (* printf "infered %s : %s\n%!" (to_string e) (to_string a'); *)
         (* printf "env: %s\n%!" (string_of_context env); *)
         a := Some a';
