@@ -112,6 +112,7 @@ let rec has_fv x e =
   | App (t, u) -> has_fv x t || has_fv x u
   | Hole (t, a) -> has_fv x t || has_fv x a
   | Meta { contents = Some t } -> has_fv x t
+  | Meta { contents = None } -> true
   | Obj -> false
   | _ -> error ~pos:e.pos "has_fv: handle %s" (to_string e)
 
@@ -187,7 +188,7 @@ let check_ps l a =
       | App (t, u) -> mk (App (rewrite t, rewrite u))
       | Hole (t, _) -> rewrite t
       | Meta { contents = Some t } -> rewrite t
-      | _ -> failwith (Printf.sprintf "TODO: in rewrite handle %s" (to_string e))
+      | _ -> error ~pos:e.pos "TODO: in rewrite handle %s" (to_string e)
     in
     (* Orient identities on variables as rewriting rules and normalize l. *)
     let rec aux rw = function
