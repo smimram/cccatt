@@ -67,6 +67,8 @@ let id' (a : .) (x : a) := ap _ _ (I _) x
 
 let ap' (a b : .) (x : a) (f : a -> b) := ap _ _ f x
 
+let ap2 (a b c : .) (f : a -> b -> c) (x : a) (y : b) := ap _ _ (ap _ _ f x) y
+
 ## Testing identities
 
 coh refl (a : .) (x : a) : x = x
@@ -97,6 +99,10 @@ let two (a : .) (f : a -> a) (x : a) := ap a a f (ap a a f x)
 
 let three (a : .) (f : a -> a) (x : a) := ap a a f (ap a a f (ap a a f x))
 
+# let add (a : .) (m n : nat a) (f : a -> a) (x : a) := ap a a (ap (a -> a) (a -> a) m f) (ap a a (ap (a -> a) (a -> a) n f) x)
+
+# let add-zero (a : .) (n : nat a) : add a (zero a) n = n
+
 ## Church numerals
 
 let nat (a : .) := (a -> a) -> a -> a
@@ -107,9 +113,16 @@ let one (a : .) : nat a := I (a -> a)
 
 let two (a : .) : nat a := ap ((a -> a) -> (a -> a) -> (a -> a)) ((a -> a) -> (a -> a)) (W (a -> a) (a -> a)) (B a a a)
 
-# let add (a : .) (m n : nat a) (f : a -> a) (x : a) := ap a a (ap (a -> a) (a -> a) m f) (ap a a (ap (a -> a) (a -> a) n f) x)
+# [n f x].f(n f x)
+# [nf].B(nf)
+# [n].BB(BnI)
+# BB(BB(C(BBI)I))
 
-# let add-zero (a : .) (n : nat a) : add a (zero a) n = n
+# let suc (a : .) : nat a := ap2 _ _ _ B
+
+# m.n.f.
+
+# let add (a : b) (m n : nat a) :=
 
 ## Products
 
