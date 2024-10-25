@@ -14,18 +14,18 @@ type t =
   }
 
 and desc =
-  | Coh of context * t
-  | Var of string
-  | Abs of string * t * t
-  | App of t * t
-  | Pi of string * t * t
-  | Obj
-  | Hom of t * t
-  | Prod of t * t
-  | Id of t * t * t
+  | Coh of context * t (** coherence *)
+  | Var of string (** variable *)
+  | Abs of string * t * t (** abstraction *)
+  | App of t * t (** application *)
+  | Pi of string * t * t (** Π-type *)
+  | Obj (** object type *)
+  | Hom of t * t (** hom type *)
+  | Prod of t * t (** product type *)
+  | Id of t * t * t (** identity type *)
   | Hole of t * t (** hole along with its type *)
-  | Meta of t option ref
-  | Type
+  | Meta of t option ref (** a variable to be unified *)
+  | Type (** the type of types *)
 
 and context = (string * t) list
 
