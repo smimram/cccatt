@@ -288,8 +288,24 @@ let rec subst x v e =
 
 exception Unification
 
-let unify _t _t' =
-  assert false
+(** Make sure that two values are equal (and raise [Unification] if this cannot be the case). *)
+let rec unify t t' =
+  match t.desc, t'.desc with
+  | Var x, Var y when x = y -> ()
+  | Hom (a, b), Hom (a', b') -> unify a a'; unify b b'
+  | Obj, Obj -> ()
+  | Type, Type -> ()
+  | Hole (t, _), _ -> unify t t'
+  | _, Hole (t', _) -> unify t t'
+  | Meta { contents = Some t }, _ -> unify t t'
+  | _, Meta { contents = Some t' } -> unify t t'
+  | Meta m, _ ->
+    (* TODO: check for cycles *)
+    m := Some t'
+  | _, Meta m' ->
+    (* TODO: check for cycles *)
+    m' := Some t
+  | _ -> raise Unification
 
 (** Evaluate an expression to a value. *)
 let rec eval env e =
