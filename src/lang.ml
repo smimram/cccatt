@@ -61,6 +61,7 @@ let mk ?pos desc : t =
 let hole ?pos () =
   mk ?pos (Hole (V.metavariable ?pos (), V.metavariable ()))
 
+(** Commands a toplevel actions. *)
 type command =
   | Let of string * t option * t (** declare a value *)
   | Check of t (** infer the type of an expression *)
@@ -121,7 +122,7 @@ let check_ps a =
 
 (** Whether a type in a context is a pasting scheme. *)
 let check_ps l a =
-  printf "* check_ps: %s\n%!" (to_string (pis l a));
+  (* printf "* check_ps: %s\n%!" (to_string (pis l a)); *)
   (* Remove variable declarations from the context. *)
   let vars, l =
     let split_vars l =
