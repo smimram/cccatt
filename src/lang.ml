@@ -29,7 +29,12 @@ and desc =
 
 and context = (string * t) list
 
-and meta = t option ref
+and meta =
+  {
+    pos : Pos.t option;
+    id : int;
+    mutable value : t option;
+  }
 
 (** String representation of an expression. This should mostly be useful for debugging (we want to print values). *)
 let rec to_string ?(pa=false) e =
@@ -47,11 +52,11 @@ let rec to_string ?(pa=false) e =
   | Id (a, t, u) ->
     Printf.sprintf "(%s = %s : %s)" (to_string ~pa:true t) (to_string ~pa:true u) (to_string ~pa:true a) |> pa
   | Hole (t, _) -> Printf.sprintf "[%s]" (to_string t)
-  | Meta t ->
+  | Meta m ->
     (
-      match !t with
+      match m.value with
       | Some t -> to_string t
-      | _ -> "_"
+      | _ -> Printf.sprintf "?%d" m.id
     )
   | Type -> "Type"
 
@@ -64,9 +69,13 @@ let mk ?pos desc : t =
 
 let var ?pos x = mk ?pos (Var x)
 
+let meta_counter = ref 0
+
 let hole ?pos () =
-  let t = mk ?pos (Meta (ref None)) in
-  let a = mk (Meta (ref None)) in
+  let t = mk ?pos (Meta { pos = pos; value = None; id = !meta_counter }) in
+  incr meta_counter;
+  let a = mk (Meta { pos = None; value = None; id = !meta_counter }) in
+  incr meta_counter;
   mk ?pos (Hole (t, a))
 
 (** Create coherence with abstracted arguments. *)
@@ -114,8 +123,8 @@ let rec has_fv x e =
   | Id (a, t, u) -> has_fv x a || has_fv x t || has_fv x u
   | App (t, u) -> has_fv x t || has_fv x u
   | Hole (t, a) -> has_fv x t || has_fv x a
-  | Meta { contents = Some t } -> has_fv x t
-  | Meta { contents = None } -> true
+  | Meta { value = Some t; _ } -> has_fv x t
+  | Meta { value = None; _ } -> true
   | Obj -> false
   | _ -> error ~pos:e.pos "has_fv: handle %s" (to_string e)
 
@@ -190,7 +199,7 @@ let check_ps l a =
       | Obj -> e
       | App (t, u) -> mk (App (rewrite t, rewrite u))
       | Hole (t, _) -> rewrite t
-      | Meta { contents = Some t } -> rewrite t
+      | Meta { value = Some t; _ } -> rewrite t
       | _ -> error ~pos:e.pos "TODO: in rewrite handle %s" (to_string e)
     in
     (* Orient identities on variables as rewriting rules and normalize l. *)
@@ -292,8 +301,8 @@ let rec subst x v e =
   | Prod (a, b) -> mk (Prod (s a, s b))
   | Id (a, t, u) -> mk (Id (s a, s t, s u))
   | Hole (t, a) -> mk (Hole (s t, s a))
-  | Meta { contents = Some t } -> s t
-  | Meta { contents = None } -> e
+  | Meta { value = Some t; _ } -> s t
+  | Meta { value = None; _ } -> e
   | Type -> e
 
 (*
@@ -320,14 +329,14 @@ let rec unify ?(alpha=[]) t t' =
   | Pi (x, a, b), Pi (x', a', b') -> unify a a'; unify ~alpha:((x',x)::alpha) b b'
   | Hole (t, _), _ -> unify t t'
   | _, Hole (t', _) -> unify t t'
-  | Meta { contents = Some t }, _ -> unify t t'
-  | _, Meta { contents = Some t' } -> unify t t'
+  | Meta { value = Some t; _ }, _ -> unify t t'
+  | _, Meta { value = Some t'; _ } -> unify t t'
   | Meta m, _ ->
     (* TODO: check for cycles *)
-    m := Some t'
+    m.value <- Some t'
   | _, Meta m' ->
     (* TODO: check for cycles *)
-    m' := Some t
+    m'.value <- Some t
   | _ -> raise Unification
 
 (** Evaluate an expression to a value. *)
@@ -369,8 +378,8 @@ let rec eval env e =
   | Prod (a, b) -> mk (Prod (eval env a, eval env b))
   | Type -> mk Type
   | Hole (t, _) -> t
-  | Meta { contents = Some t } -> eval env t
-  | Meta { contents = None } -> e
+  | Meta { value = Some t; _ } -> eval env t
+  | Meta { value = None; _ } -> e
 
 (* Note: in the following environments only contain values, and type inference produces values. *)
 
@@ -459,13 +468,14 @@ let metavariables e =
 
 let print_metavariables_elaboration e =
   List.iter
-    (fun m ->
-       let v =
-         match !m with
-         | Some v -> to_string v
-         | None -> "?"
-       in
-       printf "... at %s, elaborated to %s\n" (Pos.to_string e.pos) v
+    (fun (m:meta) ->
+       if m.pos <> None then
+         let v =
+           match m.value with
+           | Some v -> to_string v
+           | None -> "?"
+         in
+         printf "... at %s, ?%d elaborated to %s\n" (Pos.to_string (Option.get m.pos)) m.id v
     ) (metavariables e)
 
 let exec_command (tenv, env) p =
