@@ -53,7 +53,7 @@ type_opt:
 expr:
   | FUN args TO expr { abss $2 $4 }
   | expr HOM expr { mk (Hom ($1, $3)) }
-  | expr EQ expr { mk (Id (hole ~pos:(defpos()) (), $1, $3)) }
+  | expr EQ expr { mk (Id (hole (), $1, $3)) }
   | expr TIMES expr { mk (Prod ($1, $3)) }
   | aexpr { $1 }
 
