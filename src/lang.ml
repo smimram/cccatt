@@ -465,7 +465,13 @@ let metavariables e =
   | Prod (a, b) -> acc |> aux a |> aux b
   | Id (a, t, u) -> acc |> aux a |> aux t |> aux u
   | Hole (t, a) -> acc |> aux t |> aux a
-  | Meta m -> if List.memq m acc then acc else m::acc
+  | Meta m ->
+    (
+      let acc = if List.memq m acc then acc else m::acc in
+      match m.value with
+      | Some v -> aux v acc
+      | None -> acc
+    )
   | Type -> acc
   in
   aux e []
@@ -503,6 +509,7 @@ let exec_command (tenv, env) p =
     let tenv = (x,a)::tenv in
     let env = (x,v)::env in
     printf "=^.^= defined %s : %s\n%!" x (to_string a);
+    (* printf "      %s\n%!" (to_string v); *)
     tenv, env
   | Check e ->
     let a = infer tenv env e in
