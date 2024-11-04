@@ -271,6 +271,7 @@ let check_ps ?pos l a =
   in
   List.iter check_ps_type aa
 
+(*
 (** Replace variable x by v in e. *)
 let rec subst x v e =
   let s = subst x v in
@@ -304,7 +305,8 @@ let rec subst x v e =
   | Meta { value = Some t; _ } -> s t
   | Meta { value = None; _ } -> e
   | Type -> e
-
+*)
+   
 (*
 let subst x v e =
   let e' = subst x v e in
@@ -366,7 +368,9 @@ let rec eval env e =
   | App (t,u) ->
     (
       match (eval env t).desc with
-      | Abs (x,_,t) -> subst x u t
+      | Abs (x,_,t) ->
+        let u = eval env u in
+        eval ((x,u)::env) t
       | _ -> assert false
     )
   | Pi (x, a, b) ->
