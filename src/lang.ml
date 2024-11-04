@@ -476,7 +476,7 @@ let metavariables e =
   in
   aux e []
 
-let print_metavariables_elaboration e =
+let print_metavariables_elaboration m =
   List.iter
     (fun (m:meta) ->
        if m.pos <> None then
@@ -486,7 +486,7 @@ let print_metavariables_elaboration e =
            | None -> "?"
          in
          printf "... at %s, ?%d elaborated to %s\n" (Pos.to_string (Option.get m.pos)) m.id v
-    ) (metavariables e)
+    ) m
 
 let exec_command (tenv, env) p =
   match p with
@@ -496,16 +496,18 @@ let exec_command (tenv, env) p =
     let a =
       match a with
       | Some a ->
+        let m = metavariables a in
         let a = eval env a in
-        print_metavariables_elaboration a;
+        print_metavariables_elaboration m;
         check tenv env e a;
         a
       | None ->
         infer tenv env e
     in
+    let m = metavariables e in
     (* print_endline "checking"; *)
     let v = eval env e in
-    print_metavariables_elaboration v;
+    print_metavariables_elaboration m;
     let tenv = (x,a)::tenv in
     let env = (x,v)::env in
     printf "=^.^= defined %s : %s\n%!" x (to_string a);
