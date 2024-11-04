@@ -4,6 +4,9 @@ all:
 test:
 	@dune exec ./cccatt.exe test.cccatt
 
+curry:
+	@dune exec ./cccatt.exe curry.cccatt
+
 debug:
 	@dune exec ./cccatt.exe debug.cccatt
 

@@ -22,12 +22,13 @@ coh ax5 (a b c d : .) : ap ((c -> b -> a -> d) -> (c -> b -> a) -> c -> b -> d) 
 
 ## Version with holes
 
-# coh ax1 (a b c : .) : ap _ _ (ap _ _ (S _ _ _) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (K _ _))) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))) (K _ _))))) (ap _ _ (K _ _) (K _ _)) = ap _ _ (S _ _ _) (ap _ _ (K _ _) (K _ _))
+coh ax1 (a b c : .) : ap _ _ (ap _ _ (S _ _ _) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (K _ _))) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))) (K _ _))))) (ap _ _ (K _ _) (K _ _)) = ap _ _ (S _ _ _) (ap _ _ (K _ c) (K b a))
 
-# coh ax2 : ap _ _ (ap _ _ (S _ _ _) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))) (K _ _))) (ap _ _ (K _ _) (I _)) = I _
+coh ax2 (a b : .) : ap _ _ (ap _ _ (S _ _ _) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))) (K _ _))) (ap _ _ (K _ _) (I _)) = I (a -> b)
 
-# coh ax3 (a b : .) : ap _ _ (S _ _ _) (ap _ _ (K _ a) (I b)) = I (a -> b)
+coh ax3 (a b : .) : ap _ _ (S _ _ _) (ap _ _ (K _ _) (I _)) = I (a -> b)
+coh ax3 (a b : .) : ap _ _ (S _ _ _) (ap _ _ (K _ a) (I b)) = I _
 
-# coh ax4 : ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))) (ap _ _ (S _ _ _) (ap _ _ (K _ _) (K _ _))) = K _ _
+coh ax4 (a b c : .) : ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))) (ap _ _ (S _ _ _) (ap _ _ (K _ _) (K _ _))) = K (a -> c) (a -> b)
 
-# coh ax5 : ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))))) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))) (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _)))) = ap _ _ (ap _ _ (S _ _ _) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (K _ _))) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))))) (S _ _ _)))))) (ap _ _ (K _ _) (S _ _ _))
+coh ax5 (a b c d : .) : ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))))) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))) (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _)))) = ap _ _ (ap _ _ (S _ _ _) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (K _ _))) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))) (ap _ _ (ap _ _ (S _ _ _) (ap _ _ (K _ _) (ap _ _ (S _ _ _) (ap _ _ (K _ _) (S _ _ _))))) (S _ _ _)))))) (ap _ _ (K _ (c -> b -> a -> d)) (S _ _ _))
