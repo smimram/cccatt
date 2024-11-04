@@ -51,7 +51,7 @@ let run _ =
     output##.value := Js.string s
   in
   let error s =
-    print ("=/.\\= Error: " ^ s)
+    print ("=¡.¡= Error: " ^ s)
   in
   let read () =
     Js.to_string input##.value
