@@ -31,8 +31,8 @@ and context = (string * t) list
 
 and meta =
   {
-    pos : Pos.t option;
     id : int;
+    pos : Pos.t option;
     mutable value : t option;
   }
 
@@ -475,6 +475,9 @@ let metavariables e =
   | Type -> acc
   in
   aux e []
+
+let metavariables e =
+  metavariables e |> List.sort compare
 
 let print_metavariables_elaboration m =
   List.iter
