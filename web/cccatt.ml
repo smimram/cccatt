@@ -50,6 +50,9 @@ let run _ =
     let s = Js.to_string output##.value ^ s in
     output##.value := Js.string s
   in
+  let error s =
+    print ("=/.\\= Error: " ^ s)
+  in
   let read () =
     Js.to_string input##.value
   in
@@ -63,7 +66,10 @@ let run _ =
       "Send"
       (fun () ->
          output##.value := Js.string "";
-         read () |> String.trim |> loop
+         try read () |> String.trim |> loop
+         with
+         | Failure e -> error e
+         | e -> error (Printexc.to_string e)
       )
   in
   send##.id := Js.string "send";
