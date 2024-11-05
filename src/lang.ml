@@ -406,8 +406,9 @@ let rec eval env e =
 
 (* Note: in the following environments only contain values, and type inference produces values. *)
 
-(** Infer the type of an expression. *)
+(** Infer the type of an expression, elaborates the term along the way. *)
 let rec infer tenv env e =
+  let pos = e.pos in
   printf "* infer %s\n%!" (to_string e);
   (* printf "  tenv : %s\n%!" (string_of_context tenv); *)
   (* printf "  env : %s\n%!" (string_of_context env); *)
@@ -415,58 +416,57 @@ let rec infer tenv env e =
   match e.desc with
   | Coh (l, a) ->
     check tenv env (pis (List.map (fun (x,a) -> `Explicit,x,a) l) a) (mk Type);
-    check_ps ~pos:e.pos l a;
-    eval env a
+    check_ps ~pos l a;
+    mk ~pos (Coh (l, a)), eval env a
   | Var x ->
     (
       match List.assoc_opt x tenv with
-      | Some a -> a
+      | Some a -> mk ~pos (Var x), a
       | None -> failure e.pos "unknown variable %s" x
     )
   | Abs (i,x,a,t) ->
     check tenv env a (mk Type);
-    let a = eval env a in
-    let b = infer ((x,a)::tenv) ((x, mk (Var x))::env) t in
-    mk (Pi (i, x, a, b))
+    let a' = eval env a in
+    let t, b = infer ((x,a')::tenv) ((x, mk (Var x))::env) t in
+    mk ~pos (Abs (i,x,a,t)), mk (Pi (i, x, a, b))
   | App (t, u) ->
     (
-      let a = infer tenv env t in
+      let t, a = infer tenv env t in
       Printf.printf "a is %s\n%!" (to_string a);
-      let (* rec *) aux a =
-        match a.desc with
-        | Pi (`Explicit, x, a, b) ->
-          check tenv env u a;
-          let u = eval env u in
-          eval ((x,u)::env) b
-        | Pi (`Implicit, _x, _a, _b) ->
-          (* aux b *)
-          failwith "TOOD: correct implemenetation"
-        | _ -> failure t.pos "of type %s but a function was expected" (to_string a)
-      in
-      aux a
+      match a.desc with
+      | Pi (`Explicit, x, a, b) ->
+        check tenv env u a;
+        let u = eval env u in
+        mk ~pos (App (t, u)), eval ((x,u)::env) b
+      | Pi (`Implicit, _x, _a, _b) ->
+        (* aux b *)
+        failwith "TOOD: correct implemenetation"
+      | _ -> failure t.pos "of type %s but a function was expected" (to_string a)
     )
-  | Pi (_, x, a, b) ->
+  | Pi (i, x, a, b) ->
     check tenv env a (mk Type);
-    let a = eval env a in
     check ((x, eval env a)::tenv) ((x, var x)::env) b (mk Type);
-    mk Type
+    mk ~pos (Pi (i, x, a, b)), mk Type
   | Id (a, t, u) ->
     check tenv env a (mk Obj);
-    let a = eval env a in
-    check tenv env t a;
-    check tenv env u a;
-    mk Type
-  | Obj -> (mk Type)
+    let a' = eval env a in
+    check tenv env t a';
+    check tenv env u a';
+    mk ~pos (Id (a, t, u)), mk Type
+  | Obj ->
+    mk ~pos Obj, mk Type
   | Hom (a, b) ->
     check tenv env a (mk Obj);
     check tenv env b (mk Obj);
-    mk Obj
+    mk ~pos (Hom (a, b)), mk Obj
   | Prod (a, b) ->
     check tenv env a (mk Obj);
     check tenv env b (mk Obj);
-    mk Obj
-  | Type -> mk Type
-  | Hole (_, a) -> a
+    mk ~pos (Prod (a, b)), mk Obj
+  | Type ->
+    mk ~pos Type, mk Type
+  | Hole (t, a) ->
+    mk ~pos (Hole (t, a)), a
   | Meta _ -> assert false
 
 and check tenv env e a =
