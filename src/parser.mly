@@ -56,6 +56,7 @@ expr:
 
 aexpr:
   | aexpr sexpr { mk (App (`Explicit, $1, $2)) }
+  | aexpr LACC expr RACC { mk (App (`Implicit, $1, $3)) }
   | sexpr { $1 }
 
 /* Simple expression */

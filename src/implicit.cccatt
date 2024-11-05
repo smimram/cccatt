@@ -8,7 +8,7 @@ coh S {a b c : .} : (a → b → c) → (a → b) → a → c
 
 coh ap {a b : .} (t : a → b) (u : a) : b
 
-let id := ap (ap S K) K
+# let id := ap (ap S K) K
 
 # coh comp (a b c : .) (f : a → b) (g : b → c) : a → c
 
