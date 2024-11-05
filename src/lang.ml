@@ -488,7 +488,7 @@ let print_metavariables_elaboration m =
            | Some v -> to_string v
            | None -> "?"
          in
-         printf "... at %s, ?%d elaborated to %s\n" (Pos.to_string (Option.get m.pos)) m.id v
+         printf "=?.?= at %s, ?%d elaborated to %s\n" (Pos.to_string (Option.get m.pos)) m.id v
     ) m
 
 let exec_command (tenv, env) p =
