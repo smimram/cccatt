@@ -429,9 +429,7 @@ let rec infer tenv env e =
 and check tenv env e a =
   (* printf "* check %s : %s\n%!" (to_string e) (V.to_string a); *)
   let e, b = infer tenv env e in
-  try
-    if not (b.desc = Obj && a.desc = Type) then unify b a;
-    e
+  try if not (b.desc = Obj && a.desc = Type) then unify b a; e
   with
   | Unification -> failure e.pos "got %s but %s expected" (to_string b) (to_string a)
 
