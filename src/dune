@@ -22,7 +22,7 @@
 
 (rule
  (alias runtest)
- (deps test.cccatt curry.cccatt)
+ (deps test.cccatt curry.cccatt implicit.cccatt)
  (action
    (progn
     (run ./cccatt.exe test.cccatt)
