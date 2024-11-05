@@ -1,6 +1,6 @@
 # CCCaTT
 
-A type theory for **unbiased cartesian closed categories**.
+A type theory for **unbiased cartesian closed categories**. We provide a small proof assistant which you can also [try online](https://smimram.github.io/cccatt/). In order to get used to the syntax, you can have a look at the [test file](src/test.cccatt).
 
 The theory should come up soon.
 
