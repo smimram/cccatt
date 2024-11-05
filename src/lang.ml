@@ -406,9 +406,8 @@ let rec eval env e =
   | Meta { value = Some t; _ } -> eval env t
   | Meta { value = None; _ } -> e
 
-(* Note: in the following environments only contain values, and type inference produces values. *)
-
 (** Infer the type of an expression, elaborates the term along the way. *)
+(* NOTE: in the following environments only contain values, and type inference produces values. *)
 let rec infer tenv env e =
   let pos = e.pos in
   (* printf "* infer %s\n%!" (to_string e); *)
@@ -429,8 +428,7 @@ let rec infer tenv env e =
     )
   | Abs (i,x,a,t) ->
     let a = check tenv env a (mk Type) in
-    let a' = eval env a in
-    let t, b = infer ((x,a')::tenv) ((x, mk (Var x))::env) t in
+    let t, b = infer ((x,eval env a)::tenv) ((x, mk (Var x))::env) t in
     mk ~pos (Abs (i,x,a,t)), mk (Pi (i, x, a, b))
   | App (i, t, u) ->
     (
@@ -471,7 +469,7 @@ let rec infer tenv env e =
   | Meta _ -> assert false
 
 (* NOTE: a is supposed to be a value *)
-and check tenv env e a : t =
+and check tenv env e a =
   (* printf "* check %s : %s\n%!" (to_string e) (V.to_string a); *)
   let e, b = infer tenv env e in
   try
