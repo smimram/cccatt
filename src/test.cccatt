@@ -163,3 +163,9 @@ coh uncurry (a b c : .) : (a -> b -> c) -> (a * b -> c)
 coh curry-uncurry (a b c : .) : comp (a * b -> c) (a -> b -> c) (a * b -> c) (curry a b c) (uncurry a b c) = I (a * b -> c)
 
 coh uncurry-curry (a b c : .) : comp (a -> b -> c) (a * b -> c) (a -> b -> c) (uncurry a b c) (curry a b c) = I (a -> b -> c)
+
+## Test implicit arguments
+
+coh ap {a b : .} (t : a → b) (u : a) : b
+
+let K' (a b : .) : a -> b -> b := ap (K (b -> b) a) (I b)
