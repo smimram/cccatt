@@ -38,6 +38,22 @@ and meta =
     mutable value : t option;
   }
 
+module Value : sig
+  type expr = t
+  type t = private expr
+  val of_expr : expr -> t
+  val to_expr : t -> expr
+end = struct
+  type expr = t
+  type t = expr
+  let of_expr = Fun.id
+  let to_expr = Fun.id
+end
+type value = Value.t
+let value = Value.of_expr
+
+type venv = (string * value) list
+
 (** String representation of an expression. This should mostly be useful for debugging (we want to print values). *)
 let rec to_string ?(pa=false) e =
   let pa s = if pa then "(" ^ s ^ ")" else s in
@@ -319,11 +335,11 @@ let rec unify ?(alpha=[]) t t' =
   | _ -> raise Unification
 
 (** Evaluate an expression to a value. *)
-let rec eval env e =
+let rec eval (env:venv) e : value =
   (* Printf.printf "* eval: %s\n" (to_string e); *)
   (* Printf.printf "  env : %s\n" (string_of_context env); *)
-  let mk ?(pos=e.pos) = mk ~pos in
-  let var ?(pos=e.pos) = var ~pos in
+  let mk ?(pos=e.pos) t = mk ~pos t |> value in
+  let var ?(pos=e.pos) x = var ~pos x |> value in
   match e.desc with
   | Coh (l, a) ->
     let l, a =
@@ -341,10 +357,10 @@ let rec eval env e =
     )
   | Abs (i,x,a,e) ->
     let x' = if List.mem_assoc x env then fresh_var_name () else x in
-    mk (Abs (i,x', eval env a, eval ((x,var x')::env) e))
+    mk (Abs (i,x', (eval env a :> t), (eval ((x,var x')::env) e :> t)))
   | App (i,t,u) ->
     (
-      match (eval env t).desc with
+      match (eval env t :> t).desc with
       | Abs (i',x,_,t) ->
         assert (i = i');
         let u = eval env u in
@@ -353,19 +369,19 @@ let rec eval env e =
     )
   | Pi (i, x, a, b) ->
     let x' = if List.mem_assoc x env then fresh_var_name () else x in
-    mk (Pi (i, x', eval env a, eval ((x,var x')::env) b))
-  | Id (a, t, u) -> mk (Id (eval env a, eval env t, eval env u))
+    mk (Pi (i, x', (eval env a :> t), (eval ((x,var x')::env) b :> t)))
+  | Id (a, t, u) -> mk (Id ((eval env a :> t), (eval env t :> t), (eval env u :> t)))
   | Obj -> mk Obj
-  | Hom (a, b) -> mk (Hom (eval env a, eval env b))
-  | Prod (a, b) -> mk (Prod (eval env a, eval env b))
+  | Hom (a, b) -> mk (Hom ((eval env a :> t), (eval env b :> t)))
+  | Prod (a, b) -> mk (Prod ((eval env a :> t), (eval env b :> t)))
   | Type -> mk Type
-  | Hole (t, _) -> t
+  | Hole (t, _) -> value t
   | Meta { value = Some t; _ } -> eval env t
-  | Meta { value = None; _ } -> e
+  | Meta { value = None; _ } -> value e
 
 (** Infer the type of an expression, elaborates the term along the way. *)
 (* NOTE: in the following environments only contain values, and type inference produces values. *)
-let rec infer tenv env e =
+let rec infer (tenv:venv) (env:venv) e : t * value =
   let pos = e.pos in
   (* printf "* infer %s\n%!" (to_string e); *)
   (* printf "  tenv : %s\n%!" (string_of_context tenv); *)
@@ -385,8 +401,8 @@ let rec infer tenv env e =
     )
   | Abs (i,x,a,t) ->
     let a = check tenv env a (mk Type) in
-    let t, b = infer ((x,eval env a)::tenv) ((x, mk (Var x))::env) t in
-    mk ~pos (Abs (i,x,a,t)), mk (Pi (i, x, a, b))
+    let t, b = infer ((x,eval env a)::tenv) ((x, mk (Var x) |> value)::env) t in
+    mk ~pos (Abs (i,x,a,t)), value (mk (Pi (i, x, a, (b :> t))))
   | App (i, t, u) ->
     (
       let t, a = infer tenv env t in
@@ -426,7 +442,7 @@ let rec infer tenv env e =
   | Meta _ -> assert false
 
 (* NOTE: a is supposed to be a value *)
-and check tenv env e a =
+and check (tenv:venv) (env:venv) e (a:value) : t =
   (* printf "* check %s : %s\n%!" (to_string e) (V.to_string a); *)
   let e, b = infer tenv env e in
   try
