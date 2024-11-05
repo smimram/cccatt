@@ -431,14 +431,16 @@ let rec infer tenv env e =
   | App (t, u) ->
     (
       let a = infer tenv env t in
-      let rec aux a =
+      Printf.printf "a is %s\n%!" (to_string a);
+      let (* rec *) aux a =
         match a.desc with
         | Pi (`Explicit, x, a, b) ->
           check tenv env u a;
           let u = eval env u in
           eval ((x,u)::env) b
-        | Pi (`Implicit, _x, _a, b) ->
-          aux b
+        | Pi (`Implicit, _x, _a, _b) ->
+          (* aux b *)
+          failwith "TOOD: correct implemenetation"
         | _ -> failure t.pos "of type %s but a function was expected" (to_string a)
       in
       aux a
