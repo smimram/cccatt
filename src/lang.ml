@@ -43,9 +43,9 @@ let rec to_string ?(pa=false) e =
   (* | Coh (l, a) -> Printf.sprintf "coh[%s|%s]" (List.map (fun (x,a) -> Printf.sprintf "%s:%s" x (to_string a)) l |> String.concat ",") (to_string a) *)
   | Coh _ -> "coh"
   | Var x -> x
-  | Abs (x, a, t) -> Printf.sprintf "fun (%s : %s) => %s" x (to_string a) (to_string t)
-  | App (t, u) -> Printf.sprintf "%s %s" (to_string t) (to_string ~pa:true u)
-  | Pi (x, a, t) -> Printf.sprintf "(%s : %s) => %s" x (to_string a) (to_string t)
+  | Abs (x, a, t) -> Printf.sprintf "fun (%s : %s) => %s" x (to_string a) (to_string t) |> pa
+  | App (t, u) -> Printf.sprintf "%s %s" (to_string t) (to_string ~pa:true u) |> pa
+  | Pi (x, a, t) -> Printf.sprintf "(%s : %s) => %s" x (to_string a) (to_string t) |> pa
   | Obj -> "."
   | Hom (a, b) -> Printf.sprintf "%s → %s" (to_string ~pa:true a) (to_string b) |> pa
   | Prod (a, b) -> Printf.sprintf "%s × %s" (to_string ~pa:true a) (to_string b) |> pa
@@ -421,7 +421,6 @@ let rec infer tenv env e =
     )
   | Pi (x, a, b) ->
     check tenv env a (mk Type);
-    let a = eval env a in
     check ((x, eval env a)::tenv) ((x, var x)::env) b (mk Type);
     mk Type
   | Id (a, t, u) ->
@@ -430,7 +429,7 @@ let rec infer tenv env e =
     check tenv env t a;
     check tenv env u a;
     mk Type
-  | Obj -> (mk Type)
+  | Obj -> mk Type
   | Hom (a, b) ->
     check tenv env a (mk Obj);
     check tenv env b (mk Obj);
