@@ -45,15 +45,15 @@ let rec to_string ?(pa=false) e =
   | Var x -> x
   | Abs (i, x, a, t) ->
     if i = `Implicit then
-      Printf.sprintf "fun {%s : %s} => %s" x (to_string a) (to_string t)
+      Printf.sprintf "fun {%s : %s} => %s" x (to_string a) (to_string t) |> pa
     else
-      Printf.sprintf "fun (%s : %s) => %s" x (to_string a) (to_string t)
-  | App (t, u) -> Printf.sprintf "%s %s" (to_string t) (to_string ~pa:true u)
+      Printf.sprintf "fun (%s : %s) => %s" x (to_string a) (to_string t) |> pa
+  | App (t, u) -> Printf.sprintf "%s %s" (to_string t) (to_string ~pa:true u) |> pa
   | Pi (i, x, a, t) ->
     if i = `Implicit then
-      Printf.sprintf "{%s : %s} => %s" x (to_string a) (to_string t)
+      Printf.sprintf "{%s : %s} => %s" x (to_string a) (to_string t) |> pa
     else
-      Printf.sprintf "(%s : %s) => %s" x (to_string a) (to_string t)
+      Printf.sprintf "(%s : %s) => %s" x (to_string a) (to_string t) |> pa
   | Obj -> "."
   | Hom (a, b) -> Printf.sprintf "%s → %s" (to_string ~pa:true a) (to_string b) |> pa
   | Prod (a, b) -> Printf.sprintf "%s × %s" (to_string ~pa:true a) (to_string b) |> pa
@@ -408,7 +408,7 @@ let rec eval env e =
 
 (** Infer the type of an expression. *)
 let rec infer tenv env e =
-  (* printf "* infer %s\n%!" (to_string e); *)
+  printf "* infer %s\n%!" (to_string e);
   (* printf "  tenv : %s\n%!" (string_of_context tenv); *)
   (* printf "  env : %s\n%!" (string_of_context env); *)
   (* printf "\n"; *)
