@@ -8,23 +8,24 @@ coh S {a b c : .} : (a → b → c) → (a → b) → a → c
 
 coh ap {a b : .} (t : a → b) (u : a) : b
 
-# let id := ap (ap S K) K
+# let id {a : .} : a -> a := ap (ap S K) K
 
-# coh comp (a b c : .) (f : a → b) (g : b → c) : a → c
+coh comp {a b c : .} (f : a → b) (g : b → c) : a → c
 
-# coh B (a b c : .) : (b -> c) -> (a -> b) -> a -> c
+coh B {a b c : .} : (b -> c) -> (a -> b) -> a -> c
 
-# coh B' (a b c : .) : (a -> b) -> (b -> c) -> a -> c
+coh B' {a b c : .} : (a -> b) -> (b -> c) -> a -> c
 
-# coh W (a b : .) : (a -> a -> b) -> (a -> b)
+coh W {a b : .} : (a -> a -> b) -> (a -> b)
 
-# coh C (a b c : .) : (a -> b -> c) -> b -> a -> c
+coh C {a b c : .} : (a -> b -> c) -> b -> a -> c
 
-# let test (a b : .) : b -> a -> b := K b a
+# let test {a b : .} : b -> a -> b := K
 
-# # this can be obtained directly or defined
-# coh K' (a b : .) : a -> b -> b
-# let K' (a b : .) : a -> b -> b := ap (b -> b) (a -> b -> b) (K (b -> b) a) (I b)
+# this can be obtained directly or defined
+coh K' (a b : .) : a -> b -> b
+# let K' {a b : .} : a -> b -> b := ap (K (b -> b) a) (I b)
+let K' {a b : .} : a -> b -> b := ap K (I {b})
 
 # ## Test
 

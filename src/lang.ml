@@ -431,7 +431,15 @@ and check tenv env e a =
   let e, b = infer tenv env e in
   try if not (b.desc = Obj && a.desc = Type) then unify b a; e
   with
-  | Unification -> failure e.pos "got %s but %s expected" (to_string b) (to_string a)
+  | Unification ->
+    (
+      match b.desc with
+      | Pi (`Implicit, _, _, _) ->
+        (* Printf.printf "check add hole to %s\n%!" (to_string e); *)
+        let e = mk ~pos:e.pos (App (`Implicit, e, hole ())) in
+        check tenv env e a
+      | _ -> failure e.pos "got %s but %s expected" (to_string b) (to_string a)
+    )
 
 (** All metavariables of a term. *)
 let metavariables e =
@@ -473,6 +481,13 @@ let print_metavariables_elaboration m =
          printf "=?.?= at %s, ?%d elaborated to %s\n" (Pos.to_string (Option.get m.pos)) m.id v
     ) m
 
+let print_unelaborated_metavariables m =
+  List.iter
+    (fun (m:meta) ->
+       if m.value = None then
+         printf "=?.?= warning: unelaborated ?%d at %s\n%!" m.id (Pos.Option.to_string m.pos)
+    ) m
+
 let exec_command (tenv, env) p =
   match p with
   | Let (x, a, e) ->
@@ -493,6 +508,7 @@ let exec_command (tenv, env) p =
     (* print_endline "checking"; *)
     let v = eval env e in
     print_metavariables_elaboration m;
+    print_unelaborated_metavariables m;
     let tenv = (x,a)::tenv in
     let env = (x,v)::env in
     printf "=^.^= defined %s : %s\n%!" x (to_string a);
