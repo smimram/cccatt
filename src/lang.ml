@@ -14,17 +14,17 @@ type t =
   }
 
 and desc =
-  | Coh of context * t (** coherence *)
-  | Var of string (** variable *)
-  | Abs of implicit * string * t * t (** abstraction *)
-  | App of implicit * t * t (** application *)
-  | Pi of implicit * string * t * t (** Π-type *)
-  | Obj (** object type *)
-  | Hom of t * t (** hom type *)
+  | Coh  of context * t (** coherence *)
+  | Var  of string (** variable *)
+  | Abs  of implicit * string * t * t (** abstraction *)
+  | App  of implicit * t * t (** application *)
+  | Pi   of implicit * string * t * t (** Π-type *)
+  | Hom  of t * t (** hom type *)
   | Prod of t * t (** product type *)
-  | Id of t * t * t (** identity type *)
+  | Id   of t * t * t (** identity type *)
   | Hole of t * t (** hole along with its type *)
   | Meta of meta (** a variable to be unified *)
+  | Obj  (** object type *)
   | Type (** the type of types *)
 
 and implicit = [`Explicit |  `Implicit]
