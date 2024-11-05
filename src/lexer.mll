@@ -19,6 +19,8 @@ rule token = parse
   | "." { OBJ }
   | "(" { LPAR }
   | ")" { RPAR }
+  | "{" { LACC }
+  | "}" { RACC }
   | ":" { COL }
   | "->" { HOM }
   | "→" { utf8 ~n:2 lexbuf; HOM }

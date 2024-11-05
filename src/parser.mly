@@ -10,11 +10,8 @@ let mk ?pos e =
   mk ~pos e
 
 let abss ?pos l e =
-  let rec aux = function
-    | (x,a)::l -> mk ?pos (Abs (x, a, aux l))
-    | [] -> e
-  in
-  aux l
+  let pos = Option.value ~default:(defpos ()) pos in
+  abss ~pos l e
 
 let pis ?pos l a =
   let pos = Option.value ~default:(defpos ()) pos in
@@ -23,7 +20,7 @@ let pis ?pos l a =
 
 %token LET CHECK NCOH FUN TO HOLE
 %token COH HOM EQ EQDEF OBJ TIMES
-%token LPAR RPAR COL
+%token LPAR RPAR LACC RACC COL
 %token <string> IDENT
 %token EOF
 
@@ -42,7 +39,7 @@ prog:
 
 cmd:
   | COH IDENT args COL expr { Let ($2, None, abs_coh ~pos:(defpos()) $3 $5) }
-  | NCOH args COL expr { NCoh ($2, $4) }
+  | NCOH args COL expr { NCoh (List.map (fun (_,x,a) -> x,a) $2, $4) }
   | LET IDENT args type_opt EQDEF expr { Let ($2, Option.map (pis $3) $4, abss $3 $6) }
   | CHECK expr { Check $2 }
 
@@ -69,7 +66,8 @@ sexpr:
   | LPAR expr RPAR { $2 }
 
 args:
-  | LPAR idents COL expr RPAR args { (List.map (fun x -> x, $4) $2)@$6 }
+  | LPAR idents COL expr RPAR args { (List.map (fun x -> `Explicit, x, $4) $2)@$6 }
+  | LACC idents COL expr RACC args { (List.map (fun x -> `Implicit, x, $4) $2)@$6 }
   | { [] }
 
 ident:
