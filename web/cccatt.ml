@@ -72,8 +72,17 @@ let run _ =
          | e -> error (Printexc.to_string e)
       )
   in
+  let clear =
+    button
+      "Clear"
+      (fun () ->
+         input##.value := Js.string "";
+         output##.value := Js.string ""
+      )
+  in
   send##.id := Js.string "send";
   Dom.appendChild top send;
+  Dom.appendChild top clear;
   input##focus;
   input##select;
 
