@@ -55,7 +55,7 @@ expr:
   | aexpr { $1 }
 
 aexpr:
-  | aexpr sexpr { mk (App ($1, $2)) }
+  | aexpr sexpr { mk (App (`Explicit, $1, $2)) }
   | sexpr { $1 }
 
 /* Simple expression */
