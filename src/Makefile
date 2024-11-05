@@ -7,6 +7,9 @@ test:
 curry:
 	@dune exec ./cccatt.exe curry.cccatt
 
+implicit:
+	@dune exec ./cccatt.exe implicit.cccatt
+
 debug:
 	@dune exec ./cccatt.exe debug.cccatt
 
