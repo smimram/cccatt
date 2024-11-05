@@ -14,18 +14,20 @@ type t =
   }
 
 and desc =
-  | Coh of context * t (** coherence *)
-  | Var of string (** variable *)
-  | Abs of string * t * t (** abstraction *)
-  | App of t * t (** application *)
-  | Pi of string * t * t (** Π-type *)
-  | Obj (** object type *)
-  | Hom of t * t (** hom type *)
+  | Coh  of context * t (** coherence *)
+  | Var  of string (** variable *)
+  | Abs  of implicit * string * t * t (** abstraction *)
+  | App  of implicit * t * t (** application *)
+  | Pi   of implicit * string * t * t (** Π-type *)
+  | Hom  of t * t (** hom type *)
   | Prod of t * t (** product type *)
-  | Id of t * t * t (** identity type *)
+  | Id   of t * t * t (** identity type *)
   | Hole of t * t (** hole along with its type *)
   | Meta of meta (** a variable to be unified *)
+  | Obj  (** object type *)
   | Type (** the type of types *)
+
+and implicit = [`Explicit |  `Implicit]
 
 and context = (string * t) list
 
@@ -43,9 +45,19 @@ let rec to_string ?(pa=false) e =
   (* | Coh (l, a) -> Printf.sprintf "coh[%s|%s]" (List.map (fun (x,a) -> Printf.sprintf "%s:%s" x (to_string a)) l |> String.concat ",") (to_string a) *)
   | Coh _ -> "coh"
   | Var x -> x
-  | Abs (x, a, t) -> Printf.sprintf "fun (%s : %s) => %s" x (to_string a) (to_string t) |> pa
-  | App (t, u) -> Printf.sprintf "%s %s" (to_string t) (to_string ~pa:true u) |> pa
-  | Pi (x, a, t) -> Printf.sprintf "(%s : %s) => %s" x (to_string a) (to_string t) |> pa
+  | Abs (i, x, a, t) ->
+    if i = `Implicit then
+      Printf.sprintf "fun {%s : %s} => %s" x (to_string a) (to_string t) |> pa
+    else
+      Printf.sprintf "fun (%s : %s) => %s" x (to_string a) (to_string t) |> pa
+  | App (i, t, u) ->
+    if i = `Implicit then Printf.sprintf "%s {%s}" (to_string t) (to_string u) |> pa
+    else Printf.sprintf "%s %s" (to_string t) (to_string ~pa:true u) |> pa
+  | Pi (i, x, a, t) ->
+    if i = `Implicit then
+      Printf.sprintf "{%s : %s} => %s" x (to_string a) (to_string t) |> pa
+    else
+      Printf.sprintf "(%s : %s) => %s" x (to_string a) (to_string t) |> pa
   | Obj -> "."
   | Hom (a, b) -> Printf.sprintf "%s → %s" (to_string ~pa:true a) (to_string b) |> pa
   | Prod (a, b) -> Printf.sprintf "%s × %s" (to_string ~pa:true a) (to_string b) |> pa
@@ -82,8 +94,10 @@ let hole ?pos () =
 let abs_coh ?pos l a =
   let mk = mk ?pos in
   let rec aux = function
-    | (x,a)::l -> mk (Abs (x, a, aux l))
-    | [] -> mk (Coh (l, a))
+    | (i,x,a)::l -> mk (Abs (i,x, a, aux l))
+    | [] ->
+      let l = List.map (fun (_i,x,a) -> x,a) l in
+      mk (Coh (l, a))
   in
   aux l
 
@@ -108,10 +122,16 @@ let rec homs ?pos l t =
   | a::l -> mk ?pos (Hom (a, homs ?pos l t))
   | [] -> t
 
+(** Build multiple abstractions. *)
+let rec abss ?pos l e =
+  match l with
+    | (i,x,a)::l -> mk ?pos (Abs (i, x, a, abss ?pos l e))
+    | [] -> e
+
 (** Build multiple pi types. *)
 let rec pis ?pos l t =
   match l with
-  | (x,a)::l -> mk ?pos (Pi (x, a, pis ?pos l t))
+  | (i,x,a)::l -> mk ?pos (Pi (i, x, a, pis ?pos l t))
   | [] -> t
 
 (* Test whether an expression has a free variable. *)
@@ -121,7 +141,7 @@ let rec has_fv x e =
   | Hom (a, b) -> has_fv x a || has_fv x b
   | Prod (a, b) -> has_fv x a || has_fv x b
   | Id (a, t, u) -> has_fv x a || has_fv x t || has_fv x u
-  | App (t, u) -> has_fv x t || has_fv x u
+  | App (_, t, u) -> has_fv x t || has_fv x u
   | Hole (t, a) -> has_fv x t || has_fv x a
   | Meta { value = Some t; _ } -> has_fv x t
   | Meta { value = None; _ } -> true
@@ -197,7 +217,7 @@ let check_ps ?pos l a =
       | Prod (a, b) -> mk (Prod (rewrite a, rewrite b))
       | Id (a, t, u) -> mk (Id (rewrite a, rewrite t, rewrite u))
       | Obj -> e
-      | App (t, u) -> mk (App (rewrite t, rewrite u))
+      | App (i, t, u) -> mk (App (i, rewrite t, rewrite u))
       | Hole (t, _) -> rewrite t
       | Meta { value = Some t; _ } -> rewrite t
       | _ -> error ~pos:e.pos "TODO: in rewrite handle %s" (to_string e)
@@ -237,7 +257,7 @@ let check_ps ?pos l a =
         | Hom (a, b) -> fv |> aux a |> aux b
         | Prod (a, b) -> fv |> aux a |> aux b
         | Id (a, t, u) -> fv |> aux a |> aux t |> aux u
-        | App (t, u) -> fv |> aux t |> aux u
+        | App (_, t, u) -> fv |> aux t |> aux u
         | _ -> failwith (Printf.sprintf "TODO: fv handle %s" (to_string a))
       in
       aux a []
@@ -285,7 +305,7 @@ let rec unify ?(alpha=[]) t t' =
   | Obj, Obj -> ()
   | Type, Type -> ()
   | Prod (a, b), Prod (a', b') -> unify a a'; unify b b'
-  | Pi (x, a, b), Pi (x', a', b') -> unify a a'; unify ~alpha:((x',x)::alpha) b b'
+  | Pi (i, x, a, b), Pi (i', x', a', b') -> (if i <> i' then raise Unification); unify a a'; unify ~alpha:((x',x)::alpha) b b'
   | Hole (t, _), _ -> unify t t'
   | _, Hole (t', _) -> unify t t'
   | Meta { value = Some t; _ }, _ -> unify t t'
@@ -319,20 +339,21 @@ let rec eval env e =
       | Some v -> v
       | None -> failure e.pos "unexpected error: value for %s not found" x
     )
-  | Abs (x,a,e) ->
+  | Abs (i,x,a,e) ->
     let x' = if List.mem_assoc x env then fresh_var_name () else x in
-    mk (Abs (x', eval env a, eval ((x,var x')::env) e))
-  | App (t,u) ->
+    mk (Abs (i,x', eval env a, eval ((x,var x')::env) e))
+  | App (i,t,u) ->
     (
       match (eval env t).desc with
-      | Abs (x,_,t) ->
+      | Abs (i',x,_,t) ->
+        assert (i = i');
         let u = eval env u in
         eval ((x,u)::env) t
       | _ -> assert false
     )
-  | Pi (x, a, b) ->
+  | Pi (i, x, a, b) ->
     let x' = if List.mem_assoc x env then fresh_var_name () else x in
-    mk (Pi (x', eval env a, eval ((x,var x')::env) b))
+    mk (Pi (i, x', eval env a, eval ((x,var x')::env) b))
   | Id (a, t, u) -> mk (Id (eval env a, eval env t, eval env u))
   | Obj -> mk Obj
   | Hom (a, b) -> mk (Hom (eval env a, eval env b))
@@ -342,70 +363,83 @@ let rec eval env e =
   | Meta { value = Some t; _ } -> eval env t
   | Meta { value = None; _ } -> e
 
-(* Note: in the following environments only contain values, and type inference produces values. *)
-
-(** Infer the type of an expression. *)
+(** Infer the type of an expression, elaborates the term along the way. *)
+(* NOTE: in the following environments only contain values, and type inference produces values. *)
 let rec infer tenv env e =
+  let pos = e.pos in
   (* printf "* infer %s\n%!" (to_string e); *)
   (* printf "  tenv : %s\n%!" (string_of_context tenv); *)
   (* printf "  env : %s\n%!" (string_of_context env); *)
   (* printf "\n"; *)
   match e.desc with
   | Coh (l, a) ->
-    check tenv env (pis l a) (mk Type);
-    check_ps ~pos:e.pos l a;
-    eval env a
+    (* TODO: don't ignore... *)
+    check tenv env (pis (List.map (fun (x,a) -> `Explicit,x,a) l) a) (mk Type) |> ignore;
+    check_ps ~pos l a;
+    mk ~pos (Coh (l, a)), eval env a
   | Var x ->
     (
       match List.assoc_opt x tenv with
-      | Some a -> a
+      | Some a -> mk ~pos (Var x), a
       | None -> failure e.pos "unknown variable %s" x
     )
-  | Abs (x,a,t) ->
-    check tenv env a (mk Type);
-    let a = eval env a in
-    let b = infer ((x,a)::tenv) ((x, mk (Var x))::env) t in
-    mk (Pi (x, a, b))
-  | App (t, u) ->
+  | Abs (i,x,a,t) ->
+    let a = check tenv env a (mk Type) in
+    let t, b = infer ((x,eval env a)::tenv) ((x, mk (Var x))::env) t in
+    mk ~pos (Abs (i,x,a,t)), mk (Pi (i, x, a, b))
+  | App (i, t, u) ->
     (
-      let a = infer tenv env t in
+      let t, a = infer tenv env t in
       match a.desc with
-      | Pi (x, a, b) ->
-        check tenv env u a;
-        let u = eval env u in
-        eval ((x,u)::env) b
+      | Pi (i', x, a, b) when i = i' ->
+        let u = check tenv env u a in
+        mk ~pos (App (i, t, u)), eval ((x, eval env u)::env) b
+      | Pi (`Implicit, _x, _a, _b) when i = `Explicit ->
+        let t = mk ~pos:t.pos (App (`Implicit, t, hole ())) in
+        infer tenv env (mk ~pos (App (i, t, u)))
       | _ -> failure t.pos "of type %s but a function was expected" (to_string a)
     )
-  | Pi (x, a, b) ->
-    check tenv env a (mk Type);
-    check ((x, eval env a)::tenv) ((x, var x)::env) b (mk Type);
-    mk Type
+  | Pi (i, x, a, b) ->
+    let a = check tenv env a (mk Type) in
+    let b = check ((x, eval env a)::tenv) ((x, var x)::env) b (mk Type) in
+    mk ~pos (Pi (i, x, a, b)), mk Type
   | Id (a, t, u) ->
-    check tenv env a (mk Obj);
-    let a = eval env a in
-    check tenv env t a;
-    check tenv env u a;
-    mk Type
-  | Obj -> mk Type
+    let a = check tenv env a (mk Obj) in
+    let a' = eval env a in
+    let t = check tenv env t a' in
+    let u = check tenv env u a' in
+    mk ~pos (Id (a, t, u)), mk Type
+  | Obj ->
+    mk ~pos Obj, mk Type
   | Hom (a, b) ->
-    check tenv env a (mk Obj);
-    check tenv env b (mk Obj);
-    mk Obj
+    let a = check tenv env a (mk Obj) in
+    let b = check tenv env b (mk Obj) in
+    mk ~pos (Hom (a, b)), mk Obj
   | Prod (a, b) ->
-    check tenv env a (mk Obj);
-    check tenv env b (mk Obj);
-    mk Obj
-  | Type -> mk Type
-  | Hole (_, a) -> a
+    let a = check tenv env a (mk Obj) in
+    let b = check tenv env b (mk Obj) in
+    mk ~pos (Prod (a, b)), mk Obj
+  | Type ->
+    mk ~pos Type, mk Type
+  | Hole (t, a) ->
+    mk ~pos (Hole (t, a)), a
   | Meta _ -> assert false
 
+(* NOTE: a is supposed to be a value *)
 and check tenv env e a =
   (* printf "* check %s : %s\n%!" (to_string e) (V.to_string a); *)
-  let b = infer tenv env e in
-  try
-    if not (b.desc = Obj && a.desc = Type) then unify b a
+  let e, b = infer tenv env e in
+  try if not (b.desc = Obj && a.desc = Type) then unify b a; e
   with
-  | Unification -> failure e.pos "got %s but %s expected" (to_string b) (to_string a)
+  | Unification ->
+    (
+      match b.desc with
+      | Pi (`Implicit, _, _, _) ->
+        (* Printf.printf "check add hole to %s\n%!" (to_string e); *)
+        let e = mk ~pos:e.pos (App (`Implicit, e, hole ())) in
+        check tenv env e a
+      | _ -> failure e.pos "got %s but %s expected" (to_string b) (to_string a)
+    )
 
 (** All metavariables of a term. *)
 let metavariables e =
@@ -413,10 +447,10 @@ let metavariables e =
   match e.desc with
   | Coh (l, a) -> List.fold_left (fun acc (_, a) -> aux a acc) acc l |> aux a
   | Var _ -> acc
-  | Abs (_, a, t) -> acc |> aux a |> aux t
-  | App (t, u) -> acc |> aux t |> aux u
+  | Abs (_, _, a, t) -> acc |> aux a |> aux t
+  | App (_, t, u) -> acc |> aux t |> aux u
   | Obj -> acc
-  | Pi (_, a, b)
+  | Pi (_, _, a, b)
   | Hom (a, b)
   | Prod (a, b) -> acc |> aux a |> aux b
   | Id (a, t, u) -> acc |> aux a |> aux t |> aux u
@@ -447,19 +481,26 @@ let print_metavariables_elaboration m =
          printf "=?.?= at %s, ?%d elaborated to %s\n" (Pos.to_string (Option.get m.pos)) m.id v
     ) m
 
+let print_unelaborated_metavariables m =
+  List.iter
+    (fun (m:meta) ->
+       if m.value = None then
+         printf "=?.?= warning: unelaborated ?%d at %s\n%!" m.id (Pos.Option.to_string m.pos)
+    ) m
+
 let exec_command (tenv, env) p =
   match p with
   | Let (x, a, e) ->
     (* printf "*** let %s := %s\n%!" x (to_string e); *)
     (* print_endline "inferring"; *)
-    let a =
+    let e, a =
       match a with
       | Some a ->
         let m = metavariables a in
         let a = eval env a in
         print_metavariables_elaboration m;
-        check tenv env e a;
-        a
+        let e = check tenv env e a in
+        e, a
       | None ->
         infer tenv env e
     in
@@ -467,17 +508,18 @@ let exec_command (tenv, env) p =
     (* print_endline "checking"; *)
     let v = eval env e in
     print_metavariables_elaboration m;
+    print_unelaborated_metavariables m;
     let tenv = (x,a)::tenv in
     let env = (x,v)::env in
     printf "=^.^= defined %s : %s\n%!" x (to_string a);
     (* printf "      %s\n%!" (to_string v); *)
     tenv, env
   | Check e ->
-    let a = infer tenv env e in
+    let e, a = infer tenv env e in
     printf "=^.^= check %s : %s\n%!" (Pos.to_string e.pos) (to_string a);
     tenv, env
   | NCoh (l, a) ->
-    check tenv env (pis l a) (mk Type);
+    check tenv env (pis (List.map (fun (x,a) -> `Explicit,x,a) l) a) (mk Type) |> ignore;
     (try check_ps ~pos:a.pos l a; failure a.pos "expression accepted as a coherence" with _ -> ());
     tenv, env
 

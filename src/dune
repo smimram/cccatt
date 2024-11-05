@@ -27,6 +27,7 @@
    (progn
     (run ./cccatt.exe test.cccatt)
     (run ./cccatt.exe curry.cccatt)
+    (run ./cccatt.exe implicit.cccatt)
    )
  )
 )
