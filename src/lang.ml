@@ -270,49 +270,6 @@ let check_ps ?pos l a =
     List.map (homs ?pos l) (deproduct a)
   in
   List.iter check_ps_type aa
-
-(*
-(** Replace variable x by v in e. *)
-let rec subst x v e =
-  let s = subst x v in
-  let mk ?(pos=e.pos) = mk ~pos in
-  let var ?(pos=e.pos) = var ~pos in
-  match e.desc with
-  | Coh (l, a) -> mk (Coh (List.map (fun (x,a) -> x, s a) l, s a))
-  | Var y -> if y = x then mk v.desc else e
-  | Abs (y, a, t) ->
-    let y, t =
-      if has_fv y v then
-        let y' = fresh_var_name () in
-        y', subst y (var y') t
-      else y, t
-    in
-    mk (Abs (y, s a, s t))
-  | Pi (y, a, b) ->
-    let y, b =
-      if has_fv y v then
-        let y' = fresh_var_name () in
-        y', subst y (var y') b
-      else y, b
-    in
-    mk (Pi (y, s a, s b))
-  | App (t, u) -> mk (App (s t, s u))
-  | Obj -> e
-  | Hom (a, b) -> mk (Hom (s a, s b))
-  | Prod (a, b) -> mk (Prod (s a, s b))
-  | Id (a, t, u) -> mk (Id (s a, s t, s u))
-  | Hole (t, a) -> mk (Hole (s t, s a))
-  | Meta { value = Some t; _ } -> s t
-  | Meta { value = None; _ } -> e
-  | Type -> e
-*)
-   
-(*
-let subst x v e =
-  let e' = subst x v e in
-  Printf.printf "%s[%s/%s] = %s\n" (to_string e) (to_string v) x (to_string e');
-  e'
-*)
    
 exception Unification
 
