@@ -2,4 +2,4 @@ all:
 
 test:
 	make -C errors $@
-	@dune runtest
+	@dune runtest -f
