@@ -8,6 +8,14 @@ coh S {a b c : .} : (a → b → c) → (a → b) → a → c
 
 coh ap {a b : .} (t : a → b) (u : a) : b
 
+let ap-I {a : .} (x : a) := ap I x
+
+# let ap-K {a b : .} (x : a) : b -> a := ap K x
+
+# let ap-K {a b : .} (x : a) (y : b) := ap (ap K x) y
+
+# coh ap-K {a b : .} (x : a) (y : b) : ap (ap K x) y = x
+
 # let id {a : .} : a -> a := ap (ap S K) K
 
 coh comp {a b c : .} (f : a → b) (g : b → c) : a → c

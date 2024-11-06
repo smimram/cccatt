@@ -51,8 +51,8 @@ let rec to_string ?(pa=false) e =
     else
       Printf.sprintf "fun (%s : %s) => %s" x (to_string a) (to_string t) |> pa
   | App (i, t, u) ->
-    if i = `Implicit then Printf.sprintf "%s {%s}" (to_string t) (to_string u) |> pa
-    else Printf.sprintf "%s %s" (to_string t) (to_string ~pa:true u) |> pa
+    if i = `Implicit then Printf.sprintf "%s {%s}" (to_string ~pa:true t) (to_string u) |> pa
+    else Printf.sprintf "%s %s" (to_string ~pa:true t) (to_string ~pa:true u) |> pa
   | Pi (i, x, a, t) ->
     if i = `Implicit then
       Printf.sprintf "{%s : %s} => %s" x (to_string a) (to_string t) |> pa
@@ -346,7 +346,7 @@ let rec eval env e =
     (
       match (eval env t).desc with
       | Abs (i',x,_,t) ->
-        assert (i = i');
+        if i <> i' then error "Application mismatch in %s" (to_string e);
         let u = eval env u in
         eval ((x,u)::env) t
       | _ -> assert false
