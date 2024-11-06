@@ -51,8 +51,9 @@ let rec to_string ?(pa=false) e =
     else
       Printf.sprintf "fun (%s : %s) => %s" x (to_string a) (to_string t) |> pa
   | App (i, t, u) ->
-    if i = `Implicit then Printf.sprintf "%s {%s}" (to_string ~pa:true t) (to_string u) |> pa
-    else Printf.sprintf "%s %s" (to_string ~pa:true t) (to_string ~pa:true u) |> pa
+    let isnt_app e = match e.desc with App _ -> false | _ -> true in
+    if i = `Implicit then Printf.sprintf "%s {%s}" (to_string ~pa:(isnt_app t) t) (to_string u) |> pa
+    else Printf.sprintf "%s %s" (to_string ~pa:(isnt_app t) t) (to_string ~pa:true u) |> pa
   | Pi (i, x, a, t) ->
     if i = `Implicit then
       Printf.sprintf "{%s : %s} => %s" x (to_string a) (to_string t) |> pa
