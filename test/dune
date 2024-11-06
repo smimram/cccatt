@@ -1,0 +1,11 @@
+(rule
+ (alias runtest)
+ (deps test.cccatt curry.cccatt implicit.cccatt)
+ (action
+   (progn
+    (run ../src/cccatt.exe test.cccatt)
+    (run ../src/cccatt.exe curry.cccatt)
+    (run ../src/cccatt.exe implicit.cccatt)
+   )
+ )
+)

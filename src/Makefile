@@ -2,13 +2,13 @@ all:
 	@dune build
 
 test:
-	@dune exec ./cccatt.exe test.cccatt
+	@dune exec ./cccatt.exe ../test/test.cccatt
 
 curry:
-	@dune exec ./cccatt.exe curry.cccatt
+	@dune exec ./cccatt.exe ../test/curry.cccatt
 
 implicit:
-	@dune exec ./cccatt.exe implicit.cccatt
+	@dune exec ./cccatt.exe ../test/implicit.cccatt
 
 debug:
 	@dune exec ./cccatt.exe debug.cccatt
