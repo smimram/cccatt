@@ -60,83 +60,77 @@ coh ap-comp {a b c : .} (f : a -> b) (g : b -> c) (x : a) : ap (comp f g) x = ap
 
 # I is derivable
 # coh SKK (a b : .) : ap (a -> b -> a) (a -> a) (ap (a -> (b -> a) -> a) ((a -> b -> a) -> a -> a) (S a (b -> a) a) (K a (b -> a))) (K a b) = I a
-# coh SKK {a b : .} : ap (ap S K) K = I
+coh SKK {a b : .} : ap (ap S K) (K {a} {b}) = I
 
-# ## Church numerals with pi-types
+## Church numerals with pi-types
 
-# let zero (a : .) (f : a -> a) (x : a) := x
+let zero {a : .} (f : a -> a) (x : a) := x
 
-# let one (a : .) (f : a -> a) (x : a) := ap a a f x
+let one {a : .} (f : a -> a) (x : a) := ap f x
 
-# let two (a : .) (f : a -> a) (x : a) := ap a a f (ap a a f x)
+let two {a : .} (f : a -> a) (x : a) := ap f (ap f x)
 
-# let three (a : .) (f : a -> a) (x : a) := ap a a f (ap a a f (ap a a f x))
+let three {a : .} (f : a -> a) (x : a) := ap f (ap f (ap f x))
 
-# # let add (a : .) (m n : nat a) (f : a -> a) (x : a) := ap a a (ap (a -> a) (a -> a) m f) (ap a a (ap (a -> a) (a -> a) n f) x)
+# let add (a : .) (m n : nat a) (f : a -> a) (x : a) := ap a a (ap (a -> a) (a -> a) m f) (ap a a (ap (a -> a) (a -> a) n f) x)
 
-# # let add-zero (a : .) (n : nat a) : add a (zero a) n = n
+# let add-zero {a : .} (n : nat a) : add zero n = n
 
-# ## Church numerals
+## Church numerals
 
-# let nat (a : .) := (a -> a) -> a -> a
+let nat (a : .) := (a -> a) -> a -> a
 
-# let zero (a : .) : nat a := K' (a -> a) a
+let zero {a : .} : nat a := K'
 
-# let one (a : .) : nat a := I (a -> a)
+let one {a : .} : nat a := I
 
-# let two (a : .) : nat a := ap ((a -> a) -> (a -> a) -> (a -> a)) ((a -> a) -> (a -> a)) (W (a -> a) (a -> a)) (B a a a)
-# # let two (a : .) : nat a := ap _ _ (W _ _) (B a a a)
+let two {a : .} : nat a := ap W B
+# let two (a : .) : nat a := ap _ _ (W _ _) (B a a a)
 
-# # [n f x].f(n f x)
-# # [nf].B(nf)
-# # [n].BB(BnI)
-# # BB(BB(C(BBI)I))
+# [n f x].f(n f x)
+# [nf].B(nf)
+# [n].BB(BnI)
+# BB(BB(C(BBI)I))
 
-# # let suc (a : .) : nat a := ap2 _ _ _ B
+# let suc (a : .) : nat a := ap2 _ _ _ B
 
-# # m.n.f.
+# m.n.f.
 
-# # let add (a : b) (m n : nat a) :=
+# let add (a : b) (m n : nat a) :=
 
-# ## Products
+## Products
 
-# coh fst (a b : .) (_ : a × b) : a
+coh fst {a b : .} (_ : a × b) : a
 
-# coh snd (a b : .) (_ : a × b) : b
+coh snd {a b : .} (_ : a × b) : b
 
-# coh pair (a b : .) (_ : a) (_ : b) : a × b
+coh pair {a b : .} (_ : a) (_ : b) : a × b
 
-# coh diag (a : .) : a -> a * a
+coh diag {a : .} : a -> a * a
 
-# coh diag-pair (a : .) (x : a) : ap _ _ (diag a) x = pair a a x x
+coh diag-pair {a : .} (x : a) : ap diag x = pair x x
 
-# coh fst-pair (a b : .) (x : a) (y : b) : fst a b (pair a b x y) = x
+coh fst-pair {a b : .} (x : a) (y : b) : fst (pair x y) = x
 
-# coh snd-pair (a b : .) (x : a) (y : b) : fst a b (pair a b x y) = x
+coh snd-pair {a b : .} (x : a) (y : b) : fst (pair x y) = x
 
-# coh pair-sym (a b : .) (_ : a × b) : (b × a)
+coh pair-sym {a b : .} (_ : a × b) : (b × a)
 
-# let pair-sym' (a b : .) (x : a × b) := pair b a (snd a b x) (fst a b x)
+let pair-sym' {a b : .} (x : a × b) := pair (snd x) (fst x)
 
-# coh pair-syms (a b : .) (x : a × b) : pair-sym a b x = pair-sym' a b x
+coh pair-syms {a b : .} (x : a × b) : pair-sym x = pair-sym' x
 
-# coh pair1 (a b : .) (a' b' : .) (f : a -> a') (g : b -> b') : (a * b -> a' * b')
+coh pair1 {a b : .} {a' b' : .} (f : a -> a') (g : b -> b') : (a * b -> a' * b')
 
-# # # TODO: generalize
+# # TODO: generalize
 # # coh pair2 (a b : .) (f g f' g' : a -> b) (p : f = f') (q : g = g') : (pair1 a b a b f g = pair1 f' g')
 
-# ## Curryfication
+## Curryfication
 
-# coh curry (a b c : .) : (a * b -> c) -> (a -> b -> c)
+coh curry {a b c : .} : (a * b -> c) -> (a -> b -> c)
 
-# coh uncurry (a b c : .) : (a -> b -> c) -> (a * b -> c)
+coh uncurry {a b c : .} : (a -> b -> c) -> (a * b -> c)
 
-# coh curry-uncurry (a b c : .) : comp (a * b -> c) (a -> b -> c) (a * b -> c) (curry a b c) (uncurry a b c) = I (a * b -> c)
+coh curry-uncurry {a b c : .} : comp curry uncurry = I {a * b -> c}
 
-# coh uncurry-curry (a b c : .) : comp (a -> b -> c) (a * b -> c) (a -> b -> c) (uncurry a b c) (curry a b c) = I (a -> b -> c)
-
-# ## Test implicit arguments
-
-# coh ap {a b : .} (t : a → b) (u : a) : b
-
-# let K' (a b : .) : a -> b -> b := ap (K _ _) (I _)
+coh uncurry-curry {a b c : .} : comp uncurry curry = I {a -> b -> c}
