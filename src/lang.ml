@@ -327,6 +327,8 @@ let metavariables e =
   in
   aux e []
 
+let has_metavariable m e = List.mem m (metavariables e)
+
 exception Unification
 
 (** Make sure that two values are equal (and raise [Unification] if this cannot be the case). *)
@@ -346,11 +348,12 @@ let rec unify ?(alpha=[]) t t' =
   | _, Hole (t', _) -> unify t t'
   | Meta { value = Some t; _ }, _ -> unify t t'
   | _, Meta { value = Some t'; _ } -> unify t t'
+  | Meta m, Meta m' when m = m' -> ()
   | Meta m, _ ->
-    (* TODO: check for cycles *)
+    if has_metavariable m t' then raise Unification;
     m.value <- Some t'
   | _, Meta m' ->
-    (* TODO: check for cycles *)
+    if has_metavariable m' t then raise Unification;
     m'.value <- Some t
   | _ -> raise Unification
 
