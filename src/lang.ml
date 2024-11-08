@@ -304,13 +304,13 @@ let rec unify ?(alpha=[]) t t' =
   let unify ?(alpha=alpha) = unify ~alpha in
   match t.desc, t'.desc with
   | Var x, Var y ->
-    let y = match List.assoc_opt y alpha with Some y -> y | None -> y in
+    let x = match List.assoc_opt x alpha with Some x -> x | None -> x in
     if x <> y then raise Unification
   | Hom (a, b), Hom (a', b') -> unify a a'; unify b b'
   | Obj, Obj -> ()
   | Type, Type -> ()
   | Prod (a, b), Prod (a', b') -> unify a a'; unify b b'
-  | Pi (i, x, a, b), Pi (i', x', a', b') -> (if i <> i' then raise Unification); unify a a'; unify ~alpha:((x',x)::alpha) b b'
+  | Pi (i, x, a, b), Pi (i', x', a', b') -> (if i <> i' then raise Unification); unify a a'; unify ~alpha:((x,x')::alpha) b b'
   | Hole (t, _), _ -> unify t t'
   | _, Hole (t', _) -> unify t t'
   | Meta { value = Some t; _ }, _ -> unify t t'
