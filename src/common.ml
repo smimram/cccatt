@@ -17,5 +17,5 @@ let error ?pos e =
     | Some pos when pos = Pos.dummy -> ""
     | Some pos -> Pos.to_string pos ^ ": "
   in
-  (* Printf.ksprintf (fun s -> failwith "[EE]: %s%s.\n%!" pos s) e *)
-  Printf.ksprintf (fun s -> printf "[EE]: %s%s.\n%!" pos s; exit 1) e
+  Printf.ksprintf (fun s -> failwith "[EE]: %s%s.\n%!" pos s) e
+  (* Printf.ksprintf (fun s -> printf "[EE]: %s%s.\n%!" pos s; exit 1) e *)

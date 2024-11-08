@@ -384,8 +384,18 @@ let rec infer tenv env e =
   (* printf "\n"; *)
   match e.desc with
   | Coh (l, a) ->
-    (* TODO: don't ignore... *)
-    check tenv env (pis (List.map (fun (x,a) -> `Explicit,x,a) l) a) (mk Type) |> ignore;
+    let l, a =
+      let l' = ref [] in
+      let rec aux tenv env = function
+        | (x,a)::l ->
+          let a = check tenv env a (mk Type) in
+          l' := (x,a) :: !l';
+          aux ((x,eval env a)::tenv) ((x,var x)::env) l
+        | [] -> check tenv env a (mk Type)
+      in
+      let a = aux tenv env l in
+      List.rev !l', a
+    in
     check_ps ~pos l a;
     mk ~pos (Coh (l, a)), eval env a
   | Var x ->
