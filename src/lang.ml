@@ -117,6 +117,8 @@ let fresh_var_name =
     incr n;
     Printf.sprintf "x#%d" !n
 
+let fresh_var () = fresh_var_name () |> var
+
 (** Build multiple hom types. *)
 let rec homs ?pos l t =
   match l with
@@ -432,10 +434,12 @@ let rec infer tenv env e =
 
 (* NOTE: a is supposed to be a value *)
 and check tenv env e a =
-  printf "* check %s : %s\n%!" (to_string e) (to_string a);
+  (* printf "* check %s : %s\n%!" (to_string e) (to_string a); *)
   match e.desc, a.desc with
-  (* | Abs(`Implicit,x,a,t), Pi(`Implicit,x',a',b) -> *)
-    (* unify *)
+  | Abs(`Implicit,x,a,t), Pi(`Implicit,x',a',b) when x = x' (* TODO: alpha *)->
+    unify a a';
+    let t = check ((x,a)::tenv) ((x,var x)::env) t b in
+    mk ~pos:e.pos (Abs(`Implicit,x,a,t))
   | _ ->
     let e, b = infer tenv env e in
     try
