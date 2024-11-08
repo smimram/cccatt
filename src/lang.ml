@@ -428,7 +428,7 @@ let rec infer tenv env e =
 
 (* NOTE: a is supposed to be a value *)
 and check tenv env e a =
-  (* printf "* check %s : %s\n%!" (to_string e) (V.to_string a); *)
+  (* printf "* check %s : %s\n%!" (to_string e) (to_string a); *)
   let e, b = infer tenv env e in
   try if not (b.desc = Obj && a.desc = Type) then unify b a; e
   with
