@@ -478,7 +478,7 @@ let rec infer tenv env e =
 and check tenv env e a =
   (* printf "* check %s : %s\n%!" (to_string e) (to_string a); *)
   match e.desc, a.desc with
-  | Abs(`Implicit,x,a,t), Pi(`Implicit,x',a',b) when x = x' (* TODO: alpha *)->
+  | Abs(`Implicit,x,a,t), Pi(`Implicit,x',a',b) when x = x' (* TODO: alpha? *)->
     unify a a';
     let t = check ((x,a)::tenv) ((x,var x)::env) t b in
     mk ~pos:e.pos (Abs(`Implicit,x,a,t))
