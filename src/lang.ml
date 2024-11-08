@@ -149,6 +149,10 @@ let rec has_fv x e =
   | Obj -> false
   | _ -> error ~pos:e.pos "has_fv: handle %s" (to_string e)
 
+let is_implicit_pi e =
+  match e.desc with
+  | Pi(`Implicit,_,_,_) -> true
+  | _ -> false
 
 (** Check whether a type is a pasting scheme. *)
 let check_ps_type a =
@@ -428,19 +432,20 @@ let rec infer tenv env e =
 
 (* NOTE: a is supposed to be a value *)
 and check tenv env e a =
-  (* printf "* check %s : %s\n%!" (to_string e) (to_string a); *)
-  let e, b = infer tenv env e in
-  try if not (b.desc = Obj && a.desc = Type) then unify b a; e
-  with
-  | Unification ->
-    (
-      match b.desc with
-      | Pi (`Implicit, _, _, _) ->
-        (* Printf.printf "check add hole to %s\n%!" (to_string e); *)
+  printf "* check %s : %s\n%!" (to_string e) (to_string a);
+  match e.desc, a.desc with
+  (* | Abs(`Implicit,x,a,t), Pi(`Implicit,x',a',b) -> *)
+    (* unify *)
+  | _ ->
+    let e, b = infer tenv env e in
+    try
+      if not (b.desc = Obj && a.desc = Type) then unify b a; e
+    with
+    | Unification ->
+      if is_implicit_pi b && not (is_implicit_pi a) then
         let e = mk ~pos:e.pos (App (`Implicit, e, hole ())) in
         check tenv env e a
-      | _ -> failure e.pos "got %s but %s expected" (to_string b) (to_string a)
-    )
+      else failure e.pos "got %s but %s expected" (to_string b) (to_string a)
 
 (** All metavariables of a term. *)
 let metavariables e =
