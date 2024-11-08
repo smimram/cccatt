@@ -14,9 +14,9 @@ coh eval-ap-I {a : .} (x : a) : ap I x = x
 let ap-K {a b : .} (x : a) : b -> a := ap K x
 
 let ap-K {a b : .} (x : a) (y : b) := ap (ap K x) y
-# coh ap-K {a b : .} (x : a) (y : b) : ap (ap K x) y = x
+coh ap-K {a b : .} (x : a) (y : b) : ap (ap K x) y = x
 
-let id {a : .} : a -> a := ap (ap S K) K
+let I {a : .} : a -> a := ap (ap S K) K
 
 coh comp {a b c : .} (f : a → b) (g : b → c) : a → c
 
@@ -36,45 +36,31 @@ coh K' (a b : .) : a -> b -> b
 let K' {a b : .} : a -> b -> b := ap K (I {b})
 # let K' {a b : .} : a -> b -> b := ap K I
 
-# ## Test
+## Testing variables
 
-# check I
+let id {a : .} (x : a) := ap I x
 
-# ## Testing variables
+## Testing identities
 
-# let id := I
+coh refl {a : .} (x : a) : x = x
 
-# let id (a : .) (x : a) := ap a a (I a) x
+coh sym {a : .} {x y : a} (p : x = y) : y = x
 
-# ## Testing holes
+coh trans {a : .} {x y z : a} (p : x = y) (q : y = z) : x = z
 
-# let id' (a : .) (x : a) := ap _ _ (I _) x
+coh ap-cong {a b : .} {t t' : a → b} {u u' : a} (p : t = t') (q : u = u') : ap t u = ap t' u'
 
-# let ap' (a b : .) (x : a) (f : a -> b) := ap _ _ f x
+coh comp-cong {a b c : .} {f f' : a -> b} {g g' : b -> c} (p : f = f') (q : g = g') : comp f g = comp f' g'
 
-# let ap2 (a b c : .) (f : a -> b -> c) (x : a) (y : b) := ap _ _ (ap _ _ f x) y
+coh ap-I {a : .} (x : a) : ap I x = x
 
-# ## Testing identities
+coh ap-K {a b : .} (x : a) (y : b) : ap (ap K x) y = x
 
-# coh refl (a : .) (x : a) : x = x
+coh ap-comp {a b c : .} (f : a -> b) (g : b -> c) (x : a) : ap (comp f g) x = ap g (ap f x)
 
-# coh sym (a : .) (x y : a) (p : x = y) : y = x
-
-# coh trans (a : .) (x y z : a) (p : x = y) (q : y = z) : x = z
-
-# coh ap-cong (a b : .) (t t' : a → b) (u u' : a) (p : t = t') (q : u = u') : ap a b t u = ap a b t' u'
-
-# coh comp-cong (a b c : .) (f f' : a -> b) (g g' : b -> c) (p : f = f') (q : g = g') : comp _ _ _ f g = comp _ _ _ f' g'
-
-# coh ap-I (a : .) (x : a) : ap a a (I a) x = x
-
-# coh ap-K (a b : .) (x : a) (y : b) : ap b a (ap a (b -> a) (K a b) x) y = x
-
-# coh ap-comp (a b c : .) (f : a -> b) (g : b -> c) (x : a) : ap a c (comp a b c f g) x = ap b c g (ap a b f x)
-
-# # I is derivable
-# # coh SKK (a b : .) : ap (a -> b -> a) (a -> a) (ap (a -> (b -> a) -> a) ((a -> b -> a) -> a -> a) (S a (b -> a) a) (K a (b -> a))) (K a b) = I a
-# coh SKK (a b : .) : ap _ _ (ap _ _ (S _ _ _) (K _ _)) (K _ b) = I a
+# I is derivable
+# coh SKK (a b : .) : ap (a -> b -> a) (a -> a) (ap (a -> (b -> a) -> a) ((a -> b -> a) -> a -> a) (S a (b -> a) a) (K a (b -> a))) (K a b) = I a
+# coh SKK {a b : .} : ap (ap S K) K = I
 
 # ## Church numerals with pi-types
 
