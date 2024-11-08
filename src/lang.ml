@@ -4,7 +4,7 @@ open Extlib
 open Common
 
 let failure pos fmt =
-  Printf.ksprintf (fun s -> failwith (Pos.to_string pos ^ ": " ^ s)) fmt
+  Printf.ksprintf (fun s -> failwith "%s: %s" (Pos.to_string pos) s) fmt
 
 (** An expression. *)
 type t =
@@ -72,6 +72,10 @@ let rec to_string ?(pa=false) e =
       | _ -> Printf.sprintf "?%d" m.id
     )
   | Type -> "Type"
+
+let string_of_implicit = function
+  | `Implicit -> "implicit"
+  | `Explicit -> "explicit"
 
 let string_of_context env = List.map (fun (x,v) -> x ^ " = " ^ to_string v) env |> String.concat ","
 
@@ -265,7 +269,7 @@ let check_ps ?pos l a =
         | Prod (a, b) -> fv |> aux a |> aux b
         | Id (a, t, u) -> fv |> aux a |> aux t |> aux u
         | App (_, t, u) -> fv |> aux t |> aux u
-        | _ -> failwith (Printf.sprintf "TODO: fv handle %s" (to_string a))
+        | _ -> failwith "TODO: fv handle %s" (to_string a)
       in
       aux a []
     in
@@ -289,7 +293,7 @@ let check_ps ?pos l a =
       (deproduct a)@(deproduct b)
     | Var _
     | Obj -> [e]
-    | _ -> failwith (Printf.sprintf "TODO: deproduct handle %s" (to_string e))
+    | _ -> failwith "TODO: deproduct handle %s" (to_string e)
   in
   let aa =
     let l = List.map snd l in
@@ -353,7 +357,7 @@ let rec eval env e =
     (
       match (eval env t).desc with
       | Abs (i',x,_,t) ->
-        if i <> i' then error "Application mismatch in %s" (to_string e);
+        if i <> i' then error "Application mismatch in %s (%s instead of %s application)" (to_string e) (string_of_implicit i) (string_of_implicit i');
         let u = eval env u in
         eval ((x,u)::env) t
       | _ -> assert false
