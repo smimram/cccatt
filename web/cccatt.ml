@@ -48,7 +48,8 @@ let run _ =
 
   let print s =
     let s = Js.to_string output##.value ^ s in
-    output##.value := Js.string s
+    output##.value := Js.string s;
+    output##.scrollTop := output##.scrollHeight
   in
   let error s =
     print ("=¡.¡= Error: " ^ s)
