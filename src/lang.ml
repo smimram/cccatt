@@ -301,7 +301,32 @@ let check_ps ?pos l a =
     List.map (homs ?pos l) (deproduct a)
   in
   List.iter check_ps_type aa
-   
+
+(** All metavariables of a term. *)
+let metavariables e =
+  let rec aux e acc =
+  match e.desc with
+  | Coh (l, a) -> List.fold_left (fun acc (_, a) -> aux a acc) acc l |> aux a
+  | Var _ -> acc
+  | Abs (_, _, a, t) -> acc |> aux a |> aux t
+  | App (_, t, u) -> acc |> aux t |> aux u
+  | Obj -> acc
+  | Pi (_, _, a, b)
+  | Hom (a, b)
+  | Prod (a, b) -> acc |> aux a |> aux b
+  | Id (a, t, u) -> acc |> aux a |> aux t |> aux u
+  | Hole (t, a) -> acc |> aux t |> aux a
+  | Meta m ->
+    (
+      let acc = if List.memq m acc then acc else m::acc in
+      match m.value with
+      | Some v -> aux v acc
+      | None -> acc
+    )
+  | Type -> acc
+  in
+  aux e []
+
 exception Unification
 
 (** Make sure that two values are equal (and raise [Unification] if this cannot be the case). *)
@@ -465,34 +490,6 @@ and check tenv env e a =
         check tenv env e a
       else failure e.pos "got %s but %s expected" (to_string b) (to_string a)
 
-(** All metavariables of a term. *)
-let metavariables e =
-  let rec aux e acc =
-  match e.desc with
-  | Coh (l, a) -> List.fold_left (fun acc (_, a) -> aux a acc) acc l |> aux a
-  | Var _ -> acc
-  | Abs (_, _, a, t) -> acc |> aux a |> aux t
-  | App (_, t, u) -> acc |> aux t |> aux u
-  | Obj -> acc
-  | Pi (_, _, a, b)
-  | Hom (a, b)
-  | Prod (a, b) -> acc |> aux a |> aux b
-  | Id (a, t, u) -> acc |> aux a |> aux t |> aux u
-  | Hole (t, a) -> acc |> aux t |> aux a
-  | Meta m ->
-    (
-      let acc = if List.memq m acc then acc else m::acc in
-      match m.value with
-      | Some v -> aux v acc
-      | None -> acc
-    )
-  | Type -> acc
-  in
-  aux e []
-
-let metavariables e =
-  metavariables e |> List.sort compare
-
 let print_metavariables_elaboration m =
   List.iter
     (fun (m:meta) ->
@@ -503,14 +500,14 @@ let print_metavariables_elaboration m =
            | None -> "?"
          in
          printf "=?.?= at %s, ?%d elaborated to %s\n" (Pos.to_string (Option.get m.pos)) m.id v
-    ) m
+    ) (List.sort compare m)
 
 let print_unelaborated_metavariables m =
   List.iter
     (fun (m:meta) ->
        if m.value = None then
          printf "=?.?= warning: unelaborated ?%d at %s\n%!" m.id (Pos.Option.to_string m.pos)
-    ) m
+    ) (List.sort compare m)
 
 let exec_command (tenv, env) p =
   match p with
