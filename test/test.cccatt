@@ -51,6 +51,10 @@ let test (a b : .) : b -> a -> b := K b a
 coh K' (a b : .) : a -> b -> b
 let K' (a b : .) : a -> b -> b := ap (b -> b) (a -> b -> b) (K (b -> b) a) (I b)
 
+#An interesting example of a contractible type
+
+coh bla (a b c : .) : ((a -> b) -> c) -> b -> c
+
 ## Test
 
 check I
