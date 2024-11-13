@@ -149,7 +149,16 @@ let pair-sym' (a b : .) (x : a × b) := pair b a (snd a b x) (fst a b x)
 
 coh pair-syms (a b : .) (x : a × b) : pair-sym a b x = pair-sym' a b x
 
-coh pair1 (a b : .) (a' b' : .) (f : a -> a') (g : b -> b') : (a * b -> a' * b')
+coh pair1 (a b a' b' : .) (f : a -> a') (g : b -> b') : (a * b -> a' * b')
+
+coh pairing1 (a b b' : .) (f : a -> b) (g : a -> b') : (a -> b * b')
+
+# TODO: rename external one
+coh fst (a b : .) : a * b -> a
+
+coh snd (a b : .) : a * b -> b
+
+coh pairing1-fst (a b b' : .) (f : a -> b) (g : a -> b') : comp _ _ _ (pairing1 a b b' f g) (fst _ _) = f
 
 # # TODO: generalize
 # coh pair2 (a b : .) (f g f' g' : a -> b) (p : f = f') (q : g = g') : (pair1 a b a b f g = pair1 f' g')
