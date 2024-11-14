@@ -1,0 +1,46 @@
+# Categorical combinators
+# See Curien, 1986
+
+# Generators
+
+coh comp {a b c : .} (f : a -> b) (g : b -> c) : a -> c
+
+coh id {a : .} : a -> a
+
+coh pairing {a b c : .} (f : a -> b) (g : a -> c) : a -> b * c
+
+coh fst {a b : .} : a * b -> a
+
+coh snd {a b : .} : a * b -> b
+
+coh abs {a b c : .} (f : a * b -> c) : a -> b -> c
+
+coh app {a b : .} : (a -> b) * a -> b
+
+coh ap {a b : .} (f : a -> b) (x : a) : b
+
+coh pair {a b : .} (x : a) (y : b) : a * b
+
+# Coherences
+
+coh Ass {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : comp (comp f g) h = comp f (comp g h)
+
+coh IdL {a b : .} (f : a -> b) : comp id f = f
+
+coh IdR {a b : .} (f : a -> b) : comp f id = f
+
+coh Fst {a b c : .} (f : a -> b) (g : a -> c) : comp (pairing f g) fst = f
+
+coh Snd {a b c : .} (f : a -> b) (g : a -> c) : comp (pairing f g) snd = g
+
+coh DPair {a' a b c : .} (f : a' -> a) (g : a -> b) (h : a -> c) : comp f (pairing g h) = pairing (comp f g) (comp f h)
+
+# coh Beta {a b c : .} (f : a -> b) (g : a * b -> c) : comp f (abs g) = abs (comp _ g)
+
+# coh DAbs {a' a b c : .} (f : a' -> a) (g : a * b -> c) : comp f (abs g) = _
+
+coh AI {a b : .} : abs app = id {a -> b}
+
+coh FSI {a b : .} : pairing fst snd = id {a * b}
+
+# coh _ass {a' a b : .} :
