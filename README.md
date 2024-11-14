@@ -4,6 +4,11 @@ A type theory for **unbiased cartesian closed categories**. We provide a small p
 
 The theory should come up soon.
 
+## Some examples
+
+- [Curry's axioms for λ-calculus](tests/curry.cccatt)
+- [Curien's categorical combinators](tests/curien.cccatt)
+
 ## Emacs mode
 
 The Emacs mode can be loaded by adding
