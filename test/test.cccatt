@@ -136,6 +136,8 @@ coh fst (a b : .) (_ : a × b) : a
 
 coh snd (a b : .) (_ : a × b) : b
 
+coh term (a : .) (_ : a) : 1
+
 coh pair (a b : .) (_ : a) (_ : b) : a × b
 
 coh diag (a : .) : a -> a * a

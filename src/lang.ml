@@ -21,6 +21,7 @@ and desc =
   | Pi   of implicit * string * t * t (** Π-type *)
   | Hom  of t * t (** hom type *)
   | Prod of t * t (** product type *)
+  | One (** terminal type *)
   | Id   of t * t * t (** identity type *)
   | Hole of t * t (** hole along with its type *)
   | Meta of meta (** a variable to be unified *)
@@ -62,6 +63,7 @@ let rec to_string ?(pa=false) e =
   | Obj -> "."
   | Hom (a, b) -> Printf.sprintf "%s → %s" (to_string ~pa:true a) (to_string b) |> pa
   | Prod (a, b) -> Printf.sprintf "%s × %s" (to_string ~pa:true a) (to_string b) |> pa
+  | One -> "1"
   | Id (a, t, u) ->
     Printf.sprintf "(%s = %s : %s)" (to_string ~pa:true t) (to_string ~pa:true u) (to_string ~pa:true a) |> pa
   | Hole (t, _) -> Printf.sprintf "[%s]" (to_string t)
@@ -226,6 +228,7 @@ let check_ps ?pos l a =
         )
       | Hom (a, b) -> mk (Hom (rewrite a, rewrite b))
       | Prod (a, b) -> mk (Prod (rewrite a, rewrite b))
+      | One -> mk One
       | Id (a, t, u) -> mk (Id (rewrite a, rewrite t, rewrite u))
       | Obj -> e
       | App (i, t, u) -> mk (App (i, rewrite t, rewrite u))
@@ -267,6 +270,7 @@ let check_ps ?pos l a =
         | Obj -> fv
         | Hom (a, b) -> fv |> aux a |> aux b
         | Prod (a, b) -> fv |> aux a |> aux b
+        | One -> fv
         | Id (a, t, u) -> fv |> aux a |> aux t |> aux u
         | App (_, t, u) -> fv |> aux t |> aux u
         | _ -> failwith "TODO: fv handle %s" (to_string a)
@@ -289,8 +293,8 @@ let check_ps ?pos l a =
       let aa = deproduct a in
       let bb = deproduct b in
       List.map (fun b -> homs ~pos:e.pos aa b) bb
-    | Prod (a, b) ->
-      (deproduct a)@(deproduct b)
+    | Prod (a, b) -> (deproduct a)@(deproduct b)
+    | One -> []
     | Var _
     | Obj -> [e]
     | _ -> failwith "TODO: deproduct handle %s" (to_string e)
@@ -314,6 +318,7 @@ let metavariables e =
   | Pi (_, _, a, b)
   | Hom (a, b)
   | Prod (a, b) -> acc |> aux a |> aux b
+  | One -> acc
   | Id (a, t, u) -> acc |> aux a |> aux t |> aux u
   | Hole (t, a) -> acc |> aux t |> aux a
   | Meta m ->
@@ -397,6 +402,7 @@ let rec eval env e =
   | Obj -> mk Obj
   | Hom (a, b) -> mk (Hom (eval env a, eval env b))
   | Prod (a, b) -> mk (Prod (eval env a, eval env b))
+  | One -> mk One
   | Type -> mk Type
   | Hole (t, _) -> t
   | Meta { value = Some t; _ } -> eval env t
@@ -468,6 +474,8 @@ let rec infer tenv env e =
     let a = check tenv env a (mk Obj) in
     let b = check tenv env b (mk Obj) in
     mk ~pos (Prod (a, b)), mk Obj
+  | One ->
+    mk ~pos One, mk Obj
   | Type ->
     mk ~pos Type, mk Type
   | Hole (t, a) ->

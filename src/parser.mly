@@ -19,7 +19,7 @@ let pis ?pos l a =
 %}
 
 %token LET CHECK NCOH FUN TO HOLE
-%token COH HOM EQ EQDEF OBJ TIMES
+%token COH HOM EQ EQDEF OBJ TIMES ONE
 %token LPAR RPAR LACC RACC COL
 %token <string> IDENT
 %token EOF
@@ -52,6 +52,7 @@ expr:
   | expr HOM expr { mk (Hom ($1, $3)) }
   | expr EQ expr { mk (Id (hole (), $1, $3)) }
   | expr TIMES expr { mk (Prod ($1, $3)) }
+  | ONE { mk One }
   | aexpr { $1 }
 
 aexpr:

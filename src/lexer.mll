@@ -26,6 +26,7 @@ rule token = parse
   | "→" { utf8 ~n:2 lexbuf; HOM }
   | "*" { utf8 lexbuf; TIMES }
   | "×" { utf8 lexbuf; TIMES }
+  | "1" { ONE }
   | "=" { EQ }
   | ":=" { EQDEF }
   | "_" { HOLE }
