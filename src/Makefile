@@ -2,7 +2,8 @@ all:
 	@dune build
 
 test:
-	@dune exec ./cccatt.exe ../test/test.cccatt
+	# @dune exec ./cccatt.exe ../test/test.cccatt
+	$(MAKE) -C ../test test
 
 curry:
 	@dune exec ./cccatt.exe ../test/curry.cccatt

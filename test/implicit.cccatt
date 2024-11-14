@@ -108,9 +108,9 @@ coh term {a : .} (_ : a) : 1
 
 coh pair {a b : .} (_ : a) (_ : b) : a × b
 
-coh pair-assoc {a b c : .} (x : a) (y : b) (z : c) : pair (pair x y) z = pair x (pair y z)
+# coh pair-assoc {a b c : .} (x : a) (y : b) (z : c) : pair (pair x y) z = pair x (pair y z)
 
-coh pair-unit-l {a : .} (x : a) : pair term x = x
+# coh pair-unit-l {a : .} (x : a) : pair term x = x
 
 coh diag {a : .} : a -> a * a
 
