@@ -183,3 +183,5 @@ coh uncurry-curry (a b c : .) : comp (a -> b -> c) (a * b -> c) (a -> b -> c) (u
 coh ap {a b : .} (t : a → b) (u : a) : b
 
 let K' (a b : .) : a -> b -> b := ap (K _ _) (I _)
+
+# let implicitarr (a : .) := id I
