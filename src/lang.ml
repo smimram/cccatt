@@ -23,7 +23,6 @@ and desc =
   | Prod of t * t (** product type *)
   | One (** terminal type *)
   | Id   of t * t * t (** identity type *)
-  | Hole of t * t (** hole along with its type *)
   | Meta of meta (** a variable to be unified *)
   | Obj  (** object type *)
   | Type (** the type of types *)
@@ -37,6 +36,7 @@ and meta =
     id : int;
     pos : Pos.t option;
     mutable value : t option;
+    ty : t;
   }
 
 (** String representation of an expression. This should mostly be useful for debugging (we want to print values). *)
@@ -66,7 +66,6 @@ let rec to_string ?(pa=false) e =
   | One -> "1"
   | Id (a, t, u) ->
     Printf.sprintf "(%s = %s : %s)" (to_string ~pa:true t) (to_string ~pa:true u) (to_string ~pa:true a) |> pa
-  | Hole (t, _) -> Printf.sprintf "[%s]" (to_string t)
   | Meta m ->
     (
       match m.value with
@@ -90,12 +89,12 @@ let var ?pos x = mk ?pos (Var x)
 
 let meta_counter = ref 0
 
+let meta ?pos ?value ty =
+  incr meta_counter;
+  mk ?pos (Meta { pos; value; id = !meta_counter; ty })
+
 let hole ?pos () =
-  let t = mk ?pos (Meta { pos = pos; value = None; id = !meta_counter }) in
-  incr meta_counter;
-  let a = mk (Meta { pos = None; value = None; id = !meta_counter }) in
-  incr meta_counter;
-  mk ?pos (Hole (t, a))
+  meta ?pos (meta ?pos (mk Obj))
 
 (** Create coherence with abstracted arguments. *)
 let abs_coh ?pos l a =
@@ -151,9 +150,8 @@ let rec has_fv x e =
   | Prod (a, b) -> has_fv x a || has_fv x b
   | Id (a, t, u) -> has_fv x a || has_fv x t || has_fv x u
   | App (_, t, u) -> has_fv x t || has_fv x u
-  | Hole (t, a) -> has_fv x t || has_fv x a
-  | Meta { value = Some t; _ } -> has_fv x t
-  | Meta { value = None; _ } -> true
+  | Meta { value = Some t; ty = ty; _ } -> has_fv x t || has_fv x ty
+  | Meta { value = None; ty = ty; _ } -> has_fv x ty
   | Obj -> false
   | _ -> error ~pos:e.pos "has_fv: handle %s" (to_string e)
 
@@ -232,7 +230,6 @@ let check_ps ?pos l a =
       | Id (a, t, u) -> mk (Id (rewrite a, rewrite t, rewrite u))
       | Obj -> e
       | App (i, t, u) -> mk (App (i, rewrite t, rewrite u))
-      | Hole (t, _) -> rewrite t
       | Meta { value = Some t; _ } -> rewrite t
       | _ -> error ~pos:e.pos "TODO: in rewrite handle %s" (to_string e)
     in
@@ -320,13 +317,12 @@ let metavariables e =
   | Prod (a, b) -> acc |> aux a |> aux b
   | One -> acc
   | Id (a, t, u) -> acc |> aux a |> aux t |> aux u
-  | Hole (t, a) -> acc |> aux t |> aux a
   | Meta m ->
     (
       let acc = if List.memq m acc then acc else m::acc in
       match m.value with
-      | Some v -> aux v acc
-      | None -> acc
+      | Some v -> acc |> aux v |> aux m.ty
+      | None -> acc |> aux m.ty
     )
   | Type -> acc
   in
@@ -349,8 +345,6 @@ let rec unify ?(alpha=[]) t t' =
   | Type, Type -> ()
   | Prod (a, b), Prod (a', b') -> unify a a'; unify b b'
   | Pi (i, x, a, b), Pi (i', x', a', b') -> (if i <> i' then raise Unification); unify a a'; unify ~alpha:((x,x')::alpha) b b'
-  | Hole (t, _), _ -> unify t t'
-  | _, Hole (t', _) -> unify t t'
   | Meta { value = Some t; _ }, _ -> unify t t'
   | _, Meta { value = Some t'; _ } -> unify t t'
   | Meta m, Meta m' when m = m' -> ()
@@ -404,7 +398,6 @@ let rec eval env e =
   | Prod (a, b) -> mk (Prod (eval env a, eval env b))
   | One -> mk One
   | Type -> mk Type
-  | Hole (t, _) -> t
   | Meta { value = Some t; _ } -> eval env t
   | Meta { value = None; _ } -> e
 
@@ -478,9 +471,8 @@ let rec infer tenv env e =
     mk ~pos One, mk Obj
   | Type ->
     mk ~pos Type, mk Type
-  | Hole (t, a) ->
-    mk ~pos (Hole (t, a)), a
-  | Meta _ -> assert false
+  | Meta m ->
+    mk ~pos (Meta m), eval env m.ty
 
 (* NOTE: a is supposed to be a value *)
 and check tenv env e a =
