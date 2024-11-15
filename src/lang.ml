@@ -333,7 +333,7 @@ let has_metavariable m e = List.mem m (metavariables e)
 exception Unification
 
 (** Make sure that two values are equal (and raise [Unification] if this cannot be the case). *)
-(* The first argument is the alpha-conversion to apply to t' *)
+(* The first argument is the alpha-conversion to apply to t *)
 let rec unify ?(alpha=[]) t t' =
   let unify ?(alpha=alpha) = unify ~alpha in
   match t.desc, t'.desc with
