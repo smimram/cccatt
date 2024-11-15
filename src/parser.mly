@@ -50,7 +50,7 @@ type_opt:
 expr:
   | FUN args TO expr { abss $2 $4 }
   | expr HOM expr { mk (Hom ($1, $3)) }
-  | expr EQ expr { mk (Id (hole (), $1, $3)) }
+  | expr EQ expr { mk (Id (hole ~pos:(defpos()) (), $1, $3)) }
   | expr TIMES expr { mk (Prod ($1, $3)) }
   | ONE { mk One }
   | aexpr { $1 }
@@ -64,7 +64,7 @@ aexpr:
 sexpr:
   | OBJ { mk Obj }
   | IDENT { mk (Var $1) }
-  | HOLE { hole ~pos:(defpos()) () }
+  | HOLE { hole ~pos:(defpos()) ~real:true () }
   | LPAR expr RPAR { $2 }
 
 args:

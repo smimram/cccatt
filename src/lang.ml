@@ -82,6 +82,7 @@ let string_of_context env = List.map (fun (x,v) -> x ^ " = " ^ to_string v) env 
 
 (** Create an expression from its contents. *)
 let mk ?pos desc : t =
+  (* assert (pos <> None); *)
   let pos = Option.value ~default:Pos.dummy pos in
   { desc; pos }
 
@@ -89,12 +90,13 @@ let var ?pos x = mk ?pos (Var x)
 
 let meta_counter = ref 0
 
-let meta ?pos ?value ty =
+let meta ?pos ?(real=false) ?value ty =
   incr meta_counter;
-  mk ?pos (Meta { pos; value; id = !meta_counter; ty })
+  mk ?pos (Meta { pos = if real then pos else None; value; id = !meta_counter; ty })
 
-let hole ?pos () =
-  meta ?pos (meta ?pos (mk Obj))
+(* Real means that the hole was written in the original source (so that we should display its elaborated contents). *)
+let hole ?pos ?(real=false) () =
+  meta ?pos ~real (meta ?pos (mk ?pos Type))
 
 (** Create coherence with abstracted arguments. *)
 let abs_coh ?pos l a =
@@ -334,30 +336,39 @@ exception Unification
 
 (** Make sure that two values are equal (and raise [Unification] if this cannot be the case). *)
 (* The first argument is the alpha-conversion to apply to t *)
-let rec unify ?(alpha=[]) t t' =
-  let unify ?(alpha=alpha) = unify ~alpha in
+let rec unify tenv env ?(alpha=[]) t t' =
+  let unify tenv env ?(alpha=alpha) = unify tenv env ~alpha in
   match t.desc, t'.desc with
   | Var x, Var y ->
     let x = match List.assoc_opt x alpha with Some x -> x | None -> x in
     if x <> y then raise Unification
-  | Hom (a, b), Hom (a', b') -> unify a a'; unify b b'
+  | Hom (a, b), Hom (a', b') ->
+    unify tenv env a a';
+    unify tenv env b b'
   | Obj, Obj -> ()
   | Type, Type -> ()
-  | Prod (a, b), Prod (a', b') -> unify a a'; unify b b'
-  | Pi (i, x, a, b), Pi (i', x', a', b') -> (if i <> i' then raise Unification); unify a a'; unify ~alpha:((x,x')::alpha) b b'
-  | Meta { value = Some t; _ }, _ -> unify t t'
-  | _, Meta { value = Some t'; _ } -> unify t t'
+  | Prod (a, b), Prod (a', b') -> unify tenv env a a'; unify tenv env b b'
+  | Pi (i, x, a, b), Pi (i', x', a', b') ->
+    if i <> i' then raise Unification;
+    unify tenv env a a';
+    let tenv = (x',eval env a)::tenv in
+    let env = (x',var x')::env in
+    unify tenv env ~alpha:((x,x')::alpha) b b'
+  | Meta { value = Some t; _ }, _ -> unify tenv env t t'
+  | _, Meta { value = Some t'; _ } -> unify tenv env t t'
   | Meta m, Meta m' when m = m' -> ()
   | Meta m, _ ->
     if has_metavariable m t' then raise Unification;
+    let t' = check tenv env t' m.ty in
     m.value <- Some t'
   | _, Meta m' ->
     if has_metavariable m' t then raise Unification;
+    let t = check tenv env t m'.ty in
     m'.value <- Some t
   | _ -> raise Unification
 
 (** Evaluate an expression to a value. *)
-let rec eval env e =
+and eval env e =
   (* Printf.printf "* eval: %s\n" (to_string e); *)
   (* Printf.printf "  env : %s\n" (string_of_context env); *)
   let mk ?(pos=e.pos) = mk ~pos in
@@ -403,7 +414,7 @@ let rec eval env e =
 
 (** Infer the type of an expression, elaborates the term along the way. *)
 (* NOTE: in the following environments only contain values, and type inference produces values. *)
-let rec infer tenv env e =
+and infer tenv env e =
   let pos = e.pos in
   (* printf "* infer %s\n%!" (to_string e); *)
   (* printf "  tenv : %s\n%!" (string_of_context tenv); *)
@@ -415,10 +426,10 @@ let rec infer tenv env e =
       let l' = ref [] in
       let rec aux tenv env = function
         | (x,a)::l ->
-          let a = check tenv env a (mk Type) in
+          let a = check tenv env a (mk ~pos:a.pos Type) in
           l' := (x,a) :: !l';
-          aux ((x,eval env a)::tenv) ((x,var x)::env) l
-        | [] -> check tenv env a (mk Type)
+          aux ((x,eval env a)::tenv) ((x,var ~pos:a.pos x)::env) l
+        | [] -> check tenv env a (mk ~pos:a.pos Type)
       in
       let a = aux tenv env l in
       List.rev !l', a
@@ -428,13 +439,13 @@ let rec infer tenv env e =
   | Var x ->
     (
       match List.assoc_opt x tenv with
-      | Some a -> mk ~pos (Var x), a
+      | Some a -> var ~pos x, a
       | None -> failure e.pos "unknown variable %s" x
     )
   | Abs (i,x,a,t) ->
-    let a = check tenv env a (mk Type) in
-    let t, b = infer ((x,eval env a)::tenv) ((x, mk (Var x))::env) t in
-    mk ~pos (Abs (i,x,a,t)), mk (Pi (i, x, a, b))
+    let a = check tenv env a (mk ~pos:a.pos Type) in
+    let t, b = infer ((x,eval env a)::tenv) ((x, var ~pos:a.pos x)::env) t in
+    mk ~pos (Abs (i,x,a,t)), mk ~pos (Pi (i, x, a, b))
   | App (i, t, u) ->
     (
       let t, a = infer tenv env t in
@@ -443,34 +454,34 @@ let rec infer tenv env e =
         let u = check tenv env u a in
         mk ~pos (App (i, t, u)), eval ((x, eval env u)::env) b
       | Pi (`Implicit, _x, _a, _b) when i = `Explicit ->
-        let t = mk ~pos:t.pos (App (`Implicit, t, hole ())) in
+        let t = mk ~pos:t.pos (App (`Implicit, t, hole ~pos:t.pos ())) in
         infer tenv env (mk ~pos (App (i, t, u)))
       | _ -> failure t.pos "of type %s but a function was expected" (to_string a)
     )
   | Pi (i, x, a, b) ->
-    let a = check tenv env a (mk Type) in
-    let b = check ((x, eval env a)::tenv) ((x, var x)::env) b (mk Type) in
-    mk ~pos (Pi (i, x, a, b)), mk Type
+    let a = check tenv env a (mk ~pos:a.pos Type) in
+    let b = check ((x, eval env a)::tenv) ((x, var ~pos:a.pos x)::env) b (mk ~pos:b.pos Type) in
+    mk ~pos (Pi (i, x, a, b)), mk ~pos Type
   | Id (a, t, u) ->
-    let a = check tenv env a (mk Obj) in
+    let a = check tenv env a (mk ~pos:a.pos Obj) in
     let a' = eval env a in
     let t = check tenv env t a' in
     let u = check tenv env u a' in
-    mk ~pos (Id (a, t, u)), mk Type
+    mk ~pos (Id (a, t, u)), mk ~pos Type
   | Obj ->
-    mk ~pos Obj, mk Type
+    mk ~pos Obj, mk ~pos Type
   | Hom (a, b) ->
-    let a = check tenv env a (mk Obj) in
-    let b = check tenv env b (mk Obj) in
-    mk ~pos (Hom (a, b)), mk Obj
+    let a = check tenv env a (mk ~pos:a.pos Obj) in
+    let b = check tenv env b (mk ~pos:b.pos Obj) in
+    mk ~pos (Hom (a, b)), mk ~pos Obj
   | Prod (a, b) ->
-    let a = check tenv env a (mk Obj) in
-    let b = check tenv env b (mk Obj) in
-    mk ~pos (Prod (a, b)), mk Obj
+    let a = check tenv env a (mk ~pos:a.pos Obj) in
+    let b = check tenv env b (mk ~pos:b.pos Obj) in
+    mk ~pos (Prod (a, b)), mk ~pos Obj
   | One ->
-    mk ~pos One, mk Obj
+    mk ~pos One, mk ~pos Obj
   | Type ->
-    mk ~pos Type, mk Type
+    mk ~pos Type, mk ~pos Type
   | Meta m ->
     mk ~pos (Meta m), eval env m.ty
 
@@ -479,17 +490,17 @@ and check tenv env e a =
   (* printf "* check %s : %s\n%!" (to_string e) (to_string a); *)
   match e.desc, a.desc with
   | Abs(`Implicit,x,a,t), Pi(`Implicit,x',a',b) when x = x' (* TODO: alpha? *)->
-    unify a a';
+    unify tenv env a a';
     let t = check ((x,a)::tenv) ((x,var x)::env) t b in
     mk ~pos:e.pos (Abs(`Implicit,x,a,t))
   | _ ->
     let e, b = infer tenv env e in
     try
-      if not (b.desc = Obj && a.desc = Type) then unify b a; e
+      if not (b.desc = Obj && a.desc = Type) then unify tenv env b a; e
     with
     | Unification ->
       if is_implicit_pi b && not (is_implicit_pi a) then
-        let e = mk ~pos:e.pos (App (`Implicit, e, hole ())) in
+        let e = mk ~pos:e.pos (App (`Implicit, e, hole ~pos:e.pos ())) in
         check tenv env e a
       else failure e.pos "got %s but %s expected" (to_string b) (to_string a)
 
@@ -543,7 +554,7 @@ let exec_command (tenv, env) p =
     printf "=^.^= check %s : %s\n%!" (Pos.to_string e.pos) (to_string a);
     tenv, env
   | NCoh (l, a) ->
-    check tenv env (pis (List.map (fun (x,a) -> `Explicit,x,a) l) a) (mk Type) |> ignore;
+    check tenv env (pis ~pos:a.pos (List.map (fun (x,a) -> `Explicit,x,a) l) a) (mk ~pos:a.pos Type) |> ignore;
     (try check_ps ~pos:a.pos l a; failure a.pos "expression accepted as a coherence" with _ -> ());
     tenv, env
 
