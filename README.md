@@ -7,7 +7,7 @@ The theory should come up soon.
 ## Some examples
 
 - [Curry's axioms for λ-calculus](test/curry.cccatt)
-- [Curien's categorical combinators](test/catcomb.cccatt)
+- [Curien's categorical combinators](test/curien.cccatt)
 
 ## Emacs mode
 
