@@ -36,11 +36,11 @@
       <p>
         If you don't feel inspired, here is a sample session:
       </p>
-      <pre>coh K (a b : .) : a -> b -> a
+      <pre>coh K {a b : .} : a -> b -> a
 
-coh ap (a b : .) (t : a -> b) (u : a) : b
+coh ap {a b : .} (t : a -> b) (u : a) : b
 
-coh ap-K (a b : .) (x : a) (y : b) : ap b a (ap a (b -> a) (K a b) x) y = x </pre>
+coh ap-K {a b : .} (x : a) (y : b) : ap (ap K x) y = x</pre>
 
       <h1>More details</h1>
       <ul>
