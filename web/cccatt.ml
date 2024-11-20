@@ -26,8 +26,8 @@ let run _ =
   let get_element_by_id id = doc##getElementById (Js.string id) |> jsget in
   let input = get_element_by_id "input" |> Html.CoerceTo.textarea |> jsget in
   let output = get_element_by_id "output" |> Html.CoerceTo.textarea |> jsget in
-  let send = get_element_by_id "send" |> Html.CoerceTo.input |> jsget in
-  let clear = get_element_by_id "clear" |> Html.CoerceTo.input |> jsget in
+  let send = get_element_by_id "send" |> Html.CoerceTo.button |> jsget in
+  let clear = get_element_by_id "clear" |> Html.CoerceTo.button |> jsget in
 
   let print s =
     let s = Js.to_string output##.value ^ s in

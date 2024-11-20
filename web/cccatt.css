@@ -1,45 +1,107 @@
 body {
-  margin: 2% 10%;
-  font-family: sans-serif;
-  font-size: 11pt;
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  color: #333;
+  background: #f9f9f9;
 }
 
-a {
-  color: darkblue;
+header, footer {
+  background: linear-gradient(135deg, #0077b6, #00b4d8);
+  color: white;
+  padding: 20px 15px;
+  text-align: center;
+}
+
+footer {
+  padding: 10px 15px;
+  margin-top: 30px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+main {
+  max-width: 800px;
+  margin: 30px auto;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 20px;
+}
+
+main h1 {
+  color: #0077b6;
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+}
+
+main p {
+  margin: 10px 0;
+}
+
+main a {
+  color: #00b4d8;
   text-decoration: none;
+  font-weight: bold;
 }
 
-a:hover {
+main a:hover {
   text-decoration: underline;
 }
 
-h1 {
-  text-align: center;
-}
-
-#areas {
-  text-align: center;
-}
-
 textarea {
-  font-size: 11pt;
+  width: 100%;
+  font-family: monospace;
+  font-size: 1rem;
+  height: 300px;
+  margin: 1ex 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  resize: vertical;
 }
 
-#input {
-  width: 45%;
+#buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-#output{
-  width: 45%;
-  /* color: #333; */
-  /* font-weight: bold; */
+button {
+  padding: 10px 15px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#send {
+  background: #0077b6;
+  color: white;
+}
+
+#send:hover {
+  background: #005f89;
+}
+
+#clear {
+  background: #ddd;
+  color: white;
+}
+
+#clear:hover {
+  background: #aaa;
 }
 
 pre {
-  color: darkred;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 1rem;
   background: whitesmoke;
+  border-radius: 5px;
   font-size: 11pt;
-  width: 100%;
   overflow-x: scroll;
   overflow-y: visible;
 }

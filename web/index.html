@@ -3,23 +3,52 @@
   <head>
     <title>CCCaTT: unbiased cartesian closed categories</title>
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="cccatt.css"/>
     <script type="text/javascript" src="cccatt.bc.js"></script>
   </head>
   <body>
-    <h1>CCCaTT<br/>=^.^=</h1>
-    <p style="text-align: center">
-      Unbiased cartesian closed categories.
-    </p>
+    <header>
+      <h1>CCCaTT<br/>=^.^=</h1>
+      <p style="text-align: center">
+        Unbiased cartesian closed categories.
+      </p>
+    </header>
 
-    <textarea id="input" cols="80" rows="25" placeholder="Write CCCaTT code here..."></textarea>
-    <textarea id="output" cols="80" rows="25" placeholder="Output" readonly="readonly"></textarea>
+    <main>
 
-    <br>
+      <h1>Typechecker</h1>
 
-    <input type="button" value="Send" id="send"><input type="button" value="Clear" id="clear">
+      <textarea id="input" cols="80" rows="25" placeholder="Write CCCaTT code here..."></textarea>
+      <textarea id="output" cols="80" rows="25" placeholder="Output" readonly="readonly"></textarea>
 
-    <script type="text/javascript">
+      <br>
+
+      <div id="buttons">
+        <button id="send">Send</button>
+        <button id="clear">Clear</button>
+      </div>
+
+      <h1>Examples</h1>
+      <p>
+        If you don't feel inspired, here is a sample session:
+      </p>
+      <pre>coh K (a b : .) : a -> b -> a
+
+coh ap (a b : .) (t : a -> b) (u : a) : b
+
+coh ap-K (a b : .) (x : a) (y : b) : ap b a (ap a (b -> a) (K a b) x) y = x </pre>
+
+      <h1>More details</h1>
+      <ul>
+        <li>The <a href="https://github.com/smimram/cccatt">source code</a>.</li>
+        <li>The <a href="doc">documentation for the modules</a>.</li>
+      </ul>
+    </main>
+    <footer>
+      &copy; Samuel Mimram
+    </footer>
+    <script>
       function ku(event) {
         if (event.keyCode == 13)
           document.getElementById("send").click();
@@ -28,21 +57,5 @@
         document.getElementById("input").onkeyup = ku;
       }
     </script>
-
-<h2>Examples</h2>
-    <p>
-      If you don't feel inspired, here is a sample session:
-    </p>
-      <pre>coh K (a b : .) : a -> b -> a
-
-coh ap (a b : .) (t : a -> b) (u : a) : b
-
-coh ap-K (a b : .) (x : a) (y : b) : ap b a (ap a (b -> a) (K a b) x) y = x </pre>
-
-    <h2>More details</h2>
-    <ul>
-      <li>The <a href="https://github.com/smimram/cccatt">source code</a>.</li>
-      <li>The <a href="doc">documentation for the modules</a>.</li>
-    </ul>
   </body>
 </html>
