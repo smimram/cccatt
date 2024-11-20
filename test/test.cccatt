@@ -184,4 +184,8 @@ coh ap {a b : .} (t : a → b) (u : a) : b
 
 let K' (a b : .) : a -> b -> b := ap (K _ _) (I _)
 
-# let implicitarr (a : .) := id I
+coh I {a : .} : a -> a
+
+coh J {a : .} : a -> a
+
+let bla {a : .} : a -> a := ap I J

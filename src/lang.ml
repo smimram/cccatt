@@ -162,6 +162,13 @@ let is_implicit_pi e =
   | Pi(`Implicit,_,_,_) -> true
   | _ -> false
 
+let is_metavariable e =
+  match e.desc with
+  | Meta { value = None; _ } -> true
+  | _ -> false
+
+let repos pos e = mk ~pos e.desc
+
 (** Check whether a type is a pasting scheme. *)
 let check_ps_type a =
   (* printf "* check_ps %s\n%!" (to_string a); *)
@@ -385,7 +392,7 @@ and eval env e =
   | Var x ->
     (
       match List.assoc_opt x env with
-      | Some v -> v
+      | Some v -> mk v.desc
       | None -> failure e.pos "unexpected error: value for %s not found" x
     )
   | Abs (i,x,a,e) ->
@@ -489,16 +496,16 @@ and infer tenv env e =
 and check tenv env e a =
   (* printf "* check %s : %s\n%!" (to_string e) (to_string a); *)
   match e.desc, a.desc with
-  | Abs(`Implicit,x,a,t), Pi(`Implicit,x',a',b) when x = x' (* TODO: alpha? *)->
+  (* Allow casting under implicit arrows. *)
+  | Abs(`Implicit,x,a,t), Pi(`Implicit,x',a',b) when x = x' (* TODO: alpha? *) ->
     unify tenv env a a';
     let t = check ((x,a)::tenv) ((x,var x)::env) t b in
     mk ~pos:e.pos (Abs(`Implicit,x,a,t))
   | _ ->
     let e, b = infer tenv env e in
-    try
-      if not (b.desc = Obj && a.desc = Type) then unify tenv env b a; e
+    try if not (b.desc = Obj && a.desc = Type) then unify tenv env b a; e
     with
-    | Unification ->
+    | (* Unification *) _ ->
       if is_implicit_pi b && not (is_implicit_pi a) then
         let e = mk ~pos:e.pos (App (`Implicit, e, hole ~pos:e.pos ())) in
         check tenv env e a
