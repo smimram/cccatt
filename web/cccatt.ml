@@ -22,29 +22,12 @@ let loop s =
   env := Lang.exec !env (Prover.parse s)
 
 let run _ =
-  let top =
-    Js.Opt.get
-      (doc##getElementById (Js.string "toplevel"))
-      (fun () -> assert false)
-  in
-
-  let areas = Html.createDiv doc in
-  Dom.appendChild top areas;
-
-  let input = Html.createTextarea doc in
-  input##.id := Js.string "input";
-  input##.cols := 80;
-  input##.rows := 25;
-  input##.placeholder := Js.string "Write CCCaTT code here...";
-  Dom.appendChild areas input;
-
-  let output = Html.createTextarea doc in
-  output##.id := Js.string "output";
-  output##.cols := 80;
-  output##.rows := 25;
-  output##.placeholder := Js.string "Output";
-  output##.readOnly := Js.bool true;
-  Dom.appendChild areas output;
+  let jsget x = Js.Opt.get x (fun () -> assert false) in
+  let get_element_by_id id = doc##getElementById (Js.string id) |> jsget in
+  let input = get_element_by_id "input" |> Html.CoerceTo.textarea |> jsget in
+  let output = get_element_by_id "output" |> Html.CoerceTo.textarea |> jsget in
+  let send = get_element_by_id "send" |> Html.CoerceTo.input |> jsget in
+  let clear = get_element_by_id "clear" |> Html.CoerceTo.input |> jsget in
 
   let print s =
     let s = Js.to_string output##.value ^ s in
@@ -57,33 +40,28 @@ let run _ =
   let read () =
     Js.to_string input##.value
   in
-
   Common.print_fun := print;
 
-  Dom.appendChild top (Html.createBr doc);
-
-  let send =
-    button
-      "Send"
-      (fun () ->
-         output##.value := Js.string "";
-         try read () |> String.trim |> loop
-         with
-         | Failure e -> error e
-         | e -> error (Printexc.to_string e)
-      )
-  in
-  let clear =
-    button
-      "Clear"
-      (fun () ->
+  send##.onclick :=
+    Html.handler
+      (fun _ ->
+         (
+           output##.value := Js.string "";
+           try read () |> String.trim |> loop
+           with
+           | Failure e -> error e
+           | e -> error (Printexc.to_string e)
+         );
+         Js.bool true
+      );
+  clear##.onclick :=
+    Html.handler
+      (fun _ ->
          input##.value := Js.string "";
-         output##.value := Js.string ""
-      )
-  in
-  send##.id := Js.string "send";
-  Dom.appendChild top send;
-  Dom.appendChild top clear;
+         output##.value := Js.string "";
+         Js.bool true
+      );
+
   input##focus;
   input##select;
 
