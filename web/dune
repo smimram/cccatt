@@ -1,6 +1,12 @@
 (executable
  (name cccatt)
  (modes js)
- (preprocess (pps js_of_ocaml-ppx))
+ (preprocess (pps ppx_blob js_of_ocaml-ppx))
+ (preprocessor_deps
+  (file ../test/test.cccatt)
+  (file ../test/implicit.cccatt)
+  (file ../test/curry.cccatt)
+  (file ../test/curien.cccatt)
+ )
  (libraries js_of_ocaml cccatt)
 )

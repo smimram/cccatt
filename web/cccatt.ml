@@ -28,6 +28,7 @@ let run _ =
   let output = get_element_by_id "output" |> Html.CoerceTo.textarea |> jsget in
   let send = get_element_by_id "send" |> Html.CoerceTo.button |> jsget in
   let clear = get_element_by_id "clear" |> Html.CoerceTo.button |> jsget in
+  let examples = get_element_by_id "examples" |> Html.CoerceTo.select |> jsget in
 
   let print s =
     let s = Js.to_string output##.value ^ s in
@@ -40,18 +41,19 @@ let run _ =
   let read () =
     Js.to_string input##.value
   in
+  let do_send () =
+    output##.value := Js.string "";
+    try read () |> String.trim |> loop
+    with
+    | Failure e -> error e
+    | e -> error (Printexc.to_string e)
+  in
   Common.print_fun := print;
 
   send##.onclick :=
     Html.handler
       (fun _ ->
-         (
-           output##.value := Js.string "";
-           try read () |> String.trim |> loop
-           with
-           | Failure e -> error e
-           | e -> error (Printexc.to_string e)
-         );
+         do_send ();
          Js.bool true
       );
   clear##.onclick :=
@@ -59,6 +61,13 @@ let run _ =
       (fun _ ->
          input##.value := Js.string "";
          output##.value := Js.string "";
+         Js.bool true
+      );
+  examples##.onchange :=
+    Html.handler
+      (fun _ ->
+         input##.value := examples##.value |> Js.to_string |> Examples.get |> Js.string;
+         do_send ();
          Js.bool true
       );
 

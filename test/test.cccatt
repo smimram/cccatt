@@ -1,30 +1,3 @@
-## Sanity checks
-
-# Not habited
-ncoh (a : .) : a
-
-# Not habited
-ncoh (a b : .) : a → b
-
-# Not habited and non-terminating
-ncoh (a : .) : (a → a) → a
-
-# Not contractible
-ncoh (a : .) : a → a → a
-
-# Not contractible
-ncoh (a : .) : (a → a) → a → a
-
-# Contractible but not a coherence
-ncoh (a b : .) : (b → a) → a → a
-
-# Deterministic but not a coherence
-ncoh (a b : .) : b → b → a → a
-
-ncoh (a : .) (x y : a) : x = y
-
-ncoh (a b : .) (f g : a → b) : f = g
-
 ## Useful stuff
 
 coh I (a : .) : a → a
