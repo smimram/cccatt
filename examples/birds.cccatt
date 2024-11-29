@@ -1,5 +1,6 @@
 # Bird combinators
 # https://hackage.haskell.org/package/data-aviary-0.4.0/docs/Data-Aviary-Birds.html
+# https://www.angelfire.com/tx4/cus/combinator/birds.html
 
 # I combinator - identity bird / idiot bird
 coh idiot {a : .} : a -> a
@@ -148,6 +149,12 @@ coh warblerstar {a b c : .} : (a -> b -> b -> c) -> a -> b -> c
 # W** warbler twice removed.
 coh warblerstarstar {a b c d : .} : (a -> b -> c -> c -> d) -> a -> b -> c -> d
 
+#
+# Relationship with SK
+#
 
+let B := bluebird
+let K := kestrel
+let S := starling
 
-
+coh blackbird-bluebird : blackbird = ap (ap B B) B
