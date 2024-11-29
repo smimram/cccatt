@@ -9,5 +9,5 @@ let get = function
   | "implicit" -> implicit
   | "curry" -> curry
   | "curien" -> curien
-  | "birds" -> curien
+  | "birds" -> birds
   | _ -> ""
