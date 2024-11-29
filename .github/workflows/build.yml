@@ -10,6 +10,7 @@ jobs:
       run: sudo apt-get -y install ocaml ocaml-dune ocaml-odoc js-of-ocaml
     - name: Install ppx_blob
       run: |
+        cd /tmp
         git clone https://github.com/johnwhitington/ppx_blob.git
         cd ppx_blob
         dune build @install
