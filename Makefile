@@ -9,6 +9,4 @@ clean:
 
 test:
 	@dune runtest
-	$(MAKE) -C test $@
-
-.PHONY: test
+	$(MAKE) -C tests $@
