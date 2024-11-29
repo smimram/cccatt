@@ -1,7 +1,7 @@
-let tests = [%blob "../test/test.cccatt"]
-let implicit = [%blob "../test/implicit.cccatt"]
-let curry = [%blob "../test/curry.cccatt"]
-let curien = [%blob "../test/curien.cccatt"]
+let tests = [%blob "../tests/test.cccatt"]
+let implicit = [%blob "../tests/implicit.cccatt"]
+let curry = [%blob "../examples/curry.cccatt"]
+let curien = [%blob "../examples/curien.cccatt"]
 
 let get = function
   | "tests" -> tests
