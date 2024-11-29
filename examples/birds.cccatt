@@ -153,8 +153,9 @@ coh warblerstarstar {a b c d : .} : (a -> b -> c -> c -> d) -> a -> b -> c -> d
 # Relationship with SK
 #
 
+coh ap {a b : .} (f : a -> b) (x : a) : b
 let B := bluebird
 let K := kestrel
 let S := starling
 
-coh blackbird-bluebird : blackbird = ap (ap B B) B
+# coh blackbird-bluebird : blackbird = ap (ap B B) B
