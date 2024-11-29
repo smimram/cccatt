@@ -1,0 +1,16 @@
+# BCKW
+# https://en.wikipedia.org/wiki/B,_C,_K,_W_system
+
+coh ap {a b : .} (f : a -> b) (x : a) : b
+
+# B x y z = x (y z)
+coh B {a b c : .} : (b -> c) -> (a -> b) -> a -> c
+
+# C x y z = x z y
+coh C {a b c : .} : (a -> b -> c) -> (b -> a -> c)
+
+# K x y = x
+coh K {a b : .} : a -> b -> a
+
+# W x y = x y y
+coh W {a b : .} : (a -> a -> b) -> (a -> b)

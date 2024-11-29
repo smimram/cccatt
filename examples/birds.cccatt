@@ -1,0 +1,153 @@
+# Bird combinators
+# https://hackage.haskell.org/package/data-aviary-0.4.0/docs/Data-Aviary-Birds.html
+
+# I combinator - identity bird / idiot bird
+coh idiot {a : .} : a -> a
+
+# K combinator
+coh kestrel {a b : .} : a -> b -> a
+
+# B combinator
+coh bluebird {a b c : .} : (b -> c) -> (a -> b) -> a -> c
+
+# C combinator
+coh cardinal {a b c : .} : (a -> b -> c) -> b -> a -> c
+
+# A combinator - apply / applicator. This is also called i-star.
+coh applicator {a b : .} : (a -> b) -> a -> b
+
+# Psi combinator - psi bird
+# coh psi {a b c : .} : (b -> b -> c) -> (a -> b) -> a -> a -> c
+
+# B3
+coh becard {a b c d : .} : (c -> d) -> (b -> c) -> (a -> b) -> a -> d
+
+# B1
+coh blackbird {a b c d : .} : (c -> d) -> (a -> b -> c) -> a -> b -> d
+
+# B'
+coh bluebird' {a b c d : .} : (a -> c -> d) -> a -> (b -> c) -> b -> d
+
+# B2
+coh bunting {a b c d e : .} : (d -> e) -> (a -> b -> c -> d) -> a -> b -> c -> e
+
+# C'
+coh cardinal' {a b c d : .} : (c -> a -> d) -> (b -> c) -> a -> b -> d
+
+# C* combinator - cardinal once removed.
+coh cardinalstar {a b c d : .} : (a -> c -> b -> d) -> a -> b -> c -> d
+
+# C** combinator - cardinal twice removed.
+coh cardinalstarstar {a b c d e : .} : (a -> b -> d -> c -> e) -> a -> b -> c -> d -> e
+
+# D
+coh dove {a b c d : .} : (a -> c -> d) -> a -> (b -> c) -> b -> d
+
+# D1
+coh dickcissel {a b c d e : .} : (a -> b -> d -> e) -> a -> b -> (c -> d) -> c -> e
+
+# D2
+coh dovekie {a b c d e : .} : (c -> d -> e) -> (a -> c) -> a -> (b -> d) -> b -> e
+
+# E
+coh eagle {a b c d e : .} : (a -> d -> e) -> a -> (b -> c -> d) -> b -> c -> e
+
+# E⁻
+coh eaglebald {a b c d e f g : .} : (e -> f -> g) -> (a -> b -> e) -> a -> b -> (c -> d -> f) -> c -> d -> g
+
+# F
+coh finch {a b c : .} : a -> b -> (b -> a -> c) -> c
+
+# F*
+coh finchstar {a b c d : .} : (c -> b -> a -> d) -> a -> b -> c -> d
+
+# F**
+coh finchstarstar {a b c d e : .} : (a -> d -> c -> b -> e) -> a -> b -> c -> d -> e
+
+# G
+coh goldfinch {a b c d : .} : (b -> c -> d) -> (a -> c) -> a -> b -> d
+
+# H
+coh hummingbird {a b c : .} : (a -> b -> a -> c) -> a -> b -> c
+
+# I*
+coh idstar {a b : .} : (a -> b) -> a -> b
+
+# I**
+coh idstarstar {a b c : .} : (a -> b -> c) -> a -> b -> c
+
+# Alternative J combinator - this is the J combintor of Joy, Rayward-Smith and Burton (see. Antoni Diller 'Compiling Functional Languages' page 104). It is not the J - jay combinator of the literature.
+coh jalt {a b c : .} : (a -> c) -> a -> b -> c
+
+# J' combinator - from Joy, Rayward-Smith and Burton.
+coh jalt' {a b c d : .} : (a -> b -> d) -> a -> b -> c -> d
+
+# J. This is the usual J combinator.
+# coh jay {a b : .} : (a -> b -> b) -> a -> b -> a -> b
+
+# Ki - kite. Corresponds to the encoding of false in the lambda calculus.
+coh kite {a b : .} : a -> b -> b
+
+# O
+# coh owl {a b :. } : ((a -> b) -> a) -> (a -> b) -> b
+
+# (Big) Phi combinator. This is the same function as starling'.
+coh phoenix {a b c d : .} : (b -> c -> d) -> (a -> b) -> (a -> c) -> a -> d
+
+# Q4
+coh quacky {a b c : .} : a -> (a -> b) -> (b -> c) -> c
+
+# Q. Haskell (##) in Peter Thiemann's Wash, reverse composition.
+coh queer {a b c : .} : (a -> b) -> (b -> c) -> a -> c
+
+# Q3
+coh quirky {a b c : .} : (a -> b) -> a -> (b -> c) -> c
+
+# Q1
+coh quixotic {a b c : .} : (b -> c) -> a -> (a -> b) -> c
+
+# Q2
+coh quizzical {a b c : .} : a -> (b -> c) -> (a -> b) -> c
+
+# R
+coh robin {a b c : .} : a -> (b -> a -> c) -> b -> c
+
+# R*. robin once removed
+coh robinstar {a b c d : .} : (b -> c -> a -> d) -> a -> b -> c -> d
+
+# R**. robin twice removed
+coh robinstarstar {a b c d e : .} : (a -> c -> d -> b -> e) -> a -> b -> c -> d -> e
+
+# S. Applicative's (<*>) on functions.
+coh starling {a b c : .} : (a -> b -> c) -> (a -> b) -> a -> c
+
+# S' combinator - starling prime - Turner's big phi. This is the same function as phoenix.
+coh starling' {a b c d : .} : (b -> c -> d) -> (a -> b) -> (a -> c) -> a -> d
+
+# T. Reverse application.
+coh thrush {a b : .} : a -> (a -> b) -> b
+
+# V (pairing)
+coh vireo {a b c : .} : a -> b -> (a -> b -> c) -> c
+
+# V* vireo once removed
+# coh vireostar {a b d : .} : (b -> a -> b -> d) -> a -> b -> b -> d
+
+# V** vireo twice removed
+# coh vireostarstar {a b c e : .} : (a -> c -> b -> c -> e) -> a -> b -> c -> c -> e
+
+# W elementary duplicator.
+coh warbler {a b : .} : (a -> a -> b) -> a -> b
+
+# W1 converse warbler. warbler with the arguments reversed.
+coh warbler1 {a b : .} : a -> (a -> a -> b) -> b
+
+# W* warbler once removed.
+coh warblerstar {a b c : .} : (a -> b -> b -> c) -> a -> b -> c
+
+# W** warbler twice removed.
+coh warblerstarstar {a b c d : .} : (a -> b -> c -> c -> d) -> a -> b -> c -> d
+
+
+
+

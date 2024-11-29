@@ -7,6 +7,7 @@
   (file ../tests/implicit.cccatt)
   (file ../examples/curry.cccatt)
   (file ../examples/curien.cccatt)
+  (file ../examples/birds.cccatt)
  )
  (libraries js_of_ocaml cccatt)
 )
