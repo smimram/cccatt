@@ -13,7 +13,7 @@ jobs:
         git clone https://github.com/johnwhitington/ppx_blob.git
         cd ppx_blob
         dune build @install
-        dune install
+        sudo dune install
     - name: Build
       run: make
     - name: Test
