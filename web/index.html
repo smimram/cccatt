@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <link rel="stylesheet" type="text/css" href="cccatt.css"/>
+    <script type="text/javascript" src="highlight.js"></script>
     <script type="text/javascript" src="cccatt.bc.js"></script>
   </head>
   <body>
@@ -71,37 +72,6 @@ coh ap-K {a b : .} (x : a) (y : b) : ap (ap K x) y = x</pre>
       function init() {
         document.getElementById("input").onkeyup = ku;
       }
-    </script>
-    <script type="module">
-      (async ({chrome, netscape}) => {
-        if (!chrome && !netscape) await import('https://unpkg.com/@ungap/custom-elements');
-        const {default: HighlightedCode} = await import('https://unpkg.com/highlighted-code');
-        const hljs = HighlightedCode.library;
-        hljs.registerLanguage('cccatt', function() {
-          return {
-            case_insensitive: false,
-            keywords: {
-              $pattern: /[->a-z:*=×→]+/,
-              keyword: ['coh','=',':='],
-              operator: ['->',,'→','*','×',':']
-            },
-            contains: [
-              {
-                className: 'string',
-                begin: '"',
-                end: '"'
-              },
-              hljs.COMMENT(
-                '#', // begin
-                '$', // end
-                {}
-              )
-            ]
-          }
-        })
-        // https://github.com/highlightjs/highlight.js/tree/main/src/styles
-        HighlightedCode.useTheme('github');
-      })(self);
     </script>
   </body>
 </html>
