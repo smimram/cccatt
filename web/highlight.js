@@ -6,9 +6,9 @@
     return {
       case_insensitive: false,
       keywords: {
-        $pattern: /[->a-z:*=×→.]+/,
-        keyword: ['coh','=',':='],
-        operator: ['->','→','*','×',':','.']
+        $pattern: /[->a-z:*=×→.^?]+/,
+        keyword: ['defined','coh','=',':='],
+        operator: ['->','→','=>','*','×',':','.','=^\.^=','=\?\.\?=']
       },
       contains: [
         {
