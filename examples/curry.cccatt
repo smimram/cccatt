@@ -31,7 +31,9 @@ coh P2 {a b : .} : a * b -> b
 coh T : 1
 
 coh P1P {a b : .} (x : a) (y : b) : ap P1 (ap (ap P x) y) = x
+
 coh P2P {a b : .} (x : a) (y : b) : ap P2 (ap (ap P x) y) = y
+
 coh Peta {a b : .} (x : a * b) : ap (ap P (ap P1 x)) (ap P2 x) = x
 
 coh prod1 {a b c : .} : ap (ap S (ap K (ap S (ap K (ap S (ap K P1)))))) (ap (ap S (ap K S)) (ap S (ap K P))) = K {a -> c} {a -> b}
