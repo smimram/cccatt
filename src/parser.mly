@@ -51,6 +51,7 @@ expr:
   | FUN args TO expr { abss $2 $4 }
   | expr HOM expr { mk (Hom ($1, $3)) }
   | expr EQ expr { mk (Id (hole ~pos:(defpos()) (), $1, $3)) }
+  | expr EQ LACC expr RACC expr %prec EQ { mk (Id ($4, $1, $6)) }
   | expr TIMES expr { mk (Prod ($1, $3)) }
   | ONE { mk One }
   | aexpr { $1 }
