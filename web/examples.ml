@@ -3,6 +3,7 @@ let implicit = [%blob "../tests/implicit.cccatt"]
 let curry = [%blob "../examples/curry.cccatt"]
 let curien = [%blob "../examples/curien.cccatt"]
 let birds = [%blob "../examples/birds.cccatt"]
+let linear = [%blob "../examples/linear.cccatt"]
 
 let get = function
   | "tests" -> tests
@@ -10,4 +11,5 @@ let get = function
   | "curry" -> curry
   | "curien" -> curien
   | "birds" -> birds
+  | "linear" -> linear
   | _ -> ""

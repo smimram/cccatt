@@ -1,6 +1,6 @@
 (rule
  (alias runtest)
- (deps curry.cccatt curry-noimplicit.cccatt curry2.cccatt curien.cccatt birds.cccatt)
+ (deps curry.cccatt curry-noimplicit.cccatt curry2.cccatt curien.cccatt birds.cccatt linear.cccatt)
  (action
    (progn
     (run ../src/cccatt.exe curry.cccatt)
@@ -8,6 +8,7 @@
     (run ../src/cccatt.exe curry2.cccatt)
     (run ../src/cccatt.exe curien.cccatt)
     (run ../src/cccatt.exe birds.cccatt)
+    (run ../src/cccatt.exe linear.cccatt)
    )
  )
 )

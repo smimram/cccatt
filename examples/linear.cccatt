@@ -1,0 +1,14 @@
+# Axioms for linear λ-terms
+# This is also known as BCI-calculus
+
+coh ap {a b : .} (f : a -> b) (x : a) : b
+
+coh B {a b c : .} : (b -> c) -> (a -> b) -> a -> c
+
+coh C {a b c : .} : (a -> b -> c) -> b -> a -> c
+
+coh I {a : .} : a -> a
+
+coh ax {a b : .} : ap (ap C B) I = I {a -> b}
+
+coh ax {a b : .} : ap B I = I {a -> b}
