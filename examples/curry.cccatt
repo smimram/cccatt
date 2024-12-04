@@ -1,4 +1,6 @@
-## λ-calculus
+# λ-calculus
+
+## Combinators
 
 coh I {a : .} : a → a
 
@@ -8,7 +10,7 @@ coh S {a b c : .} : (a → b → c) → (a → b) → a → c
 
 coh ap {a b : .} (t : a → b) (u : a) : b
 
-## Version with holes
+## Curry's axioms
 
 coh ax1 {a b c : .} : ap (ap S (ap (ap S (ap K S)) (ap (ap S (ap K K)) (ap (ap S (ap K S)) K)))) (ap K K) = ap S (ap (K {_} {c}) (K {b} {a}))
 
