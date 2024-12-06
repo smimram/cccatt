@@ -99,7 +99,7 @@ coh phoenix {a b c d : .} : (b -> c -> d) -> (a -> b) -> (a -> c) -> a -> d
 # Q4
 coh quacky {a b c : .} : a -> (a -> b) -> (b -> c) -> c
 
-# Q. Haskell (##) in Peter Thiemann's Wash, reverse composition.
+# Q. Reverse composition.
 coh queer {a b c : .} : (a -> b) -> (b -> c) -> a -> c
 
 # Q3
@@ -114,16 +114,16 @@ coh quizzical {a b c : .} : a -> (b -> c) -> (a -> b) -> c
 # R
 coh robin {a b c : .} : a -> (b -> a -> c) -> b -> c
 
-# R*. robin once removed
+# R*. Robin once removed
 coh robinstar {a b c d : .} : (b -> c -> a -> d) -> a -> b -> c -> d
 
-# R**. robin twice removed
+# R**. Robin twice removed
 coh robinstarstar {a b c d e : .} : (a -> c -> d -> b -> e) -> a -> b -> c -> d -> e
 
-# S. Applicative's (<*>) on functions.
+# S.
 coh starling {a b c : .} : (a -> b -> c) -> (a -> b) -> a -> c
 
-# S' combinator - starling prime - Turner's big phi. This is the same function as phoenix.
+# S'. Turner's Φ. This is the same function as phoenix.
 coh starling' {a b c d : .} : (b -> c -> d) -> (a -> b) -> (a -> c) -> a -> d
 
 # T. Reverse application.
