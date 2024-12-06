@@ -1,18 +1,7 @@
 # Bird combinators
+# From Raymond Smullyan, _To mock a mockingbird_
 # https://hackage.haskell.org/package/data-aviary-0.4.0/docs/Data-Aviary-Birds.html
 # https://www.angelfire.com/tx4/cus/combinator/birds.html
-
-# I combinator - identity bird / idiot bird
-coh idiot {a : .} : a -> a
-
-# K combinator
-coh kestrel {a b : .} : a -> b -> a
-
-# B combinator
-coh bluebird {a b c : .} : (b -> c) -> (a -> b) -> a -> c
-
-# C combinator
-coh cardinal {a b c : .} : (a -> b -> c) -> b -> a -> c
 
 # A combinator - apply / applicator. This is also called i-star.
 coh applicator {a b : .} : (a -> b) -> a -> b
@@ -26,11 +15,17 @@ coh becard {a b c d : .} : (c -> d) -> (b -> c) -> (a -> b) -> a -> d
 # B1
 coh blackbird {a b c d : .} : (c -> d) -> (a -> b -> c) -> a -> b -> d
 
+# B combinator
+coh bluebird {a b c : .} : (b -> c) -> (a -> b) -> a -> c
+
 # B'
 coh bluebird' {a b c d : .} : (a -> c -> d) -> a -> (b -> c) -> b -> d
 
 # B2
 coh bunting {a b c d e : .} : (d -> e) -> (a -> b -> c -> d) -> a -> b -> c -> e
+
+# C combinator
+coh cardinal {a b c : .} : (a -> b -> c) -> b -> a -> c
 
 # C'
 coh cardinal' {a b c d : .} : (c -> a -> d) -> (b -> c) -> a -> b -> d
@@ -71,6 +66,9 @@ coh goldfinch {a b c d : .} : (b -> c -> d) -> (a -> c) -> a -> b -> d
 # H
 coh hummingbird {a b c : .} : (a -> b -> a -> c) -> a -> b -> c
 
+# I combinator - identity bird / idiot bird
+coh idiot {a : .} : a -> a
+
 # I*
 coh idstar {a b : .} : (a -> b) -> a -> b
 
@@ -85,6 +83,9 @@ coh jalt' {a b c d : .} : (a -> b -> d) -> a -> b -> c -> d
 
 # J. This is the usual J combinator.
 # coh jay {a b : .} : (a -> b -> b) -> a -> b -> a -> b
+
+# K combinator
+coh kestrel {a b : .} : a -> b -> a
 
 # Ki - kite. Corresponds to the encoding of false in the lambda calculus.
 coh kite {a b : .} : a -> b -> b
