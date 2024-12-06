@@ -20,7 +20,10 @@ coh ax3 {a b : .} : ap S (ap K I) = I {a -> b}
 
 coh ax4 {a b c : .} : ap (ap S (ap K S)) (ap S (ap K K)) = K {a -> c} {a -> b}
 
-coh ax5 {a b c d : .} : ap (ap S (ap K (ap S (ap K S)))) (ap (ap S (ap K S)) (ap S (ap K S))) = ap (ap S (ap (ap S (ap K S)) (ap (ap S (ap K K)) (ap (ap S (ap K S)) (ap (ap S (ap K (ap S (ap K S)))) S))))) (ap (K {_} {c -> b -> a -> d}) S)
+coh ax5 {a b c d : .} :
+  ap (ap S (ap K (ap S (ap K S)))) (ap (ap S (ap K S)) (ap S (ap K S)))
+  ={ (a -> b -> c -> d) -> (a -> b -> c) -> (a -> b) -> a -> d }
+  ap (ap S (ap (ap S (ap K S)) (ap (ap S (ap K K)) (ap (ap S (ap K S)) (ap (ap S (ap K (ap S (ap K S)))) S))))) (ap (K) S)
 
 ## Products
 
