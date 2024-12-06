@@ -10,12 +10,21 @@ let print_fun = ref print_string
 let printf fmt = Printf.ksprintf (fun s -> !print_fun s) fmt
 
 (** Return an error message. *)
-let error ?pos e =
+let error ?pos fmt =
   let pos =
     match pos with
     | None -> ""
     | Some pos when pos = Pos.dummy -> ""
     | Some pos -> Pos.to_string pos ^ ": "
   in
-  Printf.ksprintf (fun s -> failwith "[EE]: %s%s.\n%!" pos s) e
+  Printf.ksprintf (fun s -> failwith "[EE]: %s%s.\n%!" pos s) fmt
   (* Printf.ksprintf (fun s -> printf "[EE]: %s%s.\n%!" pos s; exit 1) e *)
+
+let warning ?pos fmt =
+  let pos =
+    match pos with
+    | None -> ""
+    | Some pos when pos = Pos.dummy -> ""
+    | Some pos -> Pos.to_string pos ^ ": "
+  in
+  Printf.ksprintf (fun s -> failwith "[WW]: %s%s.\n%!" pos s) fmt

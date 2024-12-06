@@ -22,6 +22,7 @@ let pis ?pos l a =
 %token COH HOM EQ EQDEF OBJ TIMES ONE
 %token LPAR RPAR LACC RACC COL
 %token <string> IDENT
+%token <string> SETTING
 %token EOF
 
 %right TO
@@ -34,6 +35,7 @@ let pis ?pos l a =
 %%
 
 prog:
+  | SETTING prog { Setting.parse $1; $2 }
   | cmd prog { $1::$2 }
   | EOF { [] }
 

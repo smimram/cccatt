@@ -9,7 +9,7 @@
 
 (library
  (public_name cccatt)
- (modules extlib common lang parser lexer prover)
+ (modules extlib common setting lang parser lexer prover)
  (wrapped false)
 )
 
