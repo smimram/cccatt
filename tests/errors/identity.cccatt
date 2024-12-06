@@ -1,0 +1,5 @@
+# This identity is fine
+coh good (a : .) (x y : a) (p : x = y) : a
+
+# This one, however, cannot be eliminated
+coh bad (a : .) (x : a) (p : x = x) : a

@@ -1,1 +1,2 @@
+# We have an unbound variable x
 coh unbound (a : .) : x -> x
