@@ -3,106 +3,129 @@
 # https://hackage.haskell.org/package/data-aviary-0.4.0/docs/Data-Aviary-Birds.html
 # https://www.angelfire.com/tx4/cus/combinator/birds.html
 
-# - "crossed X" means that we exchange the two arguments of X, i.e. we take CX
+# - "crossed X" (or "converse X") means that we exchange the two arguments of X, i.e. we take CX
 # - "X once removed" means that the first argument now takes an argument, i.e. we take B x
 
-# A combinator - apply / applicator. This is also called i-star.
-coh applicator {a b : .} : (a -> b) -> a -> b
-
-# B3
-coh becard {a b c d : .} : (c -> d) -> (b -> c) -> (a -> b) -> a -> d
-
-# B1
-coh blackbird {a b c d : .} : (c -> d) -> (a -> b -> c) -> a -> b -> d
-
-# B. Categorical composition.
-# λfgx.g(fx)
-coh bluebird {a b c : .} : (b -> c) -> (a -> b) -> a -> c
-
-# B'
-coh bluebird' {a b c d : .} : (a -> c -> d) -> a -> (b -> c) -> b -> d
-
-# B2
-coh bunting {a b c d e : .} : (d -> e) -> (a -> b -> c -> d) -> a -> b -> c -> e
-
-# C. Crossing bird.
-# λfxy.fyx
-coh cardinal {a b c : .} : (a -> b -> c) -> b -> a -> c
-
-# C'
-coh cardinal' {a b c d : .} : (c -> a -> d) -> (b -> c) -> a -> b -> d
-
-# C* combinator - cardinal once removed.
-coh cardinalstar {a b c d : .} : (a -> c -> b -> d) -> a -> b -> c -> d
-
-# C** combinator - cardinal twice removed.
-coh cardinalstarstar {a b c d e : .} : (a -> b -> d -> c -> e) -> a -> b -> c -> d -> e
-
-# D
-coh dove {a b c d : .} : (a -> c -> d) -> a -> (b -> c) -> b -> d
-
-# D1
-coh dickcissel {a b c d e : .} : (a -> b -> d -> e) -> a -> b -> (c -> d) -> c -> e
-
-# D2
-coh dovekie {a b c d e : .} : (c -> d -> e) -> (a -> c) -> a -> (b -> d) -> b -> e
-
-# E
-coh eagle {a b c d e : .} : (a -> d -> e) -> a -> (b -> c -> d) -> b -> c -> e
-
-# E⁻
-coh eaglebald {a b c d e f g : .} : (e -> f -> g) -> (a -> b -> e) -> a -> b -> (c -> d -> f) -> c -> d -> g
-
-# F
-coh finch {a b c : .} : a -> b -> (b -> a -> c) -> c
-
-# F*
-coh finchstar {a b c d : .} : (c -> b -> a -> d) -> a -> b -> c -> d
-
-# F**
-coh finchstarstar {a b c d e : .} : (a -> d -> c -> b -> e) -> a -> b -> c -> d -> e
-
-# G
-coh goldfinch {a b c d : .} : (b -> c -> d) -> (a -> c) -> a -> b -> d
-
-# H
-coh hummingbird {a b c : .} : (a -> b -> a -> c) -> a -> b -> c
-
-# I. Idiot or identity bird.
-# λx.x
-coh idiot {a : .} : a -> a
-
-# I*
+# Applicator
+# This is the same as I* (identity once removed).
 # λfx.fx
-coh idstar {a b : .} : (a -> b) -> a -> b
+coh A {a b : .} : (a -> b) -> a -> b
 
-# I**
+# Bluebird
+# This corresponds to categorical composition. It also performs "once removing".
+# λfgx.g(fx)
+coh B {a b c : .} : (b -> c) -> (a -> b) -> a -> c
+
+# Bluebird'. Same as Dove.
+# λfxgy.fx(gy)
+coh B' {a b c d : .} : (a -> c -> d) -> a -> (b -> c) -> b -> d
+
+# Blackbird
+# λfgxy.g(fxy)
+coh B1 {a b c d : .} : (c -> d) -> (a -> b -> c) -> a -> b -> d
+
+# Bunting
+# λfgxyz.f(gxyz)
+coh B2 {a b c d e : .} : (d -> e) -> (a -> b -> c -> d) -> a -> b -> c -> e
+
+# Becard
+# λfghx.h(g(fx))
+coh B3 {a b c d : .} : (c -> d) -> (b -> c) -> (a -> b) -> a -> d
+
+# Cardinal
+# This bird produces crossed variants. This is the Thrush once removed.
+# λfxy.fyx
+coh C {a b c : .} : (a -> b -> c) -> b -> a -> c
+
+# Cardinal'
+# λfgxy.f(gy)x
+coh C' {a b c d : .} : (c -> a -> d) -> (b -> c) -> a -> b -> d
+
+# Cardinal once removed (C*)
+# λfxyz.fxzy
+coh Cs {a b c d : .} : (a -> c -> b -> d) -> a -> b -> c -> d
+
+# Cardinal twice removed (C**)
+# λfxyzw.fxywz
+coh Css {a b c d e : .} : (a -> b -> d -> c -> e) -> a -> b -> c -> d -> e
+
+# Dove. Same as Bluebird'.
+# λfxgy.fx(gy)
+coh D {a b c d : .} : (a -> c -> d) -> a -> (b -> c) -> b -> d
+
+# Dickcissel
+# λfxygz.fxy(gz)
+coh D1 {a b c d e : .} : (a -> b -> d -> e) -> a -> b -> (c -> d) -> c -> e
+
+# Dovekie
+coh D2 {a b c d e : .} : (c -> d -> e) -> (a -> c) -> a -> (b -> d) -> b -> e
+
+# Eagle
+coh E {a b c d e : .} : (a -> d -> e) -> a -> (b -> c -> d) -> b -> c -> e
+
+# Eagle bald (E-)
+coh Em {a b c d e f g : .} : (e -> f -> g) -> (a -> b -> e) -> a -> b -> (c -> d -> f) -> c -> d -> g
+
+# Finch
+coh F {a b c : .} : a -> b -> (b -> a -> c) -> c
+
+# Finch once removed (F*)
+coh Fs {a b c d : .} : (c -> b -> a -> d) -> a -> b -> c -> d
+
+# Finch twice removed (F**)
+coh Fss {a b c d e : .} : (a -> d -> c -> b -> e) -> a -> b -> c -> d -> e
+
+# Goldfinch
+# λfgxy.fy(gx)
+coh G {a b c d : .} : (b -> c -> d) -> (a -> c) -> a -> b -> d
+
+# Hummingbird
+# λfxy.fxyx
+coh H {a b c : .} : (a -> b -> a -> c) -> a -> b -> c
+
+# Idiot or identity bird.
+# λx.x
+coh I {a : .} : a -> a
+
+# Identity once removed
+# This is the same as B.
+# λfx.fx
+coh Is {a b : .} : (a -> b) -> a -> b
+
+# Identity twice removed
 # λfxy.fxy
-coh idstarstar {a b c : .} : (a -> b -> c) -> a -> b -> c
+coh Iss {a b c : .} : (a -> b -> c) -> a -> b -> c
 
 # Alternative J combinator - this is the J combintor of Joy, Rayward-Smith and Burton (see. Antoni Diller 'Compiling Functional Languages' page 104). It is not the J - jay combinator of the literature.
-coh jalt {a b c : .} : (a -> c) -> a -> b -> c
+coh Jalt {a b c : .} : (a -> c) -> a -> b -> c
 
 # J' combinator - from Joy, Rayward-Smith and Burton.
-coh jalt' {a b c d : .} : (a -> b -> d) -> a -> b -> c -> d
+coh Kalt' {a b c d : .} : (a -> b -> d) -> a -> b -> c -> d
 
-# J.
-# coh jay {a b : .} : (a -> b -> b) -> a -> b -> a -> b
+# Jay. Discovered in 1935 by Barkley Rosser, along with I generates all non-erasing terms.
+# λfxyz.fx(fzy)
+# coh J {a b : .} : (a -> b -> b) -> a -> b -> a -> b
 
-# K. Kestrel or Konstant bird. Curryfied first projection. K x returns the konstant x.
+# Kestrel or Konstant bird.
+# K x returns the konstant x. Curryfied first projection.
 # λxy.x
-coh kestrel {a b : .} : a -> b -> a
+coh K {a b : .} : a -> b -> a
 
-# Ki. Curryfied second projection. Corresponds to the encoding of false in the lambda calculus.
+# Kite
+# This is the konstant idiot: K I
+# Curryfied second projection. Corresponds to the encoding of false in the lambda calculus.
 # λxy.y
-coh kite {a b : .} : a -> b -> b
+coh Ki {a b : .} : a -> b -> b
+
+# Lark (L)
+# λfx.fxx
 
 # M. Mocking bird. Also known as ω.
 # λx.xx
 # This is untypable.
 
-# O
-# coh owl {a b :. } : ((a -> b) -> a) -> (a -> b) -> b
+# Owl
+# coh O {a b :. } : ((a -> b) -> a) -> (a -> b) -> b
 
 # (Big) Phi combinator. This is the same function as starling'.
 coh phoenix {a b c d : .} : (b -> c -> d) -> (a -> b) -> (a -> c) -> a -> d
@@ -110,66 +133,74 @@ coh phoenix {a b c d : .} : (b -> c -> d) -> (a -> b) -> (a -> c) -> a -> d
 # Psi combinator - psi bird
 # coh psi {a b c : .} : (b -> b -> c) -> (a -> b) -> a -> a -> c
 
-# Q4
-coh quacky {a b c : .} : a -> (a -> b) -> (b -> c) -> c
+# Quacky
+coh Q4 {a b c : .} : a -> (a -> b) -> (b -> c) -> c
 
-# Q. Reverse composition.
-coh queer {a b c : .} : (a -> b) -> (b -> c) -> a -> c
+# Queer. Reverse composition.
+coh Q {a b c : .} : (a -> b) -> (b -> c) -> a -> c
 
-# Q3
-coh quirky {a b c : .} : (a -> b) -> a -> (b -> c) -> c
+# Quirky
+coh Q3 {a b c : .} : (a -> b) -> a -> (b -> c) -> c
 
-# Q1
-coh quixotic {a b c : .} : (b -> c) -> a -> (a -> b) -> c
+# Quixotic
+coh Q1 {a b c : .} : (b -> c) -> a -> (a -> b) -> c
 
-# Q2
-coh quizzical {a b c : .} : a -> (b -> c) -> (a -> b) -> c
+# Quizzical
+coh Q2 {a b c : .} : a -> (b -> c) -> (a -> b) -> c
 
-# R
-coh robin {a b c : .} : a -> (b -> a -> c) -> b -> c
+# Robin
+coh R {a b c : .} : a -> (b -> a -> c) -> b -> c
 
-# R*. Robin once removed
-coh robinstar {a b c d : .} : (b -> c -> a -> d) -> a -> b -> c -> d
+# Robin once removed (R*)
+coh Rs {a b c d : .} : (b -> c -> a -> d) -> a -> b -> c -> d
 
-# R**. Robin twice removed
-coh robinstarstar {a b c d e : .} : (a -> c -> d -> b -> e) -> a -> b -> c -> d -> e
+# Robin twice removed (R**)
+coh Rss {a b c d e : .} : (a -> c -> d -> b -> e) -> a -> b -> c -> d -> e
 
-# S.
+# Starling
 # λfgx.fx(gx)
-coh starling {a b c : .} : (a -> b -> c) -> (a -> b) -> a -> c
+coh S {a b c : .} : (a -> b -> c) -> (a -> b) -> a -> c
 
-# S'. Turner's Φ. This is the same function as phoenix.
-coh starling' {a b c d : .} : (b -> c -> d) -> (a -> b) -> (a -> c) -> a -> d
+# Starling'. Turner's Φ. This is the same function as phoenix.
+coh S' {a b c d : .} : (b -> c -> d) -> (a -> b) -> (a -> c) -> a -> d
 
-# T. Transposed application. This is the crossed idiot once removed (CI*).
+# Thrush. Transposed application. This is the crossed idiot once removed (CI*).
 # λxf.fx
-coh thrush {a b : .} : a -> (a -> b) -> b
+coh T {a b : .} : a -> (a -> b) -> b
 
-# V. Pairing.
+# Turing.
+# λfx.f((xx)f)
+
+# Vireo. Pairing.
 # λxyf.fxy
-coh vireo {a b c : .} : a -> b -> (a -> b -> c) -> c
+coh V {a b c : .} : a -> b -> (a -> b -> c) -> c
 
-# V* vireo once removed
-# coh vireostar {a b d : .} : (b -> a -> b -> d) -> a -> b -> b -> d
+# Vireo once removed (V*)
+# coh Vs {a b d : .} : (b -> a -> b -> d) -> a -> b -> b -> d
 
-# V** vireo twice removed
-# coh vireostarstar {a b c e : .} : (a -> c -> b -> c -> e) -> a -> b -> c -> c -> e
+# Vireo twice removed (V**)
+# coh Vss {a b c e : .} : (a -> c -> b -> c -> e) -> a -> b -> c -> c -> e
 
-# W. Elementary duplicator. Corresponds to ω* (Mocking once removed).
+# Warbler. Elementary duplicator. Corresponds to ω* (Mocking once removed).
 # λfx.fxx
-coh warbler {a b : .} : (a -> a -> b) -> a -> b
+coh W {a b : .} : (a -> a -> b) -> a -> b
 
-# W1. Crossed warbler.
+# Crossed warbler.
 # λxf.fxx
-coh warbler1 {a b : .} : a -> (a -> a -> b) -> b
+coh W1 {a b : .} : a -> (a -> a -> b) -> b
 
-# W*. Warbler once removed.
+# Warbler once removed (W*)
 # λfxy.fxyy
-coh warblerstar {a b c : .} : (a -> b -> b -> c) -> a -> b -> c
+coh Ws {a b c : .} : (a -> b -> b -> c) -> a -> b -> c
 
-# W**. Warbler twice removed.
+# Warbler twice removed (W**)
 # λfxyz.fxyzz
-coh warblerstarstar {a b c d : .} : (a -> b -> c -> c -> d) -> a -> b -> c -> d
+coh Wss {a b c d : .} : (a -> b -> c -> c -> d) -> a -> b -> c -> d
+
+# Iota.
+# Generates all terms by itself.
+# λx.xSK
+coh iota {a b c d e f : .} : (((a -> b -> c) -> (a -> b) -> a -> c) -> (d -> e -> d) -> f) -> f 
 
 #
 # Relationship with SK
