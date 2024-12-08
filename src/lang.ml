@@ -266,7 +266,7 @@ let check_ps ?pos l a =
     vars, l, rewrite rw a
   in
   (* printf "**** after removal: %s\n%!" (to_string (pis l a)); *)
-  (* Ensure that the declared variables are exactly the free variables *)
+  (* Ensure that the declared variables are exactly the free variables. *)
   let () =
     let a = homs ?pos (List.map snd l) a in
     let fv a =
