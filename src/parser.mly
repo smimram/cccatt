@@ -1,7 +1,7 @@
 %{
 (** Parser for the CCaTT language. *)
 
-open Lang
+open Term
 
 let defpos () = Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()
 
@@ -31,7 +31,7 @@ let pis ?pos l a =
 %right EQ
 
 %start prog
-%type <Lang.prog> prog
+%type <Term.prog> prog
 %%
 
 prog:
