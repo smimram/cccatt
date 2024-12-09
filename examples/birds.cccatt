@@ -207,8 +207,5 @@ coh iota {a b c d e f : .} : (((a -> b -> c) -> (a -> b) -> a -> c) -> (d -> e -
 #
 
 coh ap {a b : .} (f : a -> b) (x : a) : b
-let B := bluebird
-let K := kestrel
-let S := starling
 
-# coh blackbird-bluebird : blackbird = ap (ap B B) B
+coh blackbird-bluebird {a b c d : .} : B1 ={(c -> d) -> (a -> b -> c) -> a -> b -> d} ap (ap B B) B
