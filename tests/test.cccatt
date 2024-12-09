@@ -35,6 +35,8 @@ check I
 
 let id := I
 
+let id {a : .} : a -> a := I a
+
 let id (a : .) (x : a) := ap a a (I a) x
 
 ## Testing holes
