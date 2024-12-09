@@ -127,8 +127,8 @@ coh Ki {a b : .} : a -> b -> b
 # Owl
 # coh O {a b :. } : ((a -> b) -> a) -> (a -> b) -> b
 
-# (Big) Phi combinator. This is the same function as starling'.
-coh phoenix {a b c d : .} : (b -> c -> d) -> (a -> b) -> (a -> c) -> a -> d
+# Phoenix. (Big) Phi combinator. This is the same function as starling'.
+coh Phi {a b c d : .} : (b -> c -> d) -> (a -> b) -> (a -> c) -> a -> d
 
 # Psi combinator - psi bird
 # coh psi {a b c : .} : (b -> b -> c) -> (a -> b) -> a -> a -> c
@@ -137,6 +137,7 @@ coh phoenix {a b c d : .} : (b -> c -> d) -> (a -> b) -> (a -> c) -> a -> d
 coh Q4 {a b c : .} : a -> (a -> b) -> (b -> c) -> c
 
 # Queer. Reverse composition.
+# λgfx.f(gx)
 coh Q {a b c : .} : (a -> b) -> (b -> c) -> a -> c
 
 # Quirky
@@ -207,5 +208,8 @@ coh iota {a b c d e f : .} : (((a -> b -> c) -> (a -> b) -> a -> c) -> (d -> e -
 #
 
 coh ap {a b : .} (f : a -> b) (x : a) : b
+
+# # Owl can be defined
+# let O {a b : .} : ((a -> b) -> a) -> (a -> b) -> b := ap Ws C
 
 coh blackbird-bluebird {a b c d : .} : B1 ={(c -> d) -> (a -> b -> c) -> a -> b -> d} ap (ap B B) B

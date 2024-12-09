@@ -1,7 +1,7 @@
 open Extlib
 open Common
 
-type mode = [ `Cartesian_closed ]
+type mode = [ `Cartesian_closed | `Symmetric_monoidal ]
 
 let mode = ref (`Cartesian_closed : mode)
 
