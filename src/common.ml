@@ -27,4 +27,4 @@ let warning ?pos fmt =
     | Some pos when pos = Pos.dummy -> ""
     | Some pos -> Pos.to_string pos ^ ": "
   in
-  Printf.ksprintf (fun s -> failwith "[WW]: %s%s.\n%!" pos s) fmt
+  Printf.ksprintf (fun s -> printf "[WW]: %s%s.\n%!" pos s) fmt

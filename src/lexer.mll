@@ -32,7 +32,7 @@ rule token = parse
   | "_" { HOLE }
   | (['_''a'-'z''A'-'Z']['-''+''a'-'z''A'-'Z''0'-'9''_']*['\'''-''+''!']* as str) { IDENT str }
   | space+ { token lexbuf }
-  | "#!"([^'\n']* as str) { SETTING str }
+  | "#-#"([^'\n']* as str) { SETTING str }
   | "#"[^'\n']* { token lexbuf }
   | "--"[^'\n']* { token lexbuf }
   | "\n" { Lexing.new_line lexbuf; token lexbuf }

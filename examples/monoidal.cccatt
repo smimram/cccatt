@@ -1,0 +1,5 @@
+#-# mode: monoidal
+
+# coh m {a b : .} (x : a * b) : a * b
+
+# coh assoc

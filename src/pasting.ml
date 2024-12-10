@@ -125,22 +125,50 @@ let check ?pos l a =
     | Id (a, _, _) -> a
     | _ -> a
   in
-  (* Turn products into arrows. *)
-  let rec deproduct e =
-    match e.desc with
-    | Hom (a, b) ->
-      let aa = deproduct a in
-      let bb = deproduct b in
-      List.map (fun b -> homs ~pos:e.pos aa b) bb
-    | Prod (a, b) -> (deproduct a)@(deproduct b)
-    | One -> []
-    | Var _
-    | Obj -> [e]
-    | _ -> failwith "TODO: deproduct handle %s" (to_string e)
-  in
-  let aa =
-    let l = List.map snd l in
-    let l = List.map deproduct l |> List.flatten in
-    List.map (homs ?pos l) (deproduct a)
-  in
-  List.iter check_type aa
+  match !Setting.mode with
+  | `Cartesian_closed ->
+    (* Turn products into arrows. *)
+    let rec deproduct e =
+      match e.desc with
+      | Hom (a, b) ->
+        let aa = deproduct a in
+        let bb = deproduct b in
+        List.map (fun b -> homs ~pos:e.pos aa b) bb
+      | Prod (a, b) -> (deproduct a)@(deproduct b)
+      | One -> []
+      | Var _
+      | Obj -> [e]
+      | _ -> failwith "TODO: deproduct handle %s" (to_string e)
+    in
+    let aa =
+      let l = List.map snd l in
+      let l = List.map deproduct l |> List.flatten in
+      List.map (homs ?pos l) (deproduct a)
+    in
+    List.iter check_type aa
+  | `Monoidal ->
+    (
+      match a.desc with
+      | Hom (a,b) ->
+        let rec flatten a =
+          match a.desc with
+          | Prod (a,b) -> (flatten a)@(flatten b)
+          | One -> []
+          | Var _ -> [a]
+          | _ -> failwith "unexpected type: %s" (to_string a)
+        in
+        let a = flatten a in
+        let b = flatten b in
+        let rec unique vars = function
+          | (x:t)::l ->
+            if List.mem x vars then failure x.pos "duplicated variable: %s" (to_string x);
+            unique (x::vars) l
+          | [] -> ()
+        in
+        let unique = unique [] in
+        unique a;
+        unique b;
+        if not (a = b) then failwith "not the same variables"
+      | _ -> failure a.pos "arrow expected"
+    )
+  | _ -> assert false
