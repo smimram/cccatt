@@ -28,6 +28,13 @@ module List = struct
     | [] -> false
 
   let remove x l = List.filter (fun y -> x <> y) l
+
+  let rec iter_unordered_pairs f = function
+    | x::l ->
+      List.iter (f x) l;
+      iter_unordered_pairs f l
+    | [] -> ()
+    
 end
 
 (** Positions in the source code. *)

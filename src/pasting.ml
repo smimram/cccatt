@@ -148,10 +148,9 @@ let check ~pos l a =
     List.iter check_type aa
   | `Category ->
     let get_arr a =
+      let a = unmeta a in
       match a.desc with
       | Hom (a, b) ->
-        let a = unmeta a in
-        let b = unmeta b in
         if not (is_var a) then failure a.pos "variable expected";
         if not (is_var b) then failure b.pos "variable expected";
         a, b
@@ -161,59 +160,48 @@ let check ~pos l a =
     let l = List.map snd l in
     let l = List.map get_arr l in
     let a, b = get_arr a in
-    (* Compare variables. *)
-    let eq a b =
-      match a.desc, b.desc with
-      | Var a, Var b -> a = b
-      | _ -> assert false
+    let eq = eq_var in
+    let rec linear seen b =
+      (* Find the unique antecedent. *)
+      let rec find = function
+        | (a,b')::l when eq b b' ->
+          List.iter (fun (_,b') -> if eq b b' then failure b'.pos "multiple producers for %s" (to_string b)) l;
+          Some a
+        | _::l -> find l
+        | [] -> None
+      in
+      let seen = b::seen in
+      match find l with
+      | Some a ->
+        if List.exists (fun a' -> eq a a') seen then failure pos "cyclic dependencies";
+        linear seen a
+      | None ->
+        if not (eq a b) then failure b.pos "no producer for %s" (to_string b)
     in
-    List.iter (fun (a,b) -> if eq a b then failure b.pos "unexpected endomorphism") l;
-    (* Find the source corresponding to a target. *)
-    let rec search b = function
-      | (a',b')::l when eq b b' ->
-        List.iter (fun (_,b') -> if eq b b' then failure b'.pos "multiple producers for %s" (to_string b)) l;
-        a'
-      | _::l -> search b l
-      | [] -> failure b.pos "no producer for %s" (to_string b)
-    in
-    (* Ensure that the context is linear. *)
-    let rec linear l b =
-      (* Printf.printf "linear %s [%s]\n%!" (to_string b) (List.map (fun (a,b) -> Printf.sprintf "%s -> %s" (to_string a) (to_string b)) l |> String.concat ", "); *)
-      if eq a b then
-        (
-          if l <> [] then
-            let l = List.map (fun (a,b) -> Printf.sprintf "%s -> %s" (to_string a) (to_string b)) l |> String.concat ", " in
-            failure pos "context is not minimal, remaining: %s" l
-        )
-      else
-        let a = search b l in
-        let l = List.filter (fun (a',b') -> not (eq a a' && eq b b')) l in
-        linear l a
-    in
-    linear l b
+    linear [] b
+      (*
   | `Monoidal ->
-    (
+    let rec get_tens a =
+      let a = unmeta a in
       match a.desc with
-      | Hom (a,b) ->
-        let rec flatten a =
-          match a.desc with
-          | Prod (a,b) -> (flatten a)@(flatten b)
-          | One -> []
-          | Var _ -> [a]
-          | _ -> failwith "unexpected type: %s" (to_string a)
-        in
-        let a = flatten a in
-        let b = flatten b in
-        let rec unique vars = function
-          | (x:t)::l ->
-            if List.mem x vars then failure x.pos "duplicated variable: %s" (to_string x);
-            unique (x::vars) l
-          | [] -> ()
-        in
-        let unique = unique [] in
-        unique a;
-        unique b;
-        if not (a = b) then failwith "not the same variables"
+      | Prod (a, b) -> (get_tens a)@(get_tens b)
+      | One -> []
+      | Var _ -> [a]
+      | _ -> failure a.pos "tensor product of variables expected"
+    in
+    let get_arr a =
+      let a = unmeta a in
+      match a.desc with
+      | Hom (a, b) ->
+        let a' = get_tens a in
+        let b' = get_tens b in
+        if a' = [] then failure a.pos "type cannot be empty";
+        if b' = [] then failure b.pos "type cannot be empty";
+        a', b'
       | _ -> failure a.pos "arrow expected"
-    )
+    in
+    let l = List.map snd l in
+    let l = List.map get_arr l in
+    let a, b = get_arr a in
+    *)
   | _ -> assert false
