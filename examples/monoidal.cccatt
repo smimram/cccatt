@@ -1,5 +1,17 @@
 #-# mode: monoidal
 
-# coh m {a b : .} (x : a * b) : a * b
+# Categories
 
-# coh assoc
+coh id {a : .} : a -> a
+
+coh co {a b c : .} (f : a -> b) (g : b -> c) : a -> c
+
+coh unitl {a b : .} (f : a -> b) : co id f = f
+
+coh unitr {a b : .} (f : a -> b) : co f id = f
+
+coh assoc {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : co (co f g) h = co f (co g h)
+
+# Monoidal categories
+
+# coh tens {a a' b b' : .} (f : a -> a') (g : b -> b') : a * a' -> b * b'

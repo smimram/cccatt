@@ -148,8 +148,7 @@ let check ~pos l a =
     List.iter check_type aa
   | `Category ->
     let get_arr a =
-      let a = unmeta a in
-      match a.desc with
+      match (unmeta a).desc with
       | Hom (a, b) ->
         if not (is_var a) then failure a.pos "variable expected";
         if not (is_var b) then failure b.pos "variable expected";
@@ -161,7 +160,8 @@ let check ~pos l a =
     let l = List.map get_arr l in
     let a, b = get_arr a in
     let eq = eq_var in
-    let rec linear seen b =
+    (* Check that we have a unique path from b to a. *)
+    let rec check seen b =
       (* Find the unique antecedent. *)
       let rec find = function
         | (a,b')::l when eq b b' ->
@@ -174,12 +174,12 @@ let check ~pos l a =
       match find l with
       | Some a ->
         if List.exists (fun a' -> eq a a') seen then failure pos "cyclic dependencies";
-        linear seen a
+        check seen a
       | None ->
+        (* Note that we ensure that a is terminal so that there is no cycle (ie another path from a to b) *)
         if not (eq a b) then failure b.pos "no producer for %s" (to_string b)
     in
-    linear [] b
-      (*
+    check [] b
   | `Monoidal ->
     let rec get_tens a =
       let a = unmeta a in
@@ -203,5 +203,35 @@ let check ~pos l a =
     let l = List.map snd l in
     let l = List.map get_arr l in
     let a, b = get_arr a in
-    *)
+    let eq = eq_var in
+    let rec check seen b =
+      (* What remains of a after b *)
+      let rec residual a b =
+        match a, b with
+        | x::a, y::b -> if eq x y then residual a b else None
+        | _, [] -> Some a
+        | [], _ -> None
+      in
+      (* All possible rewrites of b' to a' in b. *)
+      let rewrite (a',b') =
+        let rec aux pre b =
+          let rw =
+            match b with
+            | x::b -> aux (x::pre) b
+            | [] -> []
+          in
+          match residual b b' with
+          | Some c -> ((List.rev pre)@a'@c)::rw
+          | None -> rw
+        in
+        aux [] b
+      in
+      (* Possible rewrites from b. *)
+      let rw = List.map (fun (a',b') -> rewrite (a',b')) l |> List.flatten in
+      match rw with
+      | [a] -> check seen a
+      | [] -> if not (List.length a = List.length b && List.for_all2 eq a b) then failure pos "no producer for %s" (to_string (prods b))
+      | _ -> failure pos "multiple rewrites from %s" (to_string (prods b))
+    in
+    check [] b
   | _ -> assert false

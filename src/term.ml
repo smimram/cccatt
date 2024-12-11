@@ -148,6 +148,13 @@ let rec pis ?pos l t =
   | (i,x,a)::l -> mk ?pos (Pi (i, x, a, pis ?pos l t))
   | [] -> t
 
+(** Build multiple products. *)
+let rec prods ?pos l =
+  match l with
+  | [x] -> x
+  | x::l -> mk ?pos (Prod (x, prods ?pos l))
+  | [] -> mk ?pos One
+
 (* Test whether an expression has a free variable. *)
 let rec has_fv x e =
   match e.desc with
