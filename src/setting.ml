@@ -24,9 +24,10 @@ let parse s =
       match k with
       | "mode" ->
         (
+          warning "Setting mode to %s" v;
           match v with
           | "category" -> `Category
-          | "cartesian closed" -> `Cartesian_closed
+          | "cartesian closed" | "ccc" -> `Cartesian_closed
           | "symmetric monoidal" -> `Symmetric_monoidal
           | "monoidal" -> `Monoidal
           | m -> warning "Unknown mode: %s" m; raise Exit

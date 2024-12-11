@@ -29,6 +29,7 @@ let run _ =
   let send = get_element_by_id "send" |> Html.CoerceTo.button |> jsget in
   let clear = get_element_by_id "clear" |> Html.CoerceTo.button |> jsget in
   let examples = get_element_by_id "examples" |> Html.CoerceTo.select |> jsget in
+  let mode = get_element_by_id "mode" |> Html.CoerceTo.select |> jsget in
 
   let print s =
     let s = Js.to_string output##.value ^ s in
@@ -36,7 +37,7 @@ let run _ =
     output##.scrollTop := output##.scrollHeight
   in
   let error s =
-    print ("=¡.¡= Error: " ^ s)
+    print ("=¡.¡= Error: " ^ s ^ "\n")
   in
   let read () =
     Js.to_string input##.value
@@ -68,6 +69,13 @@ let run _ =
       (fun _ ->
          input##.value := examples##.value |> Js.to_string |> Examples.get |> Js.string;
          do_send ();
+         Js.bool true
+      );
+  mode##.onchange :=
+    Html.handler
+      (fun _ ->
+         let mode = mode##.value |> Js.to_string in
+         Setting.parse ("mode : " ^ mode);
          Js.bool true
       );
 

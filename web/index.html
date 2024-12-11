@@ -25,17 +25,30 @@
 
       <h1>Typechecker</h1>
 
-      <label for="examples">Examples:</label>
-      <select name="examples" id="examples">
-        <option value="none">None</option>
-        <option value="curry">Combinatory logic</option>
-        <option value="curien">Categorical combinators</option>
-        <option value="birds">Birds</option>
-        <option value="category">Categories</option>
-        <option value="linear">Linear λ-calculus</option>
-        <option value="tests">Tests</option>
-        <option value="implicit">Tests with implicit arguments</option>
-      </select>
+      <div id="dropdowns">
+        <div class="dropdown">
+          <label for="examples">Examples:</label>
+          <select name="examples" id="examples">
+            <option value="none">None</option>
+            <option value="curry">Combinatory logic</option>
+            <option value="curien">Categorical combinators</option>
+            <option value="birds">Birds</option>
+            <option value="category">Categories</option>
+            <option value="linear">Linear λ-calculus</option>
+            <option value="tests">Tests</option>
+            <option value="implicit">Tests with implicit arguments</option>
+          </select>
+        </div>
+
+        <div class="dropdown">
+          <label for="examples">Mode:</label>
+          <select name="mode" id="mode">
+            <option value="ccc">Cartesian closed categories</option>
+            <option value="category">Category</option>
+          </select>
+        </div>
+      </div>
+
       <textarea id="input"  is="highlighted-code" language="cccatt" placeholder="Write CCCaTT code here..."></textarea>
       <textarea id="output" is="highlighted-code" language="cccatt" placeholder="Output will appear here..." readonly></textarea>
 
