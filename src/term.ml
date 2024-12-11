@@ -29,7 +29,7 @@ and context = (string * t) list
 and meta =
   {
     id : int;
-    pos : Pos.t option;
+    source_pos : Pos.t option; (** position in the source code (can be empty if the metavariable was created on the fly) *)
     mutable value : t option;
     ty : t;
   }
@@ -90,11 +90,17 @@ let meta_counter = ref 0
 
 let meta ?pos ?(real=false) ?value ty =
   incr meta_counter;
-  mk ?pos (Meta { pos = if real then pos else None; value; id = !meta_counter; ty })
+  mk ?pos (Meta { source_pos = if real then pos else None; value; id = !meta_counter; ty })
 
 (* Real means that the hole was written in the original source (so that we should display its elaborated contents). *)
 let hole ?pos ?(real=false) () =
   meta ?pos ~real (meta ?pos (mk ?pos Type))
+
+(** Replace metavariables at toplevel by their content. *)
+let unmeta e =
+  match e.desc with
+  | Meta { value = Some e; _ } -> e
+  | _ -> e
 
 (** Create coherence with abstracted arguments. *)
 let abs_coh ?pos l a =
@@ -154,6 +160,11 @@ let rec has_fv x e =
   | Meta { value = None; ty = ty; _ } -> has_fv x ty
   | Obj -> false
   | _ -> error ~pos:e.pos "has_fv: handle %s" (to_string e)
+
+let is_var e =
+  match e.desc with
+  | Var _ -> true
+  | _ -> false
 
 let is_implicit_pi e =
   match e.desc with

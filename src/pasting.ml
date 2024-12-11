@@ -41,7 +41,7 @@ let check_type a =
   prove [] [] a
 
 (** Whether a type in a context is a pasting scheme. *)
-let check ?pos l a =
+let check ~pos l a =
   (* printf "* check_ps: %s\n%!" (to_string (pis l a)); *)
   (* Remove variable declarations from the context. *)
   let vars, l =
@@ -101,7 +101,7 @@ let check ?pos l a =
   (* printf "**** after removal: %s\n%!" (to_string (pis l a)); *)
   (* Ensure that the declared variables are exactly the free variables. *)
   let () =
-    let a = homs ?pos (List.map snd l) a in
+    let a = homs ~pos (List.map snd l) a in
     let fv a =
       let rec aux a fv =
         match a.desc with
@@ -143,9 +143,54 @@ let check ?pos l a =
     let aa =
       let l = List.map snd l in
       let l = List.map deproduct l |> List.flatten in
-      List.map (homs ?pos l) (deproduct a)
+      List.map (homs ~pos l) (deproduct a)
     in
     List.iter check_type aa
+  | `Category ->
+    let get_arr a =
+      match a.desc with
+      | Hom (a, b) ->
+        let a = unmeta a in
+        let b = unmeta b in
+        if not (is_var a) then failure a.pos "variable expected";
+        if not (is_var b) then failure b.pos "variable expected";
+        a, b
+      | _ ->
+        failure a.pos "arrow expected"
+    in
+    let l = List.map snd l in
+    let l = List.map get_arr l in
+    let a, b = get_arr a in
+    (* Compare variables. *)
+    let eq a b =
+      match a.desc, b.desc with
+      | Var a, Var b -> a = b
+      | _ -> assert false
+    in
+    List.iter (fun (a,b) -> if eq a b then failure b.pos "unexpected endomorphism") l;
+    (* Find the source corresponding to a target. *)
+    let rec search b = function
+      | (a',b')::l when eq b b' ->
+        List.iter (fun (_,b') -> if eq b b' then failure b'.pos "multiple producers for %s" (to_string b)) l;
+        a'
+      | _::l -> search b l
+      | [] -> failure b.pos "no producer for %s" (to_string b)
+    in
+    (* Ensure that the context is linear. *)
+    let rec linear l b =
+      (* Printf.printf "linear %s [%s]\n%!" (to_string b) (List.map (fun (a,b) -> Printf.sprintf "%s -> %s" (to_string a) (to_string b)) l |> String.concat ", "); *)
+      if eq a b then
+        (
+          if l <> [] then
+            let l = List.map (fun (a,b) -> Printf.sprintf "%s -> %s" (to_string a) (to_string b)) l |> String.concat ", " in
+            failure pos "context is not minimal, remaining: %s" l
+        )
+      else
+        let a = search b l in
+        let l = List.filter (fun (a',b') -> not (eq a a' && eq b b')) l in
+        linear l a
+    in
+    linear l b
   | `Monoidal ->
     (
       match a.desc with

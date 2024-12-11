@@ -1,9 +1,19 @@
 open Extlib
 open Common
 
-type mode = [ `Cartesian_closed | `Symmetric_monoidal | `Monoidal ]
+type mode = [ `Cartesian_closed | `Category | `Symmetric_monoidal | `Monoidal ]
 
 let mode = ref (`Cartesian_closed : mode)
+
+(** Do we have internal homs? *)
+let closed () =
+  match !mode with
+  | `Cartesian_closed
+    -> true
+  | `Category
+  | `Monoidal
+  | `Symmetric_monoidal
+    -> false
 
 let parse s =
   let k, v = String.split_on_first_char ':' s in
@@ -15,6 +25,7 @@ let parse s =
       | "mode" ->
         (
           match v with
+          | "category" -> `Category
           | "cartesian closed" -> `Cartesian_closed
           | "symmetric monoidal" -> `Symmetric_monoidal
           | "monoidal" -> `Monoidal

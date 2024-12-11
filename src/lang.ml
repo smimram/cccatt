@@ -179,20 +179,20 @@ and check tenv env e a =
 let print_metavariables_elaboration m =
   List.iter
     (fun (m:meta) ->
-       if m.pos <> None then
+       if m.source_pos <> None then
          let v =
            match m.value with
            | Some v -> to_string v
            | None -> "?"
          in
-         printf "=?.?= at %s, ?%d elaborated to %s\n" (Pos.to_string (Option.get m.pos)) m.id v
+         printf "=?.?= at %s, ?%d elaborated to %s\n" (Pos.to_string (Option.get m.source_pos)) m.id v
     ) (List.sort compare m)
 
 let print_unelaborated_metavariables m =
   List.iter
     (fun (m:meta) ->
        if m.value = None then
-         printf "=?.?= warning: unelaborated ?%d at %s\n%!" m.id (Pos.Option.to_string m.pos)
+         printf "=?.?= warning: unelaborated ?%d at %s\n%!" m.id (Pos.Option.to_string m.source_pos)
     ) (List.sort compare m)
 
 let exec_command (tenv, env) p =

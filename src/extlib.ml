@@ -21,6 +21,13 @@ module List = struct
 
   let diff l1 l2 =
     List.filter (fun x -> not (List.mem x l2)) l1
+
+  let rec exists_unique p = function
+    | x::l when p x -> List.for_all (fun x -> not (p x)) l
+    | _::l -> exists_unique p l
+    | [] -> false
+
+  let remove x l = List.filter (fun y -> x <> y) l
 end
 
 (** Positions in the source code. *)
