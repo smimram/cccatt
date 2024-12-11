@@ -10,6 +10,18 @@ coh S {a b c : .} : (a → b → c) → (a → b) → a → c
 
 coh ap {a b : .} (t : a → b) (u : a) : b
 
+let ap2 {a b c : .} (t : a -> b -> c) (x : a) (y : b) := ap (ap t x) y
+
+let ap3 {a b c d : .} (t : a -> b -> c -> d) (x : a) (y : b) (z : c) := ap (ap2 t x y) z
+
+## Reduction rules
+
+coh I-red {a : .} (x : a) : ap I x = x
+
+coh K-red {a b : .} (x : a) (y : b) : ap2 K x y = x
+
+coh S-red {a b c : .} (x : a -> b -> c) (y : a -> b) (z : a) : ap3 S x y z = ap (ap x z) (ap y z)
+
 ## Curry's axioms
 
 coh ax1 {a b c : .} : ap (ap S (ap (ap S (ap K S)) (ap (ap S (ap K K)) (ap (ap S (ap K S)) K)))) (ap K K) = ap S (ap (K {_} {c}) (K {b} {a}))
@@ -35,9 +47,9 @@ coh P2 {a b : .} : a * b -> b
 
 coh T : 1
 
-coh P1P {a b : .} (x : a) (y : b) : ap P1 (ap (ap P x) y) = x
+coh P1-red {a b : .} (x : a) (y : b) : ap P1 (ap2 P x y) = x
 
-coh P2P {a b : .} (x : a) (y : b) : ap P2 (ap (ap P x) y) = y
+coh P2-red {a b : .} (x : a) (y : b) : ap P2 (ap2 P x y) = y
 
 coh Peta {a b : .} (x : a * b) : ap (ap P (ap P1 x)) (ap P2 x) = x
 
