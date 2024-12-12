@@ -6,6 +6,8 @@ coh id {a : .} : a -> a
 
 coh co {a b c : .} (f : a -> b) (g : b -> c) : a -> c
 
+let co3 {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) := co f (co g h)
+
 coh unitl {a b : .} (f : a -> b) : co id f = f
 
 coh unitr {a b : .} (f : a -> b) : co f id = f
@@ -52,6 +54,6 @@ coh assoc-nat {a a' b b' c c' : .} (f : a -> a') (g : b -> b') (h : c -> c') : c
 
 ## Axioms
 
-coh triangle {a b : .} : co assoc (te id unitl) ={ (a*1)*b -> a*b } te unitr id
+coh triangle {a b : .} : co assoc (te id unitl) ={ (a * 1) * b -> a * b } te unitr id
 
-# coh pentagon {a b c d : .} :
+coh pentagon {a b c d : .} : co3 (te assoc id) assoc (te id assoc) ={ ((a * b) * c) * d -> a * (b * (c * d)) } co assoc assoc

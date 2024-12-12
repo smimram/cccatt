@@ -8,6 +8,7 @@ let category = [%blob "../examples/category.cccatt"]
 let monoidal = [%blob "../examples/monoidal.cccatt"]
 
 let get = function
+  | "none" -> ""
   | "tests" -> tests
   | "implicit" -> implicit
   | "curry" -> curry
