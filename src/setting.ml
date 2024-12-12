@@ -28,7 +28,7 @@ let parse s =
           match v with
           | "category" -> `Category
           | "cartesian closed" | "ccc" -> `Cartesian_closed
-          | "symmetric monoidal" -> `Symmetric_monoidal
+          | "symmetric monoidal" | "smc" -> `Symmetric_monoidal
           | "monoidal" -> `Monoidal
           | m -> warning "Unknown mode: %s" m; raise Exit
         )

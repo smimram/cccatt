@@ -216,5 +216,10 @@ let eq_var a b =
   | Var a, Var b -> a = b
   | _ -> assert false
 
+let compare_var a b =
+  match (unmeta a).desc, (unmeta b).desc with
+  | Var a, Var b -> compare a b
+  | _ -> assert false
+
 let failure pos fmt =
   Printf.ksprintf (fun s -> failwith "%s: %s" (Pos.to_string pos) s) fmt
