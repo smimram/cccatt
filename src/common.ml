@@ -27,4 +27,10 @@ let warning ?pos fmt =
     | Some pos when pos = Pos.dummy -> ""
     | Some pos -> Pos.to_string pos ^ ": "
   in
-  Printf.ksprintf (fun s -> printf "[WW]: %s%s.\n%!" pos s) fmt
+  Printf.ksprintf (fun s -> printf "=!.!= %s%s\n" pos s) fmt
+
+let message fmt =
+  Printf.ksprintf (fun s -> printf "=^.^= %s\n" s) fmt
+
+let info fmt =
+  Printf.ksprintf (fun s -> printf "=?.?= %s\n" s) fmt

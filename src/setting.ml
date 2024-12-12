@@ -24,7 +24,7 @@ let parse s =
       match k with
       | "mode" ->
         (
-          warning "Setting mode to %s" v;
+          message "setting mode to %s" v;
           match v with
           | "category" -> `Category
           | "cartesian closed" | "ccc" -> `Cartesian_closed

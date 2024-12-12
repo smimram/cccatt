@@ -187,14 +187,14 @@ let print_metavariables_elaboration m =
            | Some v -> to_string v
            | None -> "?"
          in
-         printf "=?.?= at %s, ?%d elaborated to %s\n" (Pos.to_string (Option.get m.source_pos)) m.id v
+         info "at %s, ?%d elaborated to %s" (Pos.to_string (Option.get m.source_pos)) m.id v
     ) (List.sort compare m)
 
 let print_unelaborated_metavariables m =
   List.iter
     (fun (m:meta) ->
        if m.value = None then
-         printf "=?.?= warning: unelaborated ?%d at %s\n%!" m.id (Pos.Option.to_string m.source_pos)
+         warning "unelaborated ?%d at %s" m.id (Pos.Option.to_string m.source_pos)
     ) (List.sort compare m)
 
 let exec_command (tenv, env) p =
@@ -220,12 +220,12 @@ let exec_command (tenv, env) p =
     print_unelaborated_metavariables m;
     let tenv = (x,a)::tenv in
     let env = (x,v)::env in
-    printf "=^.^= defined %s : %s\n%!" x (to_string a);
+    message "defined %s : %s" x (to_string a);
     (* printf "      %s\n%!" (to_string v); *)
     tenv, env
   | Check e ->
     let e, a = infer tenv env e in
-    printf "=^.^= check %s : %s\n%!" (Pos.to_string e.pos) (to_string a);
+    message "check %s : %s" (Pos.to_string e.pos) (to_string a);
     tenv, env
   | NCoh (l, a) ->
     check tenv env (pis ~pos:a.pos (List.map (fun (x,a) -> `Explicit,x,a) l) a) (mk ~pos:a.pos Type) |> ignore;
