@@ -6,6 +6,7 @@ let birds = [%blob "../examples/birds.cccatt"]
 let linear = [%blob "../examples/linear.cccatt"]
 let category = [%blob "../examples/category.cccatt"]
 let monoidal = [%blob "../examples/monoidal.cccatt"]
+let symmetric = [%blob "../examples/symmetric.cccatt"]
 
 let get = function
   | "none" -> ""
@@ -17,4 +18,5 @@ let get = function
   | "linear" -> linear
   | "category" -> category
   | "monoidal" -> monoidal
+  | "symmetric" -> symmetric
   | _ -> ""

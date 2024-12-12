@@ -1,6 +1,6 @@
 (rule
  (alias runtest)
- (deps curry.cccatt curry-noimplicit.cccatt curry2.cccatt curien.cccatt birds.cccatt category.cccatt linear.cccatt monoidal.cccatt)
+ (deps curry.cccatt curry-noimplicit.cccatt curry2.cccatt curien.cccatt birds.cccatt category.cccatt linear.cccatt monoidal.cccatt symmetric.cccatt)
  (action
    (progn
     (run ../src/cccatt.exe curry.cccatt)
@@ -11,6 +11,7 @@
     (run ../src/cccatt.exe category.cccatt)
     (run ../src/cccatt.exe linear.cccatt)
     (run ../src/cccatt.exe monoidal.cccatt)
+    (run ../src/cccatt.exe symmetric.cccatt)
    )
  )
 )

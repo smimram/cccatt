@@ -254,7 +254,6 @@ let check ~pos l a =
     in
     check [] b
 
-(*
   | `Symmetric_monoidal ->
     let module S = Set.Make(struct type nonrec t = t let compare = compare_var end) in
     (* Make sure that the types are arrows between tensor expressions. *)
@@ -271,21 +270,19 @@ let check ~pos l a =
       | _ -> failure a.pos "tensor product of variables expected"
     in
     let get_arr a =
-      let pos = a.pos in
       match (unmeta a).desc with
       | Hom (a, b) ->
         let a' = get_tens a in
         let b' = get_tens b in
         if S.is_empty a' then failure a.pos "type cannot be empty";
         if S.is_empty b' then failure b.pos "type cannot be empty";
-        if not (S.disjoint a' b') then failure pos "looping type";
+        (* if not (S.disjoint a' b') then failure pos "looping type"; *)
         a', b'
       | _ -> failure a.pos "arrow expected"
     in
     let l = List.map snd l in
     let l = List.map get_arr l in
     let a, b = get_arr a in
-    let eq = eq_var in
     (* Make sure that sources and targets are pairwise disjoint. *)
     List.iter_unordered_pairs
       (fun (a,b) (a',b') ->
@@ -295,42 +292,14 @@ let check ~pos l a =
     (* Make sure that we have a 2-path from b to a. *)
     let rec check seen b =
       (* Printf.printf "check : %s\n%!" (to_string (prods b)); *)
-      (* What remains of a after b *)
-      let rec residual a b =
-        match a, b with
-        | x::a, y::b -> if eq x y then residual a b else None
-        | _, [] -> Some a
-        | [], _ -> None
-      in
-      (* Find a possible rewrite of b' to a' in b. *)
-      let rewrite_rule (a',b') =
-        let rec aux pre b =
-          match residual b b' with
-          | Some c ->
-            (* Printf.printf "%s (%s -> %s) %s\n%!" (to_string (prods (List.rev pre))) (to_string (prods a')) (to_string (prods b)) (to_string (prods c)); *)
-            Some ((List.rev pre)@a'@c)
-          | None ->
-            match b with
-            | x::b -> aux (x::pre) b
-            | [] -> None
-        in
-        aux [] b
-      in
-      let rec rewrite = function
-        | [] -> None
-        | r::l ->
-          match rewrite_rule r with
-          | Some rw -> Some rw
-          | None -> rewrite l
-      in
-      let rw = rewrite l in
-      match rw with
-      | Some a ->
-        List.iter (fun x -> if List.exists (eq x) seen then failure pos "cyclic dependency on %s" (to_string x)) a;
-        check seen a
-      | None -> if not (List.length a = List.length b && List.for_all2 eq a b) then failure pos "no producer for %s" (to_string (prods b))
+      let rule = List.find_opt (fun (_,b') -> S.subset b' b) l in
+      match rule with
+      | Some (a',b') ->
+        if not (S.disjoint a' seen) then failure pos "cyclic dependency";
+        check (S.union a' seen) (S.union (S.diff b b') a')
+      | None ->
+        if not (S.equal a b) then failure pos "no producer for %s" (to_string (prods (S.to_list b)))
     in
-    check [] b
-*)
+    check S.empty b
       
-  | _ -> failwith "unhandled mode"
+  (* | _ -> failwith "unhandled mode" *)
