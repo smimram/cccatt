@@ -5,6 +5,7 @@ let curien = [%blob "../examples/curien.cccatt"]
 let birds = [%blob "../examples/birds.cccatt"]
 let linear = [%blob "../examples/linear.cccatt"]
 let category = [%blob "../examples/category.cccatt"]
+let monoidal = [%blob "../examples/monoidal.cccatt"]
 
 let get = function
   | "tests" -> tests
@@ -14,4 +15,5 @@ let get = function
   | "birds" -> birds
   | "linear" -> linear
   | "category" -> category
+  | "monoidal" -> monoidal
   | _ -> ""
