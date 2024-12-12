@@ -9,6 +9,7 @@ exception Unification
 (** Make sure that two values are equal (and raise [Unification] if this cannot be the case). *)
 (* The first argument is the alpha-conversion to apply to t *)
 let rec unify tenv env ?(alpha=[]) t t' =
+  (* Printf.printf "unify %s with %s\n%!" (to_string t) (to_string t'); *)
   let unify tenv env ?(alpha=alpha) = unify tenv env ~alpha in
   match t.desc, t'.desc with
   | Var x, Var y ->
@@ -20,6 +21,7 @@ let rec unify tenv env ?(alpha=[]) t t' =
   | Obj, Obj -> ()
   | Type, Type -> ()
   | Prod (a, b), Prod (a', b') -> unify tenv env a a'; unify tenv env b b'
+  | One, One -> ()
   | Pi (i, x, a, b), Pi (i', x', a', b') ->
     if i <> i' then raise Unification;
     unify tenv env a a';
