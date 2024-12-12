@@ -211,7 +211,8 @@ let check ~pos l a =
         let distinct a = List.iter_unordered_pairs (fun x y -> if eq x y then failure y.pos "repeated variable") a in
         distinct a;
         distinct b;
-        List.iter (fun x -> List.iter (fun y -> if eq x y then failure y.pos "looping variable") b) a
+        (* NOTE: should already be handled by seen below *)
+        (* List.iter (fun x -> List.iter (fun y -> if eq x y then failure y.pos "looping variable") b) a *)
       ) l;
     (* Make sure that sources and targets are pairwise disjoint. *)
     List.iter_unordered_pairs
@@ -236,7 +237,7 @@ let check ~pos l a =
           match residual b b' with
           | Some c ->
             (* Printf.printf "%s (%s -> %s) %s\n%!" (to_string (prods (List.rev pre))) (to_string (prods a')) (to_string (prods b)) (to_string (prods c)); *)
-            Some ((List.rev pre)@a'@c)
+            Some (List.rev pre, a', c)
           | None ->
             match b with
             | x::b -> aux (x::pre) b
@@ -246,9 +247,9 @@ let check ~pos l a =
       in
       let rw = List.find_map rewrite l in
       match rw with
-      | Some a ->
+      | Some (u, a, c) ->
         List.iter (fun x -> if List.exists (eq x) seen then failure pos "cyclic dependency on %s" (to_string x)) a;
-        check seen a
+        check (a@seen) (u@a@c)
       | None -> if not (List.length a = List.length b && List.for_all2 eq a b) then failure pos "no producer for %s" (to_string (prods b))
     in
     check [] b
