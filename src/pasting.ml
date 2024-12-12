@@ -181,6 +181,7 @@ let check ~pos l a =
     in
     check [] b
   | `Monoidal ->
+    (* Make sure that the types are arrows between tensor expressions. *)
     let rec get_tens a =
       let a = unmeta a in
       match a.desc with
@@ -204,7 +205,22 @@ let check ~pos l a =
     let l = List.map get_arr l in
     let a, b = get_arr a in
     let eq = eq_var in
+    (* Make sure that sources and targets have distinct variables. *)
+    List.iter (fun (a,b) ->
+        let distinct a = List.iter_unordered_pairs (fun x y -> if eq x y then failure y.pos "repeated variable") a in
+        distinct a;
+        distinct b
+      ) l;
+    (* Make sure that sources and targets are pairwise disjoint. *)
+    List.iter_unordered_pairs
+      (fun (a,b) (a',b') ->
+         let disjoint st a b = List.iter (fun x -> List.iter (fun y -> if eq x y then failure y.pos "variable already used in %s: %s" st (to_string y)) b) a in
+         disjoint "source" a a';
+         disjoint "target" b b'
+      ) l;
+    (* Make sure that we have a 2-path from b to a. *)
     let rec check seen b =
+      (* Printf.printf "check : %s\n%!" (to_string (prods b)); *)
       (* What remains of a after b *)
       let rec residual a b =
         match a, b with
@@ -212,26 +228,33 @@ let check ~pos l a =
         | _, [] -> Some a
         | [], _ -> None
       in
-      (* All possible rewrites of b' to a' in b. *)
-      let rewrite (a',b') =
+      (* Find a possible rewrite of b' to a' in b. *)
+      let rewrite_rule (a',b') =
         let rec aux pre b =
-          let rw =
+          match residual b b' with
+          | Some c ->
+            (* Printf.printf "%s (%s -> %s) %s\n%!" (to_string (prods (List.rev pre))) (to_string (prods a')) (to_string (prods b)) (to_string (prods c)); *)
+            Some ((List.rev pre)@a'@c)
+          | None ->
             match b with
             | x::b -> aux (x::pre) b
-            | [] -> []
-          in
-          match residual b b' with
-          | Some c -> ((List.rev pre)@a'@c)::rw
-          | None -> rw
+            | [] -> None
         in
         aux [] b
       in
-      (* Possible rewrites from b. *)
-      let rw = List.map (fun (a',b') -> rewrite (a',b')) l |> List.flatten in
+      let rec rewrite = function
+        | [] -> None
+        | r::l ->
+          match rewrite_rule r with
+          | Some rw -> Some rw
+          | None -> rewrite l
+      in
+      let rw = rewrite l in
       match rw with
-      | [a] -> check seen a
-      | [] -> if not (List.length a = List.length b && List.for_all2 eq a b) then failure pos "no producer for %s" (to_string (prods b))
-      | _ -> failure pos "multiple rewrites from %s" (to_string (prods b))
+      | Some a ->
+        List.iter (fun x -> if List.exists (eq x) seen then failure pos "cyclic dependency on %s" (to_string x)) a;
+        check seen a
+      | None -> if not (List.length a = List.length b && List.for_all2 eq a b) then failure pos "no producer for %s" (to_string (prods b))
     in
     check [] b
   | _ -> assert false

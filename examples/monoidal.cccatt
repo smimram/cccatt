@@ -14,4 +14,22 @@ coh assoc {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : co (co f g) h =
 
 # Monoidal categories
 
-# coh tens {a a' b b' : .} (f : a -> a') (g : b -> b') : a * a' -> b * b'
+coh te {a a' b b' : .} (f : a -> a') (g : b -> b') : a * b -> a' * b'
+
+coh assoc {a b c : .} : (a * b) * c -> a * (b * c)
+
+coh assoc' {a b c : .} : a * (b * c) -> (a * b) * c
+
+coh unitl {a : .} : 1 * a -> a
+
+coh unitl' {a : .} : a -> 1 * a
+
+coh unitr {a : .} : a * 1 -> a
+
+coh unitr' {a : .} : a -> a * 1
+
+# coh unitl-unitl' {a : .} : co unitl unitl' = id {1 * a}
+
+# coh unitl'-unitl {a : .} : co unitl' unitl = id {a}
+
+# coh assoc-assoc' {a b c : .} : co assoc assoc' = id

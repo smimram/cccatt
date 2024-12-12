@@ -30,7 +30,7 @@ rule token = parse
   | "=" { EQ }
   | ":=" { EQDEF }
   | "_" { HOLE }
-  | (['_''a'-'z''A'-'Z']['-''+''a'-'z''A'-'Z''0'-'9''_']*['\'''-''+''!']* as str) { IDENT str }
+  | (['_''a'-'z''A'-'Z']['-''+''a'-'z''A'-'Z''0'-'9''_''\'']* as str) { IDENT str }
   | space+ { token lexbuf }
   | "#-#"([^'\n']* as str) { SETTING str }
   | "#"[^'\n']* { token lexbuf }
