@@ -23,3 +23,5 @@ coh sym {a b : .} : a * b -> b * a
 coh sym-inv {a b : .} : co sym sym ={a * b -> a * b} id
 
 coh sym-yb {a b c : .} : co3 (te sym id) assoc (te id sym) ={(a * b) * c -> b * (c * a)} co3 assoc sym assoc
+
+coh sym-nat {a a' b b' : .} (f : a -> a') (g : b -> b') : co (te f g) sym = co sym (te g f)
