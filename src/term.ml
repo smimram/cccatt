@@ -1,3 +1,5 @@
+(** Terms of our language. *)
+
 open Extlib
 open Common
 

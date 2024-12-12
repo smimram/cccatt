@@ -1,7 +1,10 @@
+(** Global settings. *)
+
 open Extlib
 open Common
 
-type mode = [ `Cartesian_closed | `Category | `Symmetric_monoidal | `Monoidal ]
+(** Mode for checking pasting schemes. *)
+type mode = [ `Category | `Monoidal | `Symmetric_monoidal | `Cartesian_closed ]
 
 let mode = ref (`Cartesian_closed : mode)
 

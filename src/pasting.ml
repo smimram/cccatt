@@ -1,3 +1,5 @@
+(** Check for pasting schemes. *)
+
 open Extlib
 open Common
 open Term

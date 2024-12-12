@@ -39,6 +39,10 @@ let run _ =
   let error s =
     print ("=¡.¡= Error: " ^ s ^ "\n")
   in
+  let set_mode () =
+    let mode = mode##.value |> Js.to_string in
+    Setting.parse ("mode : " ^ mode)
+  in
   let read () =
     Js.to_string input##.value
   in
@@ -67,6 +71,7 @@ let run _ =
   examples##.onchange :=
     Html.handler
       (fun _ ->
+         set_mode ();
          input##.value := examples##.value |> Js.to_string |> Examples.get |> Js.string;
          do_send ();
          Js.bool true
@@ -74,8 +79,7 @@ let run _ =
   mode##.onchange :=
     Html.handler
       (fun _ ->
-         let mode = mode##.value |> Js.to_string in
-         Setting.parse ("mode : " ^ mode);
+         set_mode ();
          Js.bool true
       );
 
