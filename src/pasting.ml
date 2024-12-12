@@ -304,4 +304,4 @@ let check ~pos l a =
     in
     check S.empty b
       
-  (* | _ -> failwith "unhandled mode" *)
+  | _ -> failwith "unhandled mode"
