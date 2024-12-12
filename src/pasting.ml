@@ -298,7 +298,7 @@ let check ~pos l a =
         if not (S.disjoint a' seen) then failure pos "cyclic dependency";
         check (S.union a' seen) (S.union (S.diff b b') a')
       | None ->
-        if not (S.equal a b) then failure pos "no producer for %s" (to_string (prods (S.to_list b)))
+        if not (S.equal a b) then failure pos "no producer for %s" (to_string (prods (S.elements b)))
     in
     check S.empty b
       
