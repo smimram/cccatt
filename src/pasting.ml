@@ -320,13 +320,23 @@ let check ~pos l a =
       | _ -> assert false
     in
     balanced S.empty S.empty a;
+    let eq = eq_var in
     (* Prove a. *) 
     let rec prove env a =
+      Printf.printf "prove: %s\n%!" (to_string a);
       match a.desc with
-      (* | Var x  *)
+      | Var _ ->
+        if not (List.exists (eq a) env) then failure a.pos "cannot produce %s" (to_string a);
+        List.filter (fun b -> not (eq a b)) env
       | Prod (a, b) -> prove (prove env a) b
-      | Hom (a, b) -> prove (a::env) b
+      | Hom (a, b) -> coprove a env b
       | _ -> failwith "TODO: smcc pasting, handle %s" (to_string a)
+    (* Add a to the environment, simplifying it. *)
+    and coprove a env b =
+      match a.desc with
+      | Var _ -> prove (a::env) b
+      | Hom (a, a') -> coprove a' (prove env a) b
+      | _ -> failwith "TODO: smcc pasting (coprove), handle %s" (to_string a)
     in
     let env = prove [] a in
     if env <> [] then failure pos "unused hypothesis: %s" (env |> List.map to_string |> String.concat ", ")
