@@ -4,8 +4,8 @@ open Extlib
 open Common
 open Term
 
-(** Check whether a type is a pasting scheme. *)
-let check_type a =
+(** Check whether a type is a pasting scheme in the theory of ccc, for an implicational formula. *)
+let check_ccc a =
   (* printf "* check_ps %s\n%!" (to_string a); *)
   let rec target a =
     match a.desc with
@@ -149,7 +149,8 @@ let check ~pos l a =
       let l = List.map deproduct l |> List.flatten in
       List.map (homs ~pos l) (deproduct a)
     in
-    List.iter check_type aa
+    List.iter check_ccc aa
+
   | `Category ->
     let get_arr a =
       match (unmeta a).desc with
@@ -208,6 +209,7 @@ let check ~pos l a =
     let l = List.map get_arr l in
     let a, b = get_arr a in
     let eq = eq_var in
+    (* NOTE: we could also check that the formula is balanced *)
     (* Make sure that sources and targets have distinct variables and are disjoint. *)
     List.iter (fun (a,b) ->
         let distinct a = List.iter_unordered_pairs (fun x y -> if eq x y then failure y.pos "repeated variable") a in
@@ -286,6 +288,7 @@ let check ~pos l a =
     let l = List.map get_arr l in
     let a, b = get_arr a in
     (* Make sure that sources and targets are pairwise disjoint. *)
+    (* NOTE: we could also check that the formula is balanced *)
     List.iter_unordered_pairs
       (fun (a,b) (a',b') ->
          if not (S.disjoint a a') then failure pos "sources not disjoint";
@@ -303,5 +306,29 @@ let check ~pos l a =
         if not (S.equal a b) then failure pos "no producer for %s" (to_string (prods (S.elements b)))
     in
     check S.empty b
+
+  | `Symmetric_monoidal_closed ->
+    let module S = Set.Make(struct type nonrec t = t let compare = compare_var end) in
+    let a = homs ~pos (List.map snd l) a in
+    (* Check that the formula is balanced (every variable occurs at most once positively and at most once negatively. *)
+    let rec balanced neg pos a =
+      match a.desc with
+      | Var _ -> if S.mem a pos then failure a.pos "variable occurs twice with the same polarity"
+      | One -> ()
+      | Prod (a, b) -> balanced neg pos a; balanced neg pos b
+      | Hom (a, b) -> balanced pos neg a; balanced neg pos b
+      | _ -> assert false
+    in
+    balanced S.empty S.empty a;
+    (* Prove a. *) 
+    let rec prove env a =
+      match a.desc with
+      (* | Var x  *)
+      | Prod (a, b) -> prove (prove env a) b
+      | Hom (a, b) -> prove (a::env) b
+      | _ -> failwith "TODO: smcc pasting, handle %s" (to_string a)
+    in
+    let env = prove [] a in
+    if env <> [] then failure pos "unused hypothesis: %s" (env |> List.map to_string |> String.concat ", ")
       
-  | _ -> failwith "unhandled mode"
+  (* | _ -> failwith "unhandled mode" *)
