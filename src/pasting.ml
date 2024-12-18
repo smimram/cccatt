@@ -151,6 +151,19 @@ let check ~pos l a =
     in
     List.iter check_ccc aa
 
+(*
+  | `Monoid ->
+    let rec get_prod a =
+      match (unmeta a).desc with
+      | Var _ -> [a]
+      | Prod (a,b) -> (get_prod a)@(get_prod b)
+      | One -> []
+      | _ -> failure a.pos "product expected"
+    in
+    let a = get_prod a in
+    let l = l |> List.map snd |> List.map get_prod in
+*)
+
   | `Category ->
     let get_arr a =
       match (unmeta a).desc with
@@ -341,4 +354,4 @@ let check ~pos l a =
     let env = prove [] a in
     if env <> [] then failure pos "unused hypothesis: %s" (env |> List.map to_string |> String.concat ", ")
       
-  (* | _ -> failwith "unhandled mode" *)
+  | _ -> failwith "unhandled mode"

@@ -4,7 +4,7 @@ open Extlib
 open Common
 
 (** Mode for checking pasting schemes. *)
-type mode = [ `Category | `Monoidal | `Symmetric_monoidal | `Symmetric_monoidal_closed | `Cartesian_closed ]
+type mode = [ `Monoid | `Category | `Monoidal | `Symmetric_monoidal | `Symmetric_monoidal_closed | `Cartesian_closed ]
 
 let mode = ref (`Cartesian_closed : mode)
 
@@ -19,6 +19,7 @@ let parse s =
         (
           message "setting mode to %s" v;
           match v with
+          | "monoid" -> `Monoid
           | "category" -> `Category
           | "cartesian closed" | "ccc" -> `Cartesian_closed
           | "symmetric monoidal" | "smc" -> `Symmetric_monoidal
