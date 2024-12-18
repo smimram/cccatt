@@ -1,5 +1,9 @@
 #-# mode: monoidal
 
+#
+# Monoidal categories
+#
+
 # Categories
 
 coh id {a : .} : a -> a
