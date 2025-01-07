@@ -44,7 +44,7 @@ let check_ccc a =
     let rec depth a =
       match a.desc with
       | Var _ -> 0
-      | Hom (a, _) -> 1 + depth a
+      | Hom (a, b) -> max (1 + depth a) (depth b)
       | _ -> assert false
     in
     match !Setting.depth with
