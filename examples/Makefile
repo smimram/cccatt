@@ -1,2 +1,2 @@
 test:
-	@dune runtest
+	@dune runtest -f

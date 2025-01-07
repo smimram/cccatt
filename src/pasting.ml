@@ -40,6 +40,17 @@ let check_ccc a =
     | Obj -> failure c.pos "cannot prove identities between objects"
     | _ -> assert false
   in
+  let () =
+    let rec depth a =
+      match a.desc with
+      | Var _ -> 0
+      | Hom (a, _) -> 1 + depth a
+      | _ -> assert false
+    in
+    match !Setting.depth with
+    | Some d -> if depth a > d then failure a.pos "pasting has depth %d but we are limited to %d" (depth a) d
+    | None -> ()
+  in
   prove [] [] a
 
 (** Whether a type in a context is a pasting scheme. *)
@@ -150,6 +161,10 @@ let check ~pos l a =
       List.map (homs ~pos l) (deproduct a)
     in
     List.iter check_ccc aa
+
+  | `Plain ->
+    let l = List.map snd l in
+    assert (List.mem a l)
 
 (*
   | `Monoid ->
