@@ -351,7 +351,7 @@ let check ~pos l a =
     let eq = eq_var in
     (* Prove a. *) 
     let rec prove env a =
-      Printf.printf "prove: %s\n%!" (to_string a);
+      (* Printf.printf "prove: %s\n%!" (to_string a); *)
       match a.desc with
       | Var _ ->
         if not (List.exists (eq a) env) then failure a.pos "cannot produce %s" (to_string a);
