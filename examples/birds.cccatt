@@ -126,6 +126,7 @@ coh L {a b : .} : (a -> a -> b) -> a -> b
 # This is untypable.
 
 # Owl
+# λxy.y(xy)
 #coh O {a b :. } : ((a -> b) -> a) -> (a -> b) -> b
 
 # Phoenix. (Big) Phi combinator. This is the same function as starling'.
