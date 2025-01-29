@@ -119,13 +119,14 @@ coh Ki {a b : .} : a -> b -> b
 
 # Lark (L)
 # λfx.fxx
+coh L {a b : .} : (a -> a -> b) -> a -> b
 
 # M. Mocking bird. Also known as ω.
 # λx.xx
 # This is untypable.
 
 # Owl
-# coh O {a b :. } : ((a -> b) -> a) -> (a -> b) -> b
+#coh O {a b :. } : ((a -> b) -> a) -> (a -> b) -> b
 
 # Phoenix. (Big) Phi combinator. This is the same function as starling'.
 coh Phi {a b c d : .} : (b -> c -> d) -> (a -> b) -> (a -> c) -> a -> d
@@ -203,11 +204,25 @@ coh Wss {a b c d : .} : (a -> b -> c -> c -> d) -> a -> b -> c -> d
 # λx.xSK
 coh iota {a b c d e f : .} : (((a -> b -> c) -> (a -> b) -> a -> c) -> (d -> e -> d) -> f) -> f 
 
+coh ap {a b : .} (f : a -> b) (x : a) : b
+
+#
+# Derivations of certain birds from others
+#
+
+# From B
+
+coh D-B {a b c d : .} : D ={(a -> c -> d) -> a -> (b -> c) -> b -> d} ap B B
+
+coh E-B {a b c d e : .} : E ={(a -> d -> e) -> a -> (b -> c -> d) -> b -> c -> e} ap B (ap (ap B B) B)
+
+# From B and T
+
+coh R-BT {a b c : .} : R ={a -> (b -> a -> c) -> b -> c} ap (ap B B) T
+
 #
 # Relationship with SK
 #
-
-coh ap {a b : .} (f : a -> b) (x : a) : b
 
 # # Owl can be defined
 # let O {a b : .} : ((a -> b) -> a) -> (a -> b) -> b := ap Ws C
