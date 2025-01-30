@@ -14,7 +14,7 @@ jobs:
         git clone https://github.com/johnwhitington/ppx_blob.git
         cd ppx_blob
         dune build @install
-        sudo dune install --mandir=/usr/share/man
+        sudo dune install --mandir=/usr/share/man --docdir=/usr/share/doc
     - name: Build
       run: make
     - name: Test
