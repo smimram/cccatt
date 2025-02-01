@@ -53,6 +53,11 @@ let run _ =
     | Failure e -> error e
     | e -> error (Printexc.to_string e)
   in
+  let load_example () =
+    set_mode ();
+    input##.value := examples##.value |> Js.to_string |> Examples.get |> Js.string;
+    do_send ();
+  in
   Common.print_fun := print;
 
   send##.onclick :=
@@ -71,9 +76,7 @@ let run _ =
   examples##.onchange :=
     Html.handler
       (fun _ ->
-         set_mode ();
-         input##.value := examples##.value |> Js.to_string |> Examples.get |> Js.string;
-         do_send ();
+         load_example ();
          Js.bool true
       );
   mode##.onchange :=
@@ -85,6 +88,15 @@ let run _ =
 
   input##focus;
   input##select;
+
+  begin
+    let ex = Url.Current.get_fragment () in
+    if ex <> "" then
+      (
+        examples##.value := Js.string ex;
+        load_example ()
+      )
+  end;
 
   ignore (Js.Unsafe.eval_string "init();");
 
