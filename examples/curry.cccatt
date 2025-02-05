@@ -59,3 +59,4 @@ coh prod2 {a b c : .} : ap (ap S (ap K (ap S (ap K (ap S (ap K P2)))))) (ap (ap 
 
 coh prodext {a b c : .} : ap (ap S (ap (ap S (ap K S)) (ap (ap S (ap K (ap S (ap K P)))) (ap S (ap K P1))))) (ap S (ap K P2)) = I {a -> b * c}
 
+coh term : ap K T ={1 -> 1} I
