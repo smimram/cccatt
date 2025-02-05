@@ -1,5 +1,5 @@
-# Categorical combinators
-# See Curien, 1986
+# Categorical combinatory logic
+# See Curien, 1986, section 4.1
 # https://www.sciencedirect.com/science/article/pii/S001999588680047X
 
 # Generators
@@ -22,7 +22,7 @@ coh ap {a b : .} (f : a -> b) (x : a) : b
 
 coh pair {a b : .} (x : a) (y : b) : a * b
 
-# Coherences
+# Relations
 
 coh Ass {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : comp (comp f g) h = comp f (comp g h)
 
