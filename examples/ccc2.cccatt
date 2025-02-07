@@ -34,7 +34,7 @@ coh unitr {a b : .} (f : a -> b) : comp f id = f
 # Functoriality
 coh dist {a a' a'' b b' b'' : .} (f : a -> a') (g : b -> b') (h : a' -> a'') (k : b' -> b'') : comp (prod f g) (prod h k) = prod (comp f h) (comp g k)
 coh prod-id {a b : .} : prod id id ={a * b -> a * b} id
-# coh exp-comp {a b c : .} (f : a -> b) (g : b -> c) : exp (id {a}) (comp f g) = comp (exp id f) (exp id g)
+coh exp-comp {a b c d : .} (f : a -> b) (g : b -> c) : exp (id {d}) (comp f g) = comp (exp id f) (exp id g)
 coh exp-id {a b : .} : exp id id ={(a -> b) -> (a -> b)} id
 
 # Naturality
