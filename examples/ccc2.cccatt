@@ -42,15 +42,15 @@ coh exp-id {a b : .} : exp id id ={(a -> b) -> (a -> b)} id
 coh comp-dupl {a b : .} (f : a -> b) : comp f dupl = comp dupl (prod f f)
 coh prod-fst {a a' b b' : . } (f : a -> a') (g : b -> b') : comp (prod f g) fst = comp fst f
 coh prod-snd {a a' b b' : . } (f : a -> a') (g : b -> b') : comp (prod f g) snd = comp snd g
-# coh comp-mark {a b : .} (f : a -> b) : comp f mark = comp mark (exp id (prod f id))
-# coh comp-app {a b : .} (f : a -> b) : comp (prod (exp id f) id) app = comp app f
+coh comp-mark {a b c : .} (f : a -> b) : comp f mark ={a -> c -> b * c} comp mark (exp id (prod f id))
+coh comp-app {a b c : .} (f : b -> c) : comp (prod (exp id f) id) app ={(a -> b) * a -> c} comp app f
 coh comp-kill {a b : .} (f : a -> b) : comp f kill = kill
 
 # Adjunctions
 
-coh dupl-pair {a b : .} : comp dupl (prod fst snd) ={a * b -> a * b} id
+coh dupl-pair {a b : .} : comp dupl (prod fst snd) = id{a * b}
 coh dupl-fst {a : .} : comp dupl fst ={a -> a} id
 coh dupl-snd {a : .} : comp dupl snd ={a -> a} id
-# coh mark-app : comp (prod mark id) app = id
-# coh mark-app' : comp mark (exp id app) = id
+coh mark-app {a b : .} : comp (prod mark id) app = id{a * b}
+coh mark-app' {a b : .} : comp mark (exp id app) = id{a -> b}
 coh kill-id : kill ={1 -> 1} id
