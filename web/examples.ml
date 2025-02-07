@@ -1,6 +1,7 @@
 let tests = [%blob "../tests/test.cccatt"]
 let implicit = [%blob "../tests/implicit.cccatt"]
 let ccc = [%blob "../examples/ccc.cccatt"]
+let ccc2 = [%blob "../examples/ccc2.cccatt"]
 let curry = [%blob "../examples/curry.cccatt"]
 let curien = [%blob "../examples/curien.cccatt"]
 let birds = [%blob "../examples/birds.cccatt"]
@@ -14,6 +15,7 @@ let get = function
   | "tests" -> tests
   | "implicit" -> implicit
   | "ccc" -> ccc
+  | "ccc2" -> ccc2
   | "curry" -> curry
   | "curien" -> curien
   | "birds" -> birds
