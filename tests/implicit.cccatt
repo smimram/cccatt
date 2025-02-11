@@ -38,6 +38,7 @@ let K' {a b : .} : a -> b -> b := ap K (I {b})
 
 ## Testing variables
 
+coh id {a : .} (x : a) : a
 let id {a : .} (x : a) := ap I x
 
 ## Testing identities
