@@ -54,11 +54,25 @@ let run _ =
     | e -> error (Printexc.to_string e)
   in
   let load_example () =
+    mode##.value := Js.string "ccc";
     set_mode ();
     input##.value := examples##.value |> Js.to_string |> Examples.get |> Js.string;
     do_send ();
   in
   Common.print_fun := print;
+  Setting.on_mode
+    (fun s ->
+       let m =
+         match s with
+         | `Category -> "category"
+         | `Cartesian_closed -> "ccc"
+         | `Monoidal -> "monoidal"
+         | `Symmetric_monoidal -> "smc"
+         | `Symmetric_monoidal_closed -> "smcc"
+         | _ -> Js.to_string mode##.value
+       in
+       mode##.value := Js.string m
+    );
 
   send##.onclick :=
     Html.handler

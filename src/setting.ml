@@ -16,6 +16,13 @@ type mode = [
 
 let mode = ref (`Cartesian_closed : mode)
 
+(** Callback when the mode is changed. *)
+let mode_callback = ref (fun _ -> ())
+
+let on_mode f =
+  let g = !mode_callback in
+  mode_callback := fun s -> g s; f s
+
 (** Maximal depth for pasting schemes. *)
 let depth = ref None
 
@@ -38,7 +45,8 @@ let parse s =
           | "symmetric monoidal closed" | "smcc" -> `Symmetric_monoidal_closed
           | "monoidal" -> `Monoidal
           | m -> warning "Unknown mode: %s" m; raise Exit
-        )
+        );
+      !mode_callback !mode
     | "depth" ->
       let n = int_of_string v in
       message "setting depth to %d" n;
