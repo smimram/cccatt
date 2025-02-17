@@ -13,13 +13,22 @@ let button txt action =
   b##.onclick := Dom_html.handler (fun _ -> action (); Js._true);
   b
 
-let debug s =
-  Console.console##debug (Js.string s)
+[%%if ocaml_version = (4,14,1)]
+let debug s = Firebug.console##debug (Js.string s)
+[%%else]
+let debug s = Console.console##debug (Js.string s)
+[%%endif]
 
 let env = ref ([],[])
 
 let loop s =
   env := Lang.exec !env (Prover.parse s)
+
+[%%if ocaml_version = (4,14,1)]
+let number_of_int n = n
+[%%else]
+let number_of_int n = Js.number_of_float (float n)
+[%%endif]
 
 let run _ =
   let jsget x = Js.Opt.get x (fun () -> assert false) in
@@ -34,7 +43,7 @@ let run _ =
   let print s =
     let s = Js.to_string output##.value ^ s in
     output##.value := Js.string s;
-    output##.scrollTop := Js.number_of_float @@ float @@ output##.scrollHeight
+    output##.scrollTop := number_of_int output##.scrollHeight
   in
   let error s =
     print ("=¡.¡= Error: " ^ s ^ "\n")
