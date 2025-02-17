@@ -8,6 +8,13 @@ jobs:
       uses: actions/checkout@v4
     - name: Install packages
       run: sudo apt-get -y install ocaml ocaml-dune ocaml-odoc js-of-ocaml
+    - name: Install js_of_ocaml # version 6 is backward incompatible
+      run: |
+        cd /tmp
+        git clone git@github.com:ocsigen/js_of_ocaml.git
+        cd js_of_ocaml
+        dune build @install
+        sudo dune install --prefix=/usr --libdir=`ocamlc -where` --verbose
     - name: Install ppx_blob
       run: |
         cd /tmp
