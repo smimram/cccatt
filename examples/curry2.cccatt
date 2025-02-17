@@ -1,5 +1,7 @@
 # BCKW
 # https://en.wikipedia.org/wiki/B,_C,_K,_W_system
+#
+#-# mode: ccc
 
 coh ap {a b : .} (f : a -> b) (x : a) : b
 

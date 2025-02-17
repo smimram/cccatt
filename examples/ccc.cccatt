@@ -1,6 +1,8 @@
 # Cartesian closed categories, equationally presented
 # See Lambek & Scott, _Introduction to higher order categorical logic_, section I.3 (p. 52)
 # See also Curien, _Categorical combinators_, definition 4.5
+#
+#-# mode: ccc
 
 # Generators
 

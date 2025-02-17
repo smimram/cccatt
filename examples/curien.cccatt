@@ -1,6 +1,8 @@
 # Categorical combinatory logic
 # See Curien, 1986, section 4.1
 # https://www.sciencedirect.com/science/article/pii/S001999588680047X
+#
+#-# mode: ccc
 
 # Generators
 

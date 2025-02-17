@@ -1,4 +1,6 @@
 ## λ-calculus
+#
+#-# mode: ccc
 
 coh I (a : .) : a → a
 

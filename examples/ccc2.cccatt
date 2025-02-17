@@ -1,5 +1,7 @@
 # Cartesian closed categories, equationally presented
 # This is the version of Mori and Matsumoto in _Coherence for Cartesian Closed Categories: A Sequential Approach_
+#
+#-# mode: ccc
 
 # Generators
 

@@ -2,6 +2,8 @@
 # From Raymond Smullyan, _To mock a mockingbird_
 # https://hackage.haskell.org/package/data-aviary-0.4.0/docs/Data-Aviary-Birds.html
 # https://www.angelfire.com/tx4/cus/combinator/birds.html
+#
+#-# mode: ccc
 
 # - "crossed X" (or "converse X") means that we exchange the two arguments of X, i.e. we take CX
 # - "X once removed" means that the first argument now takes an argument, i.e. we take B x
