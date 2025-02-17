@@ -14,7 +14,7 @@ let button txt action =
   b
 
 let debug s =
-  Firebug.console##debug (Js.string s)
+  Console.console##debug (Js.string s)
 
 let env = ref ([],[])
 
@@ -34,7 +34,7 @@ let run _ =
   let print s =
     let s = Js.to_string output##.value ^ s in
     output##.value := Js.string s;
-    output##.scrollTop := output##.scrollHeight
+    output##.scrollTop := Js.number_of_float @@ float @@ output##.scrollHeight
   in
   let error s =
     print ("=¡.¡= Error: " ^ s ^ "\n")
