@@ -286,6 +286,48 @@ let check ~pos l a =
     in
     check [] b
 
+  | `Cartesian ->
+    let module S = Set.Make(struct type nonrec t = t let compare = compare_var end) in
+    let get_var a =
+      match (unmeta a).desc with
+      | Var _ -> a
+      | _ -> failure a.pos "variable expected"
+    in
+    let rec get_prod ?(distinct=false) a =
+      let a0 = a in
+      match (unmeta a).desc with
+      | Prod (a, b) ->
+        let a = get_prod a in
+        let b = get_prod b in
+        if distinct && not (S.disjoint a b) then failure a0.pos "repeated variables";
+        S.union a b
+      | One -> S.empty
+      | Var _ -> S.singleton a
+      | _ -> failure a.pos "tensor product of variables expected"
+    in
+    let get_arr a =
+      match (unmeta a).desc with
+      | Hom (a, b) -> (a, b)
+      | _ -> failure a.pos "arrow expected"
+    in
+    let l = List.map snd l in
+    let l = List.map get_arr l in
+    let l = List.map (fun (a,b) -> get_prod a, get_var b) l in
+    let a, b = get_arr a in
+    let a = get_prod ~distinct:true a in
+    let b = get_prod b in
+    (* From the source to the targets. *)
+    let rec check available l =
+      if l = [] then available else
+        match List.find_and_remove_opt (fun (a,_) -> S.subset a available) l with
+        | Some ((_,b),l) ->
+          if S.mem b available then failure b.pos "variable produced multiple times";
+          check (S.add b available) l
+        | None -> failure pos "some hypothesis could not be produced"
+    in
+    let available = check a l in
+    if not (S.subset b available) then failure pos "some variables cannot be produced: %s" (S.diff b available |> S.to_list |> List.map to_string |> String.concat ", ")
+
   | `Symmetric_monoidal ->
     let module S = Set.Make(struct type nonrec t = t let compare = compare_var end) in
     (* Make sure that the types are arrows between tensor expressions. *)
