@@ -6,6 +6,7 @@
   (file ../tests/test.cccatt)
   (file ../tests/implicit.cccatt)
   (file ../examples/category.cccatt)
+  (file ../examples/cartesian.cccatt)
   (file ../examples/ccc.cccatt)
   (file ../examples/ccc2.cccatt)
   (file ../examples/curry.cccatt)
