@@ -30,27 +30,24 @@ let parse s =
   let k, v = String.split_on_first_char ':' s in
   let k = String.trim k in
   let v = String.trim v in
-  try
-    match k with
-    | "mode" ->
-      message "setting mode to %s" v;
-      mode :=
-        (
-          match v with
-          | "plain" -> `Plain
-          | "monoid" -> `Monoid
-          | "category" -> `Category
-          | "cartesian closed" | "ccc" -> `Cartesian_closed
-          | "symmetric monoidal" | "smc" -> `Symmetric_monoidal
-          | "symmetric monoidal closed" | "smcc" -> `Symmetric_monoidal_closed
-          | "monoidal" -> `Monoidal
-          | m -> warning "Unknown mode: %s" m; raise Exit
-        );
-      !mode_callback !mode
-    | "depth" ->
-      let n = int_of_string v in
-      message "setting depth to %d" n;
-      depth := Some n
-    | k -> warning "Unknown setting: %s" k; raise Exit
-  with
-  | Exit -> ()
+  match k with
+  | "mode" ->
+    message "setting mode to %s" v;
+    mode :=
+      (
+        match v with
+        | "plain" -> `Plain
+        | "monoid" -> `Monoid
+        | "category" -> `Category
+        | "cartesian closed category" | "ccc" -> `Cartesian_closed
+        | "symmetric monoidal category" | "smc" -> `Symmetric_monoidal
+        | "symmetric monoidal closed category" | "smcc" -> `Symmetric_monoidal_closed
+        | "monoidal category" -> `Monoidal
+        | m -> error "Unknown mode: %s" m
+      );
+    !mode_callback !mode
+  | "depth" ->
+    let n = int_of_string v in
+    message "setting depth to %d" n;
+    depth := Some n
+  | k -> error "Unknown setting: %s" k

@@ -1,8 +1,7 @@
-#-# mode: symmetric monoidal
-
 #
 # Symmetric monoidal categories
 #
+#-# mode: symmetric monoidal category
 
 # Basic constructions (see monoidal for more)
 
