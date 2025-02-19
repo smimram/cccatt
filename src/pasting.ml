@@ -326,7 +326,7 @@ let check ~pos l a =
         | None -> failure pos "some hypothesis could not be produced"
     in
     let available = check a l in
-    if not (S.subset b available) then failure pos "some variables cannot be produced: %s" (S.diff b available |> S.to_list |> List.map to_string |> String.concat ", ")
+    if not (S.subset b available) then failure pos "some variables cannot be produced: %s" (S.diff b available |> S.to_seq |> List.of_seq |> List.map to_string |> String.concat ", ")
 
   | `Symmetric_monoidal ->
     let module S = Set.Make(struct type nonrec t = t let compare = compare_var end) in
