@@ -78,6 +78,7 @@ let run _ =
          | `Monoidal -> "monoidal"
          | `Symmetric_monoidal -> "smc"
          | `Symmetric_monoidal_closed -> "smcc"
+         | `Cartesian -> "cartesian category"
          | _ -> Js.to_string mode##.value
        in
        mode##.value := Js.string m

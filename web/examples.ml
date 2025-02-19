@@ -9,6 +9,7 @@ let linear = [%blob "../examples/linear.cccatt"]
 let category = [%blob "../examples/category.cccatt"]
 let monoidal = [%blob "../examples/monoidal.cccatt"]
 let symmetric = [%blob "../examples/symmetric.cccatt"]
+let cartesian = [%blob "../examples/cartesian.cccatt"]
 
 let get = function
   | "none" -> ""
@@ -23,4 +24,5 @@ let get = function
   | "category" -> category
   | "monoidal" -> monoidal
   | "symmetric" -> symmetric
+  | "cartesian" -> cartesian
   | _ -> ""
