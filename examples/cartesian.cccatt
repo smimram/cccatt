@@ -1,0 +1,29 @@
+# Cartesian categories
+#
+#-# mode: cartesian category
+
+# Generators
+
+coh comp {a b c : .} (f : a -> b) (g : b -> c) : a -> c
+
+coh id {a : .} : a -> a
+
+coh pairing {a b c : .} (f : a -> b) (g : a -> c) : a -> b * c
+
+coh fst {a b : .} : a * b -> a
+
+coh snd {a b : .} : a * b -> b
+
+# coh term {a : .} : a -> 1
+
+# Relations
+
+coh assoc {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : comp (comp f g) h = comp f (comp g h)
+coh unitl {a b : .} (f : a -> b) : comp id f = f
+coh unitr {a b : .} (f : a -> b) : comp f id = f
+
+# coh term-rule {a : .} (f : a -> 1) : f = term
+
+coh comp-fst {a b c : .} (f : a -> b) (g : a -> c) : comp (pairing f g) fst = f
+coh comp-snd {a b c : .} (f : a -> b) (g : a -> c) : comp (pairing f g) snd = g
+# coh pairing-eta {a b c : .} (h : a -> b * c) : pairing (comp h fst) (comp h snd) = h

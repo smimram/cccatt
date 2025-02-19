@@ -303,7 +303,7 @@ let check ~pos l a =
         S.union a b
       | One -> S.empty
       | Var _ -> S.singleton a
-      | _ -> failure a.pos "tensor product of variables expected"
+      | _ -> failure a.pos "product of variables expected"
     in
     let get_arr a =
       match (unmeta a).desc with
