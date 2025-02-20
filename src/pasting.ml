@@ -47,9 +47,7 @@ let check_ccc a =
       | Hom (a, b) -> max (1 + depth a) (depth b)
       | _ -> assert false
     in
-    match !Setting.depth with
-    | Some d -> if depth a > d then failure a.pos "pasting has depth %d but we are limited to %d" (depth a) d
-    | None -> ()
+    if depth a > !Setting.dimension then failure a.pos "pasting has depth %d but we are limited to %d" (depth a) !Setting.dimension
   in
   prove [] [] a
 

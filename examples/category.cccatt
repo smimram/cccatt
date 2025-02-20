@@ -1,8 +1,7 @@
-#-# mode: category
-
 #
 # Plain categories
 #
+#-# mode: category
 
 coh id {a : .} : a -> a
 
