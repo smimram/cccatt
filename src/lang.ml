@@ -82,6 +82,7 @@ and eval env e =
   | Hom (a, b) -> mk (Hom (eval env a, eval env b))
   | Prod (a, b) -> mk (Prod (eval env a, eval env b))
   | One -> mk One
+  | SimpleType -> mk SimpleType
   | Type -> mk Type
   | Meta { value = Some t; _ } -> eval env t
   | Meta { value = None; _ } -> e
@@ -154,6 +155,8 @@ and infer tenv env (e:Term.t) =
     mk ~pos (Prod (a, b)), mk ~pos Obj
   | One ->
     mk ~pos One, mk ~pos Obj
+  | SimpleType ->
+    mk ~pos SimpleType, mk ~pos Type
   | Type ->
     mk ~pos Type, mk ~pos Type
   | Meta m ->
