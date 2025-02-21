@@ -182,9 +182,10 @@ let check ~pos l a =
 *)
 
   | `Category ->
+
     let get_arr a =
       match (unmeta a).desc with
-      | Hom (a, b) ->
+      | Arr (a, b) ->
         if not (is_var a) then failure a.pos "variable expected";
         if not (is_var b) then failure b.pos "variable expected";
         a, b
