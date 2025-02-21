@@ -6,7 +6,7 @@ open Term
 
 (** Check whether a type is a pasting scheme in the theory of ccc, for an implicational formula. *)
 let check_ccc a =
-  (* printf "* check_ps %s\n%!" (to_string a); *)
+  (* printf "* check ccc: %s\n%!" (to_string a); *)
   let rec target a =
     match a.desc with
     | Var x -> x
@@ -53,7 +53,7 @@ let check_ccc a =
 
 (** Whether a type in a context is a pasting scheme. *)
 let check ~pos l a =
-  (* printf "* check_ps: %s\n%!" (to_string (pis l a)); *)
+  (* printf "* check_ps: %s\n%!" (to_string (pis_explicit l a)); *)
   (* Remove variable declarations from the context. *)
   let vars, l =
     let split_vars l =
@@ -77,6 +77,7 @@ let check ~pos l a =
           | Some e' -> mk e'.desc
           | None -> e
         )
+      | Arr (a, b) -> mk (Arr (rewrite a, rewrite b))
       | Hom (a, b) -> mk (Hom (rewrite a, rewrite b))
       | Prod (a, b) -> mk (Prod (rewrite a, rewrite b))
       | One -> mk One
@@ -110,7 +111,7 @@ let check ~pos l a =
     let vars = List.diff vars (List.map fst rw) in
     vars, l, rewrite rw a
   in
-  (* printf "**** after removal: %s\n%!" (to_string (pis l a)); *)
+  (* printf "**** after removal: %s\n%!" (to_string (pis_explicit l a)); *)
   (* Ensure that the declared variables are exactly the free variables. *)
   let () =
     let a = homs ~pos (List.map snd l) a in
@@ -119,6 +120,7 @@ let check ~pos l a =
         match a.desc with
         | Var x -> if not (List.mem x fv) then x::fv else fv
         | Obj -> fv
+        | Arr (a, b) -> fv |> aux a |> aux b
         | Hom (a, b) -> fv |> aux a |> aux b
         | Prod (a, b) -> fv |> aux a |> aux b
         | One -> fv
@@ -140,9 +142,11 @@ let check ~pos l a =
   match !Setting.mode with
 
   | `Cartesian_closed ->
+
     (* Turn products into arrows. *)
     let rec deproduct e =
       match e.desc with
+      | Arr (a, b)
       | Hom (a, b) ->
         let aa = deproduct a in
         let bb = deproduct b in

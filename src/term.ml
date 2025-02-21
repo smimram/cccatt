@@ -16,7 +16,8 @@ and desc =
   | Abs  of implicit * string * t * t (** abstraction *)
   | App  of implicit * t * t (** application *)
   | Pi   of implicit * string * t * t (** Π-type *)
-  | Hom  of t * t (** hom type *)
+  | Arr  of t * t (** arrow type *)
+  | Hom  of t * t (** internal hom type *)
   | Prod of t * t (** product type *)
   | One (** terminal type *)
   | Id   of t * t * t (** identity type *)
@@ -45,20 +46,21 @@ let rec to_string ?(pa=false) e =
   | Var x -> x
   | Abs (i, x, a, t) ->
     if i = `Implicit then
-      Printf.sprintf "fun {%s : %s} => %s" x (to_string a) (to_string t) |> pa
+      Printf.sprintf "fun {%s : %s} ⤳ %s" x (to_string a) (to_string t) |> pa
     else
-      Printf.sprintf "fun (%s : %s) => %s" x (to_string a) (to_string t) |> pa
+      Printf.sprintf "fun (%s : %s) ⤳ %s" x (to_string a) (to_string t) |> pa
   | App (i, t, u) ->
     let isnt_app e = match e.desc with App _ -> false | _ -> true in
     if i = `Implicit then Printf.sprintf "%s {%s}" (to_string ~pa:(isnt_app t) t) (to_string u) |> pa
     else Printf.sprintf "%s %s" (to_string ~pa:(isnt_app t) t) (to_string ~pa:true u) |> pa
   | Pi (i, x, a, t) ->
     if i = `Implicit then
-      Printf.sprintf "{%s : %s} => %s" x (to_string a) (to_string t) |> pa
+      Printf.sprintf "{%s : %s} ⤳ %s" x (to_string a) (to_string t) |> pa
     else
-      Printf.sprintf "(%s : %s) => %s" x (to_string a) (to_string t) |> pa
+      Printf.sprintf "(%s : %s) ⤳ %s" x (to_string a) (to_string t) |> pa
   | Obj -> "."
-  | Hom (a, b) -> Printf.sprintf "%s → %s" (to_string ~pa:true a) (to_string b) |> pa
+  | Arr (a, b) -> Printf.sprintf "%s → %s" (to_string ~pa:true a) (to_string b) |> pa
+  | Hom (a, b) -> Printf.sprintf "%s ⇒ %s" (to_string ~pa:true a) (to_string b) |> pa
   | Prod (a, b) -> Printf.sprintf "%s × %s" (to_string ~pa:true a) (to_string b) |> pa
   | One -> "1"
   | Id (a, t, u) ->
@@ -150,6 +152,10 @@ let rec pis ?pos l t =
   | (i,x,a)::l -> mk ?pos (Pi (i, x, a, pis ?pos l t))
   | [] -> t
 
+(** Build multiple pi types. *)
+let pis_explicit ?pos l t =
+  pis ?pos (List.map (fun (x,a) -> `Explicit,x,a) l) t
+
 (** Build multiple products. *)
 let rec prods ?pos l =
   match l with
@@ -161,6 +167,7 @@ let rec prods ?pos l =
 let rec has_fv x e =
   match e.desc with
   | Var y -> x = y
+  | Arr (a, b) -> has_fv x a || has_fv x b
   | Hom (a, b) -> has_fv x a || has_fv x b
   | Prod (a, b) -> has_fv x a || has_fv x b
   | Id (a, t, u) -> has_fv x a || has_fv x t || has_fv x u
@@ -195,6 +202,7 @@ let metavariables e =
   | App (_, t, u) -> acc |> aux t |> aux u
   | Obj -> acc
   | Pi (_, _, a, b)
+  | Arr (a, b)
   | Hom (a, b)
   | Prod (a, b) -> acc |> aux a |> aux b
   | One -> acc

@@ -15,11 +15,10 @@ let rec unify tenv env ?(alpha=[]) t t' =
   | Var x, Var y ->
     let x = match List.assoc_opt x alpha with Some x -> x | None -> x in
     if x <> y then raise Unification
-  | Hom (a, b), Hom (a', b') ->
-    unify tenv env a a';
-    unify tenv env b b'
   | Obj, Obj -> ()
   | Type, Type -> ()
+  | Arr (a, b), Arr (a', b') -> unify tenv env a a'; unify tenv env b b'
+  | Hom (a, b), Hom (a', b') -> unify tenv env a a'; unify tenv env b b'
   | Prod (a, b), Prod (a', b') -> unify tenv env a a'; unify tenv env b b'
   | One, One -> ()
   | Pi (i, x, a, b), Pi (i', x', a', b') ->
@@ -79,6 +78,7 @@ and eval env e =
     mk (Pi (i, x', eval env a, eval ((x,var x')::env) b))
   | Id (a, t, u) -> mk (Id (eval env a, eval env t, eval env u))
   | Obj -> mk Obj
+  | Arr (a, b) -> mk (Arr (eval env a, eval env b))
   | Hom (a, b) -> mk (Hom (eval env a, eval env b))
   | Prod (a, b) -> mk (Prod (eval env a, eval env b))
   | One -> mk One
@@ -144,6 +144,11 @@ and infer tenv env (e:Term.t) =
     mk ~pos (Id (a, t, u)), mk ~pos Type
   | Obj ->
     mk ~pos Obj, mk ~pos Type
+  | Arr (a, b) ->
+    (* TODO: change this! *)
+    let a = check tenv env a (mk ~pos:a.pos Obj) in
+    let b = check tenv env b (mk ~pos:b.pos Obj) in
+    mk ~pos (Arr (a, b)), mk ~pos Type
   | Hom (a, b) ->
     let a = check tenv env a (mk ~pos:a.pos Obj) in
     let b = check tenv env b (mk ~pos:b.pos Obj) in

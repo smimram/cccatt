@@ -19,12 +19,13 @@ let pis ?pos l a =
 %}
 
 %token LET CHECK NCOH FUN TO HOLE
-%token COH HOM EQ EQDEF OBJ TIMES ONE
+%token COH ARR HOM EQ EQDEF OBJ TIMES ONE
 %token LPAR RPAR LACC RACC COL
 %token <string> IDENT
 %token <string> SETTING
 %token EOF
 
+%right ARR
 %right TO
 %right HOM
 %right TIMES
@@ -51,6 +52,7 @@ type_opt:
 
 expr:
   | FUN args TO expr { abss $2 $4 }
+  | expr ARR expr { mk (Arr ($1, $3)) }
   | expr HOM expr { mk (Hom ($1, $3)) }
   | expr EQ expr { mk (Id (hole ~pos:(defpos()) (), $1, $3)) }
   | expr EQ LACC expr RACC expr %prec EQ { mk (Id ($4, $1, $6)) }

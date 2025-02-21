@@ -15,15 +15,16 @@ rule token = parse
   | "let" { LET }
   | "fun" { FUN }
   | "check" { CHECK }
-  | "=>" { TO }
   | "." { OBJ }
   | "(" { LPAR }
   | ")" { RPAR }
   | "{" { LACC }
   | "}" { RACC }
   | ":" { COL }
-  | "->" { HOM }
-  | "→" { utf8 ~n:2 lexbuf; HOM }
+  | "->" { ARR }
+  | "→" { utf8 ~n:2 lexbuf; ARR }
+  | "=>" { HOM }
+  | "⇒" { utf8 ~n:2 lexbuf; HOM }
   | "*" { utf8 lexbuf; TIMES }
   | "×" { utf8 lexbuf; TIMES }
   | "1" { ONE }

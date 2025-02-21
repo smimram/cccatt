@@ -6,43 +6,43 @@
 
 # Generators
 
-coh comp {a b c : .} (f : a -> b) (g : b -> c) : a -> c
+coh comp {a b c : .} (f : a => b) (g : b => c) : a => c
 
-coh id {a : .} : a -> a
+coh id {a : .} : a => a
 
-coh pairing {a b c : .} (f : a -> b) (g : a -> c) : a -> b * c
+coh pairing {a b c : .} (f : a => b) (g : a => c) : a => b * c
 
-coh fst {a b : .} : a * b -> a
+coh fst {a b : .} : a * b => a
 
-coh snd {a b : .} : a * b -> b
+coh snd {a b : .} : a * b => b
 
-coh term {a : .} : a -> 1
+coh term {a : .} : a => 1
 
-coh abs {a b c : .} (f : a * b -> c) : a -> b -> c
+coh abs {a b c : .} (f : a * b => c) : a => b => c
 
-coh app {a b : .} : (a -> b) * a -> b
+coh app {a b : .} : (a => b) * a => b
 
 # Relations
 
 # E1
-coh assoc {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : comp (comp f g) h = comp f (comp g h)
-coh unitl {a b : .} (f : a -> b) : comp id f = f
-coh unitr {a b : .} (f : a -> b) : comp f id = f
+coh assoc {a b c d : .} (f : a => b) (g : b => c) (h : c => d) : comp (comp f g) h = comp f (comp g h)
+coh unitl {a b : .} (f : a => b) : comp id f = f
+coh unitr {a b : .} (f : a => b) : comp f id = f
 
 # E2
-coh term-rule {a : .} (f : a -> 1) : f = term
+coh term-rule {a : .} (f : a => 1) : f = term
 
 # E3a
-coh comp-fst {a b c : .} (f : a -> b) (g : a -> c) : comp (pairing f g) fst = f
+coh comp-fst {a b c : .} (f : a => b) (g : a => c) : comp (pairing f g) fst = f
 
 # E3b
-coh comp-snd {a b c : .} (f : a -> b) (g : a -> c) : comp (pairing f g) snd = g
+coh comp-snd {a b c : .} (f : a => b) (g : a => c) : comp (pairing f g) snd = g
 
 # E3c
-coh pairing-eta {a b c : .} (h : a -> b * c) : pairing (comp h fst) (comp h snd) = h
+coh pairing-eta {a b c : .} (h : a => b * c) : pairing (comp h fst) (comp h snd) = h
 
 # E4a
-coh app-abs {a b c : .} (f : a * b -> c) : comp (pairing (comp fst (abs f)) snd) app = f
+coh app-abs {a b c : .} (f : a * b => c) : comp (pairing (comp fst (abs f)) snd) app = f
 
 # E4b
-coh abs-app {a b c : .} (f : a -> b -> c) : abs (comp (pairing (comp fst f) snd) app) = f
+coh abs-app {a b c : .} (f : a => b => c) : abs (comp (pairing (comp fst f) snd) app) = f
