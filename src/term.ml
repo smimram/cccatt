@@ -22,7 +22,6 @@ and desc =
   | Id   of t * t * t (** identity type *)
   | Meta of meta (** a variable to be unified *)
   | Obj  (** object type *)
-  | SimpleType (** the type of simple types *)
   | Type (** the type of types *)
 
 and implicit = [`Explicit |  `Implicit]
@@ -70,7 +69,6 @@ let rec to_string ?(pa=false) e =
       | Some t -> to_string t
       | _ -> Printf.sprintf "?%d" m.id
     )
-  | SimpleType -> "SimpleType"
   | Type -> "Type"
 
 let string_of_implicit = function
@@ -208,7 +206,6 @@ let metavariables e =
       | Some v -> acc |> aux v |> aux m.ty
       | None -> acc |> aux m.ty
     )
-  | SimpleType -> acc
   | Type -> acc
   in
   aux e []
