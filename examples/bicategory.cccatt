@@ -2,7 +2,7 @@
 # Bicategories
 #
 #-# mode: category
-#-# dim: 2
+#-# dimension: 2
 
 coh id {a : .} : a -> a
 
@@ -16,4 +16,4 @@ coh assoc {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : co (co f g) h =
 
 coh id2 {a b : .} {f : a -> b} : f -> f
 
-# coh co2 {a b : .} {f g h : a -> b} {α β : f -> g} : f -> g
+coh co2 {a b : .} {f g h : a -> b} (α : f -> g) (β : g -> h) : f -> h
