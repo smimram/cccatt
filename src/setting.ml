@@ -17,6 +17,10 @@ type mode = [
 
 let mode = ref (`Cartesian_closed : mode)
 
+
+(** Whether types have elements .*)
+let has_elements () = List.mem !mode [`Cartesian_closed]
+
 (** Callback when the mode is changed. *)
 let mode_callback = ref (fun _ -> ())
 

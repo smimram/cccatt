@@ -1,45 +1,45 @@
 # Axioms for linear λ-terms, also known as BCI-calculus
 
-coh ap {a b : .} (f : a -> b) (x : a) : b
+coh ap {a b : .} (f : a ⇒ b) (x : a) : b
 
-let ap2 {a1 a2 b : .} (f : a1 -> a2 -> b) (x1 : a1) (x2 : a2) : b := ap (ap f x1) x2
+let ap2 {a1 a2 b : .} (f : a1 ⇒ a2 ⇒ b) (x1 : a1) (x2 : a2) : b := ap (ap f x1) x2
 
-coh B {a b c : .} : (b -> c) -> (a -> b) -> a -> c
+coh B {a b c : .} : (b ⇒ c) ⇒ (a ⇒ b) ⇒ a ⇒ c
 
-coh C {a b c : .} : (a -> b -> c) -> b -> a -> c
+coh C {a b c : .} : (a ⇒ b ⇒ c) ⇒ b ⇒ a ⇒ c
 
-coh I {a : .} : a -> a
+coh I {a : .} : a ⇒ a
 
-coh ax-eta {a b : .} : ap (ap C B) I = I {a -> b}
+coh ax-eta {a b : .} : ap (ap C B) I = I {a ⇒ b}
 
-coh ax-I {a b : .} : ap B I = I {a -> b}
+coh ax-I {a b : .} : ap B I = I {a ⇒ b}
 
 coh ax-B1 {a b c d : .} :
   ap2 B (ap B C) (ap2 B C (ap B B))
-  ={(d -> b -> c) -> (a -> b) -> a -> d -> c}
+  ={(d ⇒ b ⇒ c) ⇒ (a ⇒ b) ⇒ a ⇒ d ⇒ c}
   ap2 B B C
 
 coh ax-B2 {a b c d : .} :
   ap2 B (ap B C) (ap2 B B B)
-  ={(b -> c) -> (d -> a -> b) -> a -> d -> c}
+  ={(b ⇒ c) ⇒ (d ⇒ a ⇒ b) ⇒ a ⇒ d ⇒ c}
   ap2 C (ap2 B B (ap2 B B B)) C
 
 coh ax-B3 {a b c d : .} :
   ap2 B (ap B B) B
-  ={(b -> c) -> (a -> b) -> (d -> a) -> d -> c}
+  ={(b ⇒ c) ⇒ (a ⇒ b) ⇒ (d ⇒ a) ⇒ d ⇒ c}
   ap2 C (ap2 B B (ap2 B B B)) B
 
 coh ax-C1 {a b c d : .} :
   ap2 B (ap B C) (ap2 B C (ap B C))
-  ={(d -> a -> b -> c) -> b -> a -> d -> c}
+  ={(d ⇒ a ⇒ b ⇒ c) ⇒ b ⇒ a ⇒ d ⇒ c}
   ap2 B C (ap2 B (ap B C) C)
 
 coh ax-C2 {a b c d : .} :
   ap2 B (ap B C) (ap2 B B C)
-  ={(a -> b -> c) -> (d -> b) -> a -> d -> c}
+  ={(a ⇒ b ⇒ c) ⇒ (d ⇒ b) ⇒ a ⇒ d ⇒ c}
   ap2 B C (ap B B)
 
 coh ax-C3 {a b c d : .} :
   ap2 B (ap B B) C
-  ={(a -> b -> c) -> b -> (d -> a) -> d -> c}
+  ={(a ⇒ b ⇒ c) ⇒ b ⇒ (d ⇒ a) ⇒ d ⇒ c}
   ap2 B C (ap2 B (ap B C) B)

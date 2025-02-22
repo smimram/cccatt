@@ -54,6 +54,7 @@ let check_ccc a =
 (** Whether a type in a context is a pasting scheme. *)
 let check ~pos l a =
   (* printf "* check_ps: %s\n%!" (to_string (pis_explicit l a)); *)
+
   (* Remove variable declarations from the context. *)
   let vars, l =
     let split_vars l =
@@ -64,6 +65,7 @@ let check ~pos l a =
     in
     split_vars l
   in
+
   (* Remove indentities in arguments. *)
   let vars, l, a =
     (* Apply rewriting rules. *)
@@ -77,7 +79,7 @@ let check ~pos l a =
           | Some e' -> mk e'.desc
           | None -> e
         )
-      | Arr (a, t, u) when is_obj a -> mk (Arr (a, rewrite t, rewrite u))
+      | Arr (a, t, u) -> mk (Arr (rewrite a, rewrite t, rewrite u))
       | Hom (a, b) -> mk (Hom (rewrite a, rewrite b))
       | Prod (a, b) -> mk (Prod (rewrite a, rewrite b))
       | One -> mk One
@@ -88,6 +90,7 @@ let check ~pos l a =
       | Meta { value = None; _ } -> error ~pos:e.pos "unresolved metvariable %s when checking pasting conditions" (to_string e)
       | _ -> error ~pos:e.pos "TODO: in rewrite handle %s" (to_string e)
     in
+
     (* Orient identities on variables as rewriting rules and normalize l. *)
     let rec aux rw = function
       | (_, {desc = Id (_, {desc = Var x; _}, t); _})::l
@@ -112,6 +115,7 @@ let check ~pos l a =
     vars, l, rewrite rw a
   in
   (* printf "**** after removal: %s\n%!" (to_string (pis_explicit l a)); *)
+
   (* Ensure that the declared variables are exactly the free variables. *)
   let () =
     let a = homs ~pos (List.map snd l) a in
@@ -120,7 +124,7 @@ let check ~pos l a =
         match a.desc with
         | Var x -> if not (List.mem x fv) then x::fv else fv
         | Obj -> fv
-        | Arr (a, t, u) when is_obj a -> fv |> aux t |> aux u
+        | Arr (a, t, u) -> fv |> aux a |> aux t |> aux u
         | Hom (a, b) -> fv |> aux a |> aux b
         | Prod (a, b) -> fv |> aux a |> aux b
         | One -> fv
@@ -133,11 +137,16 @@ let check ~pos l a =
     let d = List.diff vars (fv a) in
     if d <> [] then failure a.pos "unused variables: %s" (String.concat ", " d)
   in
+
   (* An identity is provable when its type is contractible. *)
   let a =
-    match a.desc with
-    | Id (a, _, _) -> a
-    | _ -> a
+    let rec aux a =
+      match a.desc with
+      | Arr(a, _, _) when not (is_obj a) -> aux a
+      | Id (a, _, _) -> aux a
+      | _ -> a
+    in
+    aux a
   in
   match !Setting.mode with
 
@@ -232,7 +241,7 @@ let check ~pos l a =
     in
     let get_arr a =
       match (unmeta a).desc with
-      | Hom (a, b) ->
+      | Arr (o, a, b) when is_obj o ->
         let a' = get_tens a in
         let b' = get_tens b in
         if a' = [] then failure a.pos "type cannot be empty";
@@ -309,7 +318,7 @@ let check ~pos l a =
     in
     let get_arr a =
       match (unmeta a).desc with
-      | Hom (a, b) -> (a, b)
+      | Arr (o, a, b) when is_obj o -> (a, b)
       | _ -> failure a.pos "arrow expected"
     in
     let l = List.map snd l in
@@ -347,7 +356,7 @@ let check ~pos l a =
     in
     let get_arr a =
       match (unmeta a).desc with
-      | Hom (a, b) ->
+      | Arr (o, a, b) when is_obj o ->
         let a' = get_tens a in
         let b' = get_tens b in
         if S.is_empty a' then failure a.pos "type cannot be empty";

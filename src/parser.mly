@@ -22,7 +22,6 @@ let pis ?pos l a =
 %token COH ARR HOM EQ EQDEF OBJ TIMES ONE
 %token LPAR RPAR LACC RACC COL
 %token <string> IDENT
-%token <string> SETTING
 %token EOF
 
 %right ARR
@@ -36,7 +35,6 @@ let pis ?pos l a =
 %%
 
 prog:
-  | SETTING prog { Setting.parse $1; $2 }
   | cmd prog { $1::$2 }
   | EOF { [] }
 
@@ -54,8 +52,8 @@ expr:
   | FUN args TO expr { abss $2 $4 }
   | expr ARR expr { mk (Arr (hole ~pos:(defpos()) (), $1, $3)) }
   | expr HOM expr { mk (Hom ($1, $3)) }
-  | expr EQ expr { mk (Id (hole ~pos:(defpos()) (), $1, $3)) }
-  | expr EQ LACC expr RACC expr %prec EQ { mk (Id ($4, $1, $6)) }
+  | expr EQ expr { if Setting.has_elements () then mk (Id (hole ~pos:(defpos()) (), $1, $3)) else mk (Arr (hole ~pos:(defpos()) (), $1, $3)) }
+  | expr EQ LACC expr RACC expr %prec EQ { if Setting.has_elements () then mk (Id ($4, $1, $6)) else mk (Arr ($4, $1, $6)) }
   | expr TIMES expr { mk (Prod ($1, $3)) }
   | ONE { mk One }
   | aexpr { $1 }
