@@ -17,9 +17,14 @@ type mode = [
 
 let mode = ref (`Cartesian_closed : mode)
 
-
-(** Whether types have elements .*)
+(** Whether types have elements. *)
 let has_elements () = List.mem !mode [`Cartesian_closed]
+
+let has_hom () = List.mem !mode [`Symmetric_monoidal_closed; `Cartesian_closed]
+
+let has_prod () = List.mem !mode [`Monoidal; `Symmetric_monoidal; `Symmetric_monoidal_closed; `Cartesian; `Cartesian_closed]
+
+let has_one () = has_prod ()
 
 (** Callback when the mode is changed. *)
 let mode_callback = ref (fun _ -> ())

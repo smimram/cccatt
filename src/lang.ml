@@ -153,14 +153,17 @@ and infer tenv env (e:Term.t) =
     let u = check tenv env u a' in
     mk ~pos (Arr (a, t, u)), mk ~pos Type
   | Hom (a, b) ->
+    if not (Setting.has_hom ()) then failure e.pos "internal hom not allowed in this mode";
     let a = check tenv env a (mk ~pos:a.pos Obj) in
     let b = check tenv env b (mk ~pos:b.pos Obj) in
     mk ~pos (Hom (a, b)), mk ~pos Obj
   | Prod (a, b) ->
+    if not (Setting.has_prod ()) then failure e.pos "products not allowed in this mode";
     let a = check tenv env a (mk ~pos:a.pos Obj) in
     let b = check tenv env b (mk ~pos:b.pos Obj) in
     mk ~pos (Prod (a, b)), mk ~pos Obj
   | One ->
+    if not (Setting.has_one ()) then failure e.pos "unit not allowed in this mode";
     mk ~pos One, mk ~pos Obj
   | Type ->
     mk ~pos Type, mk ~pos Type
@@ -178,7 +181,7 @@ and check tenv env e a =
     mk ~pos:e.pos (Abs(`Implicit,x,a,t))
   | _ ->
     let e, b = infer tenv env e in
-    try if not (b.desc = Obj && a.desc = Type) then unify tenv env b a; e
+    try if not (Setting.has_elements ()) || not (b.desc = Obj && a.desc = Type) then unify tenv env b a; e
     with
     | (* Unification *) _ ->
       if is_implicit_pi b && not (is_implicit_pi a) then
