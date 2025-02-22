@@ -17,7 +17,7 @@ let rec unify tenv env ?(alpha=[]) t t' =
     if x <> y then raise Unification
   | Obj, Obj -> ()
   | Type, Type -> ()
-  | Arr (a, b), Arr (a', b') -> unify tenv env a a'; unify tenv env b b'
+  | Arr (a, t, u), Arr (a', t', u') -> unify tenv env a a'; unify tenv env t t'; unify tenv env u u'
   | Hom (a, b), Hom (a', b') -> unify tenv env a a'; unify tenv env b b'
   | Prod (a, b), Prod (a', b') -> unify tenv env a a'; unify tenv env b b'
   | One, One -> ()
@@ -76,9 +76,9 @@ and eval env e =
   | Pi (i, x, a, b) ->
     let x' = if List.mem_assoc x env then fresh_var_name () else x in
     mk (Pi (i, x', eval env a, eval ((x,var x')::env) b))
-  | Id (a, t, u) -> mk (Id (eval env a, eval env t, eval env u))
   | Obj -> mk Obj
-  | Arr (a, b) -> mk (Arr (eval env a, eval env b))
+  | Id (a, t, u) -> mk (Id (eval env a, eval env t, eval env u))
+  | Arr (a, t, u) -> mk (Arr (eval env a, eval env t, eval env u))
   | Hom (a, b) -> mk (Hom (eval env a, eval env b))
   | Prod (a, b) -> mk (Prod (eval env a, eval env b))
   | One -> mk One
@@ -144,11 +144,13 @@ and infer tenv env (e:Term.t) =
     let t = check tenv env t a' in
     let u = check tenv env u a' in
     mk ~pos (Id (a, t, u)), mk ~pos Type
-  | Arr (t, u) ->
+  | Arr (a, t, u) ->
     (* TODO: change this! *)
-    let t = check tenv env t (mk ~pos:t.pos Obj) in
-    let u = check tenv env u (mk ~pos:u.pos Obj) in
-    mk ~pos (Arr (t, u)), mk ~pos Type
+    let a = check tenv env a (mk ~pos:a.pos Type) in
+    let a' = eval env a in
+    let t = check tenv env t a' in
+    let u = check tenv env u a' in
+    mk ~pos (Arr (a, t, u)), mk ~pos Type
   | Hom (a, b) ->
     let a = check tenv env a (mk ~pos:a.pos Obj) in
     let b = check tenv env b (mk ~pos:b.pos Obj) in

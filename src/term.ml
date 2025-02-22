@@ -16,11 +16,11 @@ and desc =
   | Abs  of implicit * string * t * t (** abstraction *)
   | App  of implicit * t * t (** application *)
   | Pi   of implicit * string * t * t (** Π-type *)
-  | Arr  of t * t (** arrow type *)
+  | Id   of t * t * t (** identity type *)
+  | Arr  of t * t * t (** arrow type *)
   | Hom  of t * t (** internal hom type *)
   | Prod of t * t (** product type *)
   | One (** terminal type *)
-  | Id   of t * t * t (** identity type *)
   | Meta of meta (** a variable to be unified *)
   | Obj  (** object type *)
   | Type (** the type of types *)
@@ -59,7 +59,8 @@ let rec to_string ?(pa=false) e =
     else
       Printf.sprintf "(%s : %s) ⤳ %s" x (to_string a) (to_string t) |> pa
   | Obj -> "."
-  | Arr (a, b) -> Printf.sprintf "%s → %s" (to_string ~pa:true a) (to_string b) |> pa
+    
+  | Arr (_, t, u) -> Printf.sprintf "%s → %s" (to_string ~pa:true t) (to_string u) |> pa
   | Hom (a, b) -> Printf.sprintf "%s ⇒ %s" (to_string ~pa:true a) (to_string b) |> pa
   | Prod (a, b) -> Printf.sprintf "%s × %s" (to_string ~pa:true a) (to_string b) |> pa
   | One -> "1"
@@ -167,9 +168,9 @@ let rec prods ?pos l =
 let rec has_fv x e =
   match e.desc with
   | Var y -> x = y
-  | Arr (a, b) -> has_fv x a || has_fv x b
-  | Hom (a, b) -> has_fv x a || has_fv x b
+  | Hom (a, b)
   | Prod (a, b) -> has_fv x a || has_fv x b
+  | Arr (a, t, u)
   | Id (a, t, u) -> has_fv x a || has_fv x t || has_fv x u
   | App (_, t, u) -> has_fv x t || has_fv x u
   | Meta { value = Some t; ty = ty; _ } -> has_fv x t || has_fv x ty
@@ -180,6 +181,11 @@ let rec has_fv x e =
 let is_var e =
   match e.desc with
   | Var _ -> true
+  | _ -> false
+
+let is_obj e =
+  match e.desc with
+  | Obj -> true
   | _ -> false
 
 let is_implicit_pi e =
@@ -202,10 +208,10 @@ let metavariables e =
   | App (_, t, u) -> acc |> aux t |> aux u
   | Obj -> acc
   | Pi (_, _, a, b)
-  | Arr (a, b)
   | Hom (a, b)
   | Prod (a, b) -> acc |> aux a |> aux b
   | One -> acc
+  | Arr (a, t, u)
   | Id (a, t, u) -> acc |> aux a |> aux t |> aux u
   | Meta m ->
     (

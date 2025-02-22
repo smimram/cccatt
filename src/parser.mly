@@ -52,7 +52,7 @@ type_opt:
 
 expr:
   | FUN args TO expr { abss $2 $4 }
-  | expr ARR expr { mk (Arr ($1, $3)) }
+  | expr ARR expr { mk (Arr (hole ~pos:(defpos()) (), $1, $3)) }
   | expr HOM expr { mk (Hom ($1, $3)) }
   | expr EQ expr { mk (Id (hole ~pos:(defpos()) (), $1, $3)) }
   | expr EQ LACC expr RACC expr %prec EQ { mk (Id ($4, $1, $6)) }

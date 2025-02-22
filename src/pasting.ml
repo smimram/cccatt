@@ -77,7 +77,7 @@ let check ~pos l a =
           | Some e' -> mk e'.desc
           | None -> e
         )
-      | Arr (a, b) -> mk (Arr (rewrite a, rewrite b))
+      | Arr (a, t, u) when is_obj a -> mk (Arr (a, rewrite t, rewrite u))
       | Hom (a, b) -> mk (Hom (rewrite a, rewrite b))
       | Prod (a, b) -> mk (Prod (rewrite a, rewrite b))
       | One -> mk One
@@ -120,7 +120,7 @@ let check ~pos l a =
         match a.desc with
         | Var x -> if not (List.mem x fv) then x::fv else fv
         | Obj -> fv
-        | Arr (a, b) -> fv |> aux a |> aux b
+        | Arr (a, t, u) when is_obj a -> fv |> aux t |> aux u
         | Hom (a, b) -> fv |> aux a |> aux b
         | Prod (a, b) -> fv |> aux a |> aux b
         | One -> fv
@@ -146,7 +146,10 @@ let check ~pos l a =
     (* Turn products into arrows. *)
     let rec deproduct e =
       match e.desc with
-      | Arr (a, b)
+      | Arr (o, a, b) when is_obj o ->
+        let aa = deproduct a in
+        let bb = deproduct b in
+        List.map (fun b -> homs ~pos:e.pos aa b) bb
       | Hom (a, b) ->
         let aa = deproduct a in
         let bb = deproduct b in
@@ -185,10 +188,11 @@ let check ~pos l a =
 
     let get_arr a =
       match (unmeta a).desc with
-      | Arr (a, b) ->
-        if not (is_var a) then failure a.pos "variable expected";
-        if not (is_var b) then failure b.pos "variable expected";
-        a, b
+      | Arr (a, t, u) ->
+        if not (is_obj a) then failure a.pos "1-dimensional arrow expected";
+        if not (is_var t) then failure t.pos "variable expected";
+        if not (is_var u) then failure u.pos "variable expected";
+        t, u
       | _ ->
         failure a.pos "arrow expected"
     in
@@ -408,5 +412,5 @@ let check ~pos l a =
     in
     let env = prove [] a in
     if env <> [] then failure pos "unused hypothesis: %s" (env |> List.map to_string |> String.concat ", ")
-      
+
   | _ -> failwith "unhandled mode"
