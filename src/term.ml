@@ -39,6 +39,12 @@ and meta =
 
 (** String representation of an expression. This should mostly be useful for debugging (we want to print values). *)
 let rec to_string ?(pa=false) e =
+  let rec dim e =
+    match e.desc with
+    | Obj -> 0
+    | Arr (a, _, _) -> 1 + dim a 
+    | _ -> 0
+  in
   let pa s = if pa then "(" ^ s ^ ")" else s in
   match e.desc with
   (* | Coh (l, a) -> Printf.sprintf "coh[%s|%s]" (List.map (fun (x,a) -> Printf.sprintf "%s:%s" x (to_string a)) l |> String.concat ",") (to_string a) *)
@@ -60,7 +66,7 @@ let rec to_string ?(pa=false) e =
       Printf.sprintf "(%s : %s) ⤳ %s" x (to_string a) (to_string t) |> pa
   | Obj -> "."
     
-  | Arr (_, t, u) -> Printf.sprintf "%s → %s" (to_string ~pa:true t) (to_string u) |> pa
+  | Arr (a, t, u) -> Printf.sprintf "%s %s %s" (to_string ~pa:true t) (if dim a = !Setting.dimension then "=" else "→") (to_string u) |> pa
   | Hom (a, b) -> Printf.sprintf "%s ⇒ %s" (to_string ~pa:true a) (to_string b) |> pa
   | Prod (a, b) -> Printf.sprintf "%s × %s" (to_string ~pa:true a) (to_string b) |> pa
   | One -> "1"
