@@ -44,5 +44,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy website
+        if: github.ref == 'refs/heads/main'
         id: deployment
         uses: actions/deploy-pages@v4
