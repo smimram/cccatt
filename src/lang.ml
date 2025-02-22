@@ -136,19 +136,19 @@ and infer tenv env (e:Term.t) =
     let a = check tenv env a (mk ~pos:a.pos Type) in
     let b = check ((x, eval env a)::tenv) ((x, var ~pos:a.pos x)::env) b (mk ~pos:b.pos Type) in
     mk ~pos (Pi (i, x, a, b)), mk ~pos Type
+  | Obj ->
+    mk ~pos Obj, mk ~pos Type
   | Id (a, t, u) ->
     let a = check tenv env a (mk ~pos:a.pos Obj) in
     let a' = eval env a in
     let t = check tenv env t a' in
     let u = check tenv env u a' in
     mk ~pos (Id (a, t, u)), mk ~pos Type
-  | Obj ->
-    mk ~pos Obj, mk ~pos Type
-  | Arr (a, b) ->
+  | Arr (t, u) ->
     (* TODO: change this! *)
-    let a = check tenv env a (mk ~pos:a.pos Obj) in
-    let b = check tenv env b (mk ~pos:b.pos Obj) in
-    mk ~pos (Arr (a, b)), mk ~pos Type
+    let t = check tenv env t (mk ~pos:t.pos Obj) in
+    let u = check tenv env u (mk ~pos:u.pos Obj) in
+    mk ~pos (Arr (t, u)), mk ~pos Type
   | Hom (a, b) ->
     let a = check tenv env a (mk ~pos:a.pos Obj) in
     let b = check tenv env b (mk ~pos:b.pos Obj) in
