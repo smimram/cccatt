@@ -8,6 +8,8 @@ let utf8 ?(n=1) lexbuf =
 }
 
 let space = ' ' | '\t' | '\r'
+let first_letter = ['_''a'-'z''A'-'Z'] | "α" | "β"
+let letter = first_letter | ['-''+''0'-'9''\'']
 
 rule token = parse
   | "coh" { COH }
@@ -31,7 +33,7 @@ rule token = parse
   | "=" { EQ }
   | ":=" { EQDEF }
   | "_" { HOLE }
-  | (['_''a'-'z''A'-'Z']['-''+''a'-'z''A'-'Z''0'-'9''_''\'']* as str) { IDENT str }
+  | (first_letter letter* as str) { IDENT str }
   | space+ { token lexbuf }
   | "#-#"([^'\n']* as s) { Setting.parse s; token lexbuf }
   | "#"[^'\n']* { token lexbuf }
