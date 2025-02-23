@@ -16,10 +16,11 @@ and desc =
   | Abs  of implicit * string * t * t (** abstraction *)
   | App  of implicit * t * t (** application *)
   | Pi   of implicit * string * t * t (** Π-type *)
-  | Hom  of t * t (** hom type *)
+  | Id   of t * t * t (** identity type *)
+  | Arr  of t * t * t (** arrow type *)
+  | Hom  of t * t (** internal hom type *)
   | Prod of t * t (** product type *)
   | One (** terminal type *)
-  | Id   of t * t * t (** identity type *)
   | Meta of meta (** a variable to be unified *)
   | Obj  (** object type *)
   | Type (** the type of types *)
@@ -38,6 +39,12 @@ and meta =
 
 (** String representation of an expression. This should mostly be useful for debugging (we want to print values). *)
 let rec to_string ?(pa=false) e =
+  let rec dim e =
+    match e.desc with
+    | Obj -> 0
+    | Arr (a, _, _) -> 1 + dim a 
+    | _ -> 0
+  in
   let pa s = if pa then "(" ^ s ^ ")" else s in
   match e.desc with
   (* | Coh (l, a) -> Printf.sprintf "coh[%s|%s]" (List.map (fun (x,a) -> Printf.sprintf "%s:%s" x (to_string a)) l |> String.concat ",") (to_string a) *)
@@ -45,20 +52,22 @@ let rec to_string ?(pa=false) e =
   | Var x -> x
   | Abs (i, x, a, t) ->
     if i = `Implicit then
-      Printf.sprintf "fun {%s : %s} => %s" x (to_string a) (to_string t) |> pa
+      Printf.sprintf "fun {%s : %s} ⤳ %s" x (to_string a) (to_string t) |> pa
     else
-      Printf.sprintf "fun (%s : %s) => %s" x (to_string a) (to_string t) |> pa
+      Printf.sprintf "fun (%s : %s) ⤳ %s" x (to_string a) (to_string t) |> pa
   | App (i, t, u) ->
     let isnt_app e = match e.desc with App _ -> false | _ -> true in
     if i = `Implicit then Printf.sprintf "%s {%s}" (to_string ~pa:(isnt_app t) t) (to_string u) |> pa
     else Printf.sprintf "%s %s" (to_string ~pa:(isnt_app t) t) (to_string ~pa:true u) |> pa
   | Pi (i, x, a, t) ->
     if i = `Implicit then
-      Printf.sprintf "{%s : %s} => %s" x (to_string a) (to_string t) |> pa
+      Printf.sprintf "{%s : %s} ⤳ %s" x (to_string a) (to_string t) |> pa
     else
-      Printf.sprintf "(%s : %s) => %s" x (to_string a) (to_string t) |> pa
+      Printf.sprintf "(%s : %s) ⤳ %s" x (to_string a) (to_string t) |> pa
   | Obj -> "."
-  | Hom (a, b) -> Printf.sprintf "%s → %s" (to_string ~pa:true a) (to_string b) |> pa
+    
+  | Arr (a, t, u) -> Printf.sprintf "%s %s %s" (to_string ~pa:true t) (if dim a = !Setting.dimension then "=" else "→") (to_string u) |> pa
+  | Hom (a, b) -> Printf.sprintf "%s ⇒ %s" (to_string ~pa:true a) (to_string b) |> pa
   | Prod (a, b) -> Printf.sprintf "%s × %s" (to_string ~pa:true a) (to_string b) |> pa
   | One -> "1"
   | Id (a, t, u) ->
@@ -150,6 +159,10 @@ let rec pis ?pos l t =
   | (i,x,a)::l -> mk ?pos (Pi (i, x, a, pis ?pos l t))
   | [] -> t
 
+(** Build multiple pi types. *)
+let pis_explicit ?pos l t =
+  pis ?pos (List.map (fun (x,a) -> `Explicit,x,a) l) t
+
 (** Build multiple products. *)
 let rec prods ?pos l =
   match l with
@@ -161,18 +174,25 @@ let rec prods ?pos l =
 let rec has_fv x e =
   match e.desc with
   | Var y -> x = y
-  | Hom (a, b) -> has_fv x a || has_fv x b
+  | Hom (a, b)
   | Prod (a, b) -> has_fv x a || has_fv x b
+  | Arr (a, t, u)
   | Id (a, t, u) -> has_fv x a || has_fv x t || has_fv x u
   | App (_, t, u) -> has_fv x t || has_fv x u
   | Meta { value = Some t; ty = ty; _ } -> has_fv x t || has_fv x ty
   | Meta { value = None; ty = ty; _ } -> has_fv x ty
+  | One
   | Obj -> false
   | _ -> error ~pos:e.pos "has_fv: handle %s" (to_string e)
 
 let is_var e =
   match e.desc with
   | Var _ -> true
+  | _ -> false
+
+let is_obj e =
+  match e.desc with
+  | Obj -> true
   | _ -> false
 
 let is_implicit_pi e =
@@ -198,6 +218,7 @@ let metavariables e =
   | Hom (a, b)
   | Prod (a, b) -> acc |> aux a |> aux b
   | One -> acc
+  | Arr (a, t, u)
   | Id (a, t, u) -> acc |> aux a |> aux t |> aux u
   | Meta m ->
     (
@@ -225,3 +246,9 @@ let compare_var a b =
 
 let failure pos fmt =
   Printf.ksprintf (fun s -> failwith "%s: %s" (Pos.to_string pos) s) fmt
+
+let rec dim e =
+  match (unmeta e).desc with
+  | Obj -> 0
+  | Arr (a, _, _) -> 1 + dim a
+  | _ -> assert false

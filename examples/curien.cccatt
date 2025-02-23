@@ -6,56 +6,56 @@
 
 # Generators
 
-coh comp {a b c : .} (f : a -> b) (g : b -> c) : a -> c
+coh comp {a b c : .} (f : a ⇒ b) (g : b ⇒ c) : a ⇒ c
 
-coh id {a : .} : a -> a
+coh id {a : .} : a ⇒ a
 
-coh pairing {a b c : .} (f : a -> b) (g : a -> c) : a -> b * c
+coh pairing {a b c : .} (f : a ⇒ b) (g : a ⇒ c) : a ⇒ b * c
 
-coh fst {a b : .} : a * b -> a
+coh fst {a b : .} : a * b ⇒ a
 
-coh snd {a b : .} : a * b -> b
+coh snd {a b : .} : a * b ⇒ b
 
-coh abs {a b c : .} (f : a * b -> c) : a -> b -> c
+coh abs {a b c : .} (f : a * b ⇒ c) : a ⇒ b ⇒ c
 
-coh app {a b : .} : (a -> b) * a -> b
+coh app {a b : .} : (a ⇒ b) * a ⇒ b
 
-coh ap {a b : .} (f : a -> b) (x : a) : b
+coh ap {a b : .} (f : a ⇒ b) (x : a) : b
 
 coh pair {a b : .} (x : a) (y : b) : a * b
 
 # Relations
 
-coh Ass {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : comp (comp f g) h = comp f (comp g h)
+coh Ass {a b c d : .} (f : a ⇒ b) (g : b ⇒ c) (h : c ⇒ d) : comp (comp f g) h = comp f (comp g h)
 
-coh IdL {a b : .} (f : a -> b) : comp id f = f
+coh IdL {a b : .} (f : a ⇒ b) : comp id f = f
 
-coh IdR {a b : .} (f : a -> b) : comp f id = f
+coh IdR {a b : .} (f : a ⇒ b) : comp f id = f
 
-coh Fst {a b c : .} (f : a -> b) (g : a -> c) : comp (pairing f g) fst = f
+coh Fst {a b c : .} (f : a ⇒ b) (g : a ⇒ c) : comp (pairing f g) fst = f
 
-coh Snd {a b c : .} (f : a -> b) (g : a -> c) : comp (pairing f g) snd = g
+coh Snd {a b c : .} (f : a ⇒ b) (g : a ⇒ c) : comp (pairing f g) snd = g
 
-coh DPair {a' a b c : .} (f : a' -> a) (g : a -> b) (h : a -> c) : comp f (pairing g h) = pairing (comp f g) (comp f h)
+coh DPair {a' a b c : .} (f : a' ⇒ a) (g : a ⇒ b) (h : a ⇒ c) : comp f (pairing g h) = pairing (comp f g) (comp f h)
 
-coh Beta {a b c : .} (f : a * b -> c) (g : a -> b) : comp (pairing (abs f) g) app = comp (pairing id g) f
+coh Beta {a b c : .} (f : a * b ⇒ c) (g : a ⇒ b) : comp (pairing (abs f) g) app = comp (pairing id g) f
 
-coh DAbs {a' a b c : .} (f : a' -> a) (g : a * b -> c) : comp f (abs g) = abs (comp (pairing (comp fst f) snd) g)
+coh DAbs {a' a b c : .} (f : a' ⇒ a) (g : a * b ⇒ c) : comp f (abs g) = abs (comp (pairing (comp fst f) snd) g)
 
-coh AI {a b : .} : abs app = id {a -> b}
+coh AI {a b : .} : abs app = id {a ⇒ b}
 
 coh FSI {a b : .} : pairing fst snd = id {a * b}
 
-coh _ass {a' a b : .} (f : a' -> a) (g : a -> b) (x : a') : ap (comp f g) x = ap g (ap f x)
+coh _ass {a' a b : .} (f : a' ⇒ a) (g : a ⇒ b) (x : a') : ap (comp f g) x = ap g (ap f x)
 
 coh _fst {a b : .} (x : a) (y : b) : ap fst (pair x y) = x
 
 coh _snd {a b : .} (x : a) (y : b) : ap snd (pair x y) = y
 
-coh dpair {a b c : .} (f : a -> b) (g : a -> c) (x : a) : ap (pairing f g) x = pair (ap f x) (ap g x)
+coh dpair {a b c : .} (f : a ⇒ b) (g : a ⇒ c) (x : a) : ap (pairing f g) x = pair (ap f x) (ap g x)
 
-coh _app {a b : .} (f : a -> b) (x : a) : ap app (pair f x) = ap f x
+coh _app {a b : .} (f : a ⇒ b) (x : a) : ap app (pair f x) = ap f x
 
-coh quote1 {a b c : .} (f : b -> c) (x : a) : comp f (ap (abs fst) x) = ap (abs fst) x
+coh quote1 {a b c : .} (f : b ⇒ c) (x : a) : comp f (ap (abs fst) x) = ap (abs fst) x
 
-coh quote2 {a b c d : .} (f : a -> c -> d) (x : a) (g : b -> c) : comp (pairing (comp (ap (abs fst) x) f) g) app = comp g (ap f x)
+coh quote2 {a b c d : .} (f : a ⇒ c ⇒ d) (x : a) (g : b ⇒ c) : comp (pairing (comp (ap (abs fst) x) f) g) app = comp g (ap f x)

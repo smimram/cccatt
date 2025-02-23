@@ -1,8 +1,8 @@
-#-# mode: category
-
 #
 # Plain categories
 #
+#-# mode: category
+#-# dimension: 1
 
 coh id {a : .} : a -> a
 

@@ -17,6 +17,15 @@ type mode = [
 
 let mode = ref (`Cartesian_closed : mode)
 
+(** Whether types have elements. *)
+let has_elements () = List.mem !mode [`Cartesian_closed]
+
+let has_hom () = List.mem !mode [`Symmetric_monoidal_closed; `Cartesian_closed]
+
+let has_prod () = List.mem !mode [`Monoidal; `Symmetric_monoidal; `Symmetric_monoidal_closed; `Cartesian; `Cartesian_closed]
+
+let has_one () = has_prod ()
+
 (** Callback when the mode is changed. *)
 let mode_callback = ref (fun _ -> ())
 
@@ -24,8 +33,15 @@ let on_mode f =
   let g = !mode_callback in
   mode_callback := fun s -> g s; f s
 
+(** Callback when the dimension is changed. *)
+let dim_callback = ref (fun _ -> ())
+
 (** Maximal depth for pasting schemes. *)
-let depth = ref None
+let dimension = ref max_int
+
+let on_dim f =
+  let g = !dim_callback in
+  dim_callback := fun n -> g n; f n
 
 let parse s =
   let k, v = String.split_on_first_char ':' s in
@@ -48,8 +64,9 @@ let parse s =
         | m -> error "Unknown mode: %s" m
       );
     !mode_callback !mode
-  | "depth" ->
-    let n = int_of_string v in
-    message "setting depth to %d" n;
-    depth := Some n
+  | "dim" | "dimension" ->
+    let n = if v = "oo" || v = "∞" then max_int else int_of_string v in
+    message "setting dimension to %d" n;
+    dimension := n;
+    !dim_callback n
   | k -> error "Unknown setting: %s" k

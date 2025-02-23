@@ -15,11 +15,10 @@ let rec unify tenv env ?(alpha=[]) t t' =
   | Var x, Var y ->
     let x = match List.assoc_opt x alpha with Some x -> x | None -> x in
     if x <> y then raise Unification
-  | Hom (a, b), Hom (a', b') ->
-    unify tenv env a a';
-    unify tenv env b b'
   | Obj, Obj -> ()
   | Type, Type -> ()
+  | Arr (a, t, u), Arr (a', t', u') -> unify tenv env a a'; unify tenv env t t'; unify tenv env u u'
+  | Hom (a, b), Hom (a', b') -> unify tenv env a a'; unify tenv env b b'
   | Prod (a, b), Prod (a', b') -> unify tenv env a a'; unify tenv env b b'
   | One, One -> ()
   | Pi (i, x, a, b), Pi (i', x', a', b') ->
@@ -77,8 +76,9 @@ and eval env e =
   | Pi (i, x, a, b) ->
     let x' = if List.mem_assoc x env then fresh_var_name () else x in
     mk (Pi (i, x', eval env a, eval ((x,var x')::env) b))
-  | Id (a, t, u) -> mk (Id (eval env a, eval env t, eval env u))
   | Obj -> mk Obj
+  | Id (a, t, u) -> mk (Id (eval env a, eval env t, eval env u))
+  | Arr (a, t, u) -> mk (Arr (eval env a, eval env t, eval env u))
   | Hom (a, b) -> mk (Hom (eval env a, eval env b))
   | Prod (a, b) -> mk (Prod (eval env a, eval env b))
   | One -> mk One
@@ -136,23 +136,34 @@ and infer tenv env (e:Term.t) =
     let a = check tenv env a (mk ~pos:a.pos Type) in
     let b = check ((x, eval env a)::tenv) ((x, var ~pos:a.pos x)::env) b (mk ~pos:b.pos Type) in
     mk ~pos (Pi (i, x, a, b)), mk ~pos Type
+  | Obj ->
+    mk ~pos Obj, mk ~pos Type
   | Id (a, t, u) ->
+    (* TODO: this should be merged as a higher-dimensional Hom *)
     let a = check tenv env a (mk ~pos:a.pos Obj) in
     let a' = eval env a in
     let t = check tenv env t a' in
     let u = check tenv env u a' in
     mk ~pos (Id (a, t, u)), mk ~pos Type
-  | Obj ->
-    mk ~pos Obj, mk ~pos Type
+  | Arr (a, t, u) ->
+    (* TODO: change this! *)
+    let a = check tenv env a (mk ~pos:a.pos Type) in
+    let a' = eval env a in
+    let t = check tenv env t a' in
+    let u = check tenv env u a' in
+    mk ~pos (Arr (a, t, u)), mk ~pos Type
   | Hom (a, b) ->
+    if not (Setting.has_hom ()) then failure e.pos "internal hom not allowed in this mode";
     let a = check tenv env a (mk ~pos:a.pos Obj) in
     let b = check tenv env b (mk ~pos:b.pos Obj) in
     mk ~pos (Hom (a, b)), mk ~pos Obj
   | Prod (a, b) ->
+    if not (Setting.has_prod ()) then failure e.pos "products not allowed in this mode";
     let a = check tenv env a (mk ~pos:a.pos Obj) in
     let b = check tenv env b (mk ~pos:b.pos Obj) in
     mk ~pos (Prod (a, b)), mk ~pos Obj
   | One ->
+    if not (Setting.has_one ()) then failure e.pos "unit not allowed in this mode";
     mk ~pos One, mk ~pos Obj
   | Type ->
     mk ~pos Type, mk ~pos Type
@@ -170,7 +181,7 @@ and check tenv env e a =
     mk ~pos:e.pos (Abs(`Implicit,x,a,t))
   | _ ->
     let e, b = infer tenv env e in
-    try if not (b.desc = Obj && a.desc = Type) then unify tenv env b a; e
+    try if not (Setting.has_elements ()) || not (b.desc = Obj && a.desc = Type) then unify tenv env b a; e
     with
     | (* Unification *) _ ->
       if is_implicit_pi b && not (is_implicit_pi a) then

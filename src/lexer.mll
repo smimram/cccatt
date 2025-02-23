@@ -8,6 +8,8 @@ let utf8 ?(n=1) lexbuf =
 }
 
 let space = ' ' | '\t' | '\r'
+let first_letter = ['_''a'-'z''A'-'Z'] | "α" | "β" | "γ"
+let letter = first_letter | ['-''+''0'-'9''\'']
 
 rule token = parse
   | "coh" { COH }
@@ -15,24 +17,25 @@ rule token = parse
   | "let" { LET }
   | "fun" { FUN }
   | "check" { CHECK }
-  | "=>" { TO }
   | "." { OBJ }
   | "(" { LPAR }
   | ")" { RPAR }
   | "{" { LACC }
   | "}" { RACC }
   | ":" { COL }
-  | "->" { HOM }
-  | "→" { utf8 ~n:2 lexbuf; HOM }
+  | "->" { ARR }
+  | "→" { utf8 ~n:2 lexbuf; ARR }
+  | "=>" { HOM }
+  | "⇒" { utf8 ~n:2 lexbuf; HOM }
   | "*" { utf8 lexbuf; TIMES }
   | "×" { utf8 lexbuf; TIMES }
   | "1" { ONE }
   | "=" { EQ }
   | ":=" { EQDEF }
   | "_" { HOLE }
-  | (['_''a'-'z''A'-'Z']['-''+''a'-'z''A'-'Z''0'-'9''_''\'']* as str) { IDENT str }
+  | (first_letter letter* as str) { IDENT str }
   | space+ { token lexbuf }
-  | "#-#"([^'\n']* as str) { SETTING str }
+  | "#-#"([^'\n']* as s) { Setting.parse s; token lexbuf }
   | "#"[^'\n']* { token lexbuf }
   | "--"[^'\n']* { token lexbuf }
   | "\n" { Lexing.new_line lexbuf; token lexbuf }

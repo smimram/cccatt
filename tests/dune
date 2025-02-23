@@ -1,6 +1,6 @@
 (rule
  (alias runtest)
- (deps test.cccatt implicit.cccatt)
+ (deps test.cccatt implicit.cccatt negative.cccatt)
  (action
    (progn
     (run ../src/cccatt.exe test.cccatt)
