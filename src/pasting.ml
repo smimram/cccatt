@@ -65,6 +65,7 @@ let check ~pos l a =
     in
     split_vars l
   in
+  (* printf "**** without variables: %s\n%!" (to_string (pis_explicit l a)); *)
 
   (* Remove indentities in arguments. *)
   let vars, l, a =
@@ -91,15 +92,23 @@ let check ~pos l a =
       | _ -> error ~pos:e.pos "TODO: in rewrite handle %s" (to_string e)
     in
 
+    (* Add a new rule to the rewriting system. *)
+    let add_rule rw x t =
+      assert (not (has_fv x t));
+      assert (not (List.exists (fun (y,_) -> x = y) rw));
+      let t = rewrite rw t in
+      let rw = List.map (fun (y,u) -> y, rewrite [x,t] u) rw in
+      ((x,t)::rw)
+    in
+
     (* Orient identities on variables as rewriting rules and normalize l. *)
     let rec aux rw = function
-      | (_, {desc = Id (_, {desc = Var x; _}, t); _})::l
-      | (_, {desc = Id (_, t, {desc = Var x; _}); _})::l ->
-        assert (not (has_fv x t));
-        let t = rewrite rw t in
-        let rw = List.map (fun (y,u) -> y, rewrite [x,t] u) rw in
-        (* printf "rewrite: %s -> %s\n%!" x (to_string t); *)
-        aux ((x,t)::rw) l
+      | (_, {desc = Id (_, {desc = Var x; _}, t); _})::l -> aux (add_rule rw x t) l
+      | (_, {desc = Id (_, t, {desc = Var x; _}); _})::l -> aux (add_rule rw x t) l
+      | (_, {desc = Arr (o, {desc = Var x; _}, t); _})::l
+        when not (List.mem x (List.map fst rw)) && dim o >= 1 -> aux (add_rule rw x t) l
+      | (_, {desc = Arr (o, t, {desc = Var x; _}); _})::l
+        when not (List.mem x (List.map fst rw)) && dim o >= 1 -> aux (add_rule rw x t) l
       | (_, {desc = Id _; pos})::_ -> failure pos "could not eliminate identity"
       | (x, a)::l ->
         let a = rewrite rw a in

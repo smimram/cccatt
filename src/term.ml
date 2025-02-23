@@ -181,6 +181,7 @@ let rec has_fv x e =
   | App (_, t, u) -> has_fv x t || has_fv x u
   | Meta { value = Some t; ty = ty; _ } -> has_fv x t || has_fv x ty
   | Meta { value = None; ty = ty; _ } -> has_fv x ty
+  | One
   | Obj -> false
   | _ -> error ~pos:e.pos "has_fv: handle %s" (to_string e)
 
@@ -245,3 +246,9 @@ let compare_var a b =
 
 let failure pos fmt =
   Printf.ksprintf (fun s -> failwith "%s: %s" (Pos.to_string pos) s) fmt
+
+let rec dim e =
+  match (unmeta e).desc with
+  | Obj -> 0
+  | Arr (a, _, _) -> 1 + dim a
+  | _ -> assert false
