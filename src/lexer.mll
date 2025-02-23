@@ -8,7 +8,7 @@ let utf8 ?(n=1) lexbuf =
 }
 
 let space = ' ' | '\t' | '\r'
-let first_letter = ['_''a'-'z''A'-'Z'] | "α" | "β"
+let first_letter = ['_''a'-'z''A'-'Z'] | "α" | "β" | "γ"
 let letter = first_letter | ['-''+''0'-'9''\'']
 
 rule token = parse
