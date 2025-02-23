@@ -16,4 +16,4 @@ coh assoc {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : co (co f g) h =
 
 coh id2 {a b : .} {f : a -> b} : f -> f
 
-# coh co2 {a b : .} {f g h : a -> b} (α : f -> g) (β : g -> h) : f -> h
+coh co2 {a b : .} {f g h : a -> b} (α : f -> g) (β : g -> h) : f -> h
