@@ -11,7 +11,7 @@ type t =
   }
 
 and desc =
-  | Coh  of context * t (** coherence *)
+  | Coh  of string * context * t * substitution option (** coherence *)
   | Var  of string (** variable *)
   | Abs  of implicit * string * t * t (** abstraction *)
   | App  of implicit * t * t (** application *)
@@ -28,6 +28,8 @@ and desc =
 and implicit = [`Explicit |  `Implicit]
 
 and context = (string * t) list
+
+and substitution = (string * t) list
 
 and meta =
   {
@@ -48,7 +50,8 @@ let rec to_string ?(pa=false) e =
   let pa s = if pa then "(" ^ s ^ ")" else s in
   match e.desc with
   (* | Coh (l, a) -> Printf.sprintf "coh[%s|%s]" (List.map (fun (x,a) -> Printf.sprintf "%s:%s" x (to_string a)) l |> String.concat ",") (to_string a) *)
-  | Coh _ -> "coh"
+  (* | Coh _ -> "coh" *)
+  | Coh (n,_,_,s) -> Printf.sprintf "%s[%s]" n (String.concat "," @@ List.map (fun (x,t) -> Printf.sprintf "%s=%s" x (to_string t)) @@ Option.value ~default:[] s)
   | Var x -> x
   | Abs (i, x, a, t) ->
     if i = `Implicit then
@@ -114,13 +117,13 @@ let unmeta e =
   | _ -> e
 
 (** Create coherence with abstracted arguments. *)
-let abs_coh ?pos l a =
+let abs_coh ?pos name l a =
   let mk = mk ?pos in
   let rec aux = function
     | (i,x,a)::l -> mk (Abs (i,x, a, aux l))
     | [] ->
       let l = List.map (fun (_i,x,a) -> x,a) l in
-      mk (Coh (l, a))
+      mk (Coh (name, l, a, None))
   in
   aux l
 
@@ -209,7 +212,7 @@ let is_metavariable e =
 let metavariables e =
   let rec aux e acc =
   match e.desc with
-  | Coh (l, a) -> List.fold_left (fun acc (_, a) -> aux a acc) acc l |> aux a
+  | Coh (_, l, a, s) -> assert (s = None); List.fold_left (fun acc (_, a) -> aux a acc) acc l |> aux a
   | Var _ -> acc
   | Abs (_, _, a, t) -> acc |> aux a |> aux t
   | App (_, t, u) -> acc |> aux t |> aux u

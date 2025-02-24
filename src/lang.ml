@@ -27,11 +27,18 @@ let rec unify tenv env ?(alpha=[]) t t' =
     let tenv = (x',eval env a)::tenv in
     let env = (x',var x')::env in
     unify tenv env ~alpha:((x,x')::alpha) b b'
-  | Coh (l, a), Coh (l', a') ->
+  | Coh (n, l, a, s), Coh (n', l', a', s') ->
+    (* TODO: we could also identify same coherences with different names *)
+    if n <> n' then raise Unification;
     if List.length l <> List.length l' then raise Unification;
     (* TODO: take the beginning of the context in account in tenv *)
     List.iter2 (fun (x,a) (x',a') -> if x <> x' then raise Unification; unify tenv env a a') l l';
-    unify tenv env a a'
+    unify tenv env a a';
+    (
+      match s, s' with
+      | None, None -> ()
+      | _ -> failwith "TODO"
+    )
   | Meta { value = Some t; _ }, _ -> unify tenv env t t'
   | _, Meta { value = Some t'; _ } -> unify tenv env t t'
   | Meta m, Meta m' when m = m' -> ()
@@ -52,14 +59,19 @@ and eval env e =
   let mk ?(pos=e.pos) = mk ~pos in
   let var ?(pos=e.pos) = var ~pos in
   match e.desc with
-  | Coh (l, a) ->
+  | Coh (n, l, a, s) ->
     let l, a =
       let env = ref env in
       let l = List.map (fun (x,a) -> let a = eval !env a in env := (x, var x) :: !env; x, a) l in
       let a = eval !env a in
       l, a
     in
-    mk (Coh (l, a))
+    let s =
+      match s with
+      | Some s -> List.map (fun (x,t) -> x, eval env t) s
+      | None -> List.map (fun (x,_) -> x, List.assoc x env) l
+    in
+    mk (Coh (n, l, a, Some s))
   | Var x ->
     (
       match List.assoc_opt x env with
@@ -100,7 +112,8 @@ and infer tenv env (e:Term.t) =
   (* printf "  env : %s\n%!" (string_of_context env); *)
   (* printf "\n"; *)
   match e.desc with
-  | Coh (l, a) ->
+  | Coh (n, l, a, s) ->
+    assert (s = None);
     let l, a =
       let l' = ref [] in
       let rec aux tenv env = function
@@ -114,7 +127,7 @@ and infer tenv env (e:Term.t) =
       List.rev !l', a
     in
     Pasting.check ~pos l a;
-    mk ~pos (Coh (l, a)), eval env a
+    mk ~pos (Coh (n, l, a, s)), eval env a
   | Var x ->
     (
       match List.assoc_opt x tenv with

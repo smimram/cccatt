@@ -39,7 +39,7 @@ prog:
   | EOF { [] }
 
 cmd:
-  | COH ident args COL expr { Let ($2, None, abs_coh ~pos:(defpos()) $3 $5) }
+  | COH ident args COL expr { Let ($2, None, abs_coh ~pos:(defpos()) $2 $3 $5) }
   | NCOH args COL expr { NCoh (List.map (fun (_,x,a) -> x,a) $2, $4) }
   | LET IDENT args type_opt EQDEF expr { Let ($2, Option.map (pis $3) $4, abss $3 $6) }
   | CHECK expr { Check $2 }
