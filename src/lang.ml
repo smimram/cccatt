@@ -27,6 +27,11 @@ let rec unify tenv env ?(alpha=[]) t t' =
     let tenv = (x',eval env a)::tenv in
     let env = (x',var x')::env in
     unify tenv env ~alpha:((x,x')::alpha) b b'
+  | Coh (l, a), Coh (l', a') ->
+    if List.length l <> List.length l' then raise Unification;
+    (* TODO: take the beginning of the context in account in tenv *)
+    List.iter2 (fun (x,a) (x',a') -> if x <> x' then raise Unification; unify tenv env a a') l l';
+    unify tenv env a a'
   | Meta { value = Some t; _ }, _ -> unify tenv env t t'
   | _, Meta { value = Some t'; _ } -> unify tenv env t t'
   | Meta m, Meta m' when m = m' -> ()
