@@ -11,7 +11,7 @@ type t =
   }
 
 and desc =
-  | Coh  of string * context * t * substitution option (** coherence *)
+  | Coh  of string * context * t * substitution (** coherence *)
   | Var  of string (** variable *)
   | Abs  of implicit * string * t * t (** abstraction *)
   | App  of implicit * t * t (** application *)
@@ -51,7 +51,7 @@ let rec to_string ?(pa=false) e =
   match e.desc with
   (* | Coh (l, a) -> Printf.sprintf "coh[%s|%s]" (List.map (fun (x,a) -> Printf.sprintf "%s:%s" x (to_string a)) l |> String.concat ",") (to_string a) *)
   (* | Coh _ -> "coh" *)
-  | Coh (n,_,_,s) -> Printf.sprintf "%s[%s]" n (String.concat ", " @@ List.map (fun (x,t) -> Printf.sprintf "%s=%s" x (to_string t)) @@ Option.value ~default:[] s)
+  | Coh (n,_,_,s) -> Printf.sprintf "%s[%s]" n (String.concat ", " @@ List.map (fun (x,t) -> Printf.sprintf "%s=%s" x (to_string t)) s)
   | Var x -> x
   | Abs (i, x, a, t) ->
     if i = `Implicit then
@@ -123,7 +123,8 @@ let abs_coh ?pos name l a =
     | (i,x,a)::l -> mk (Abs (i,x, a, aux l))
     | [] ->
       let l = List.map (fun (_i,x,a) -> x,a) l in
-      mk (Coh (name, l, a, None))
+      let s = List.map (fun (x,_) -> x, var ?pos x) l in
+      mk (Coh (name, l, a, s))
   in
   aux l
 
@@ -212,12 +213,7 @@ let is_metavariable e =
 let metavariables e =
   let rec aux e acc =
     match e.desc with
-    | Coh (_, _, _, s) ->
-      (
-        match s with
-        | Some s -> List.fold_left (fun acc (_,t) -> aux t acc) acc s
-        | None -> acc
-      )
+    | Coh (_, _, _, s) -> List.fold_left (fun acc (_,t) -> aux t acc) acc s
     | Var _ -> acc
     | Abs (_, _, a, t) -> acc |> aux a |> aux t
     | App (_, t, u) -> acc |> aux t |> aux u

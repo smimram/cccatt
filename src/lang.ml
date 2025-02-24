@@ -34,14 +34,8 @@ let rec unify tenv env ?(alpha=[]) t t' =
     (* TODO: take the beginning of the context in account in tenv? *)
     List.iter2 (fun (x,a) (x',a') -> if x <> x' then raise Unification; unify tenv env a a') l l';
     unify tenv env a a';
-    (
-      match s, s' with
-      | None, None -> ()
-      | Some s, Some s' ->
-        if List.length s <> List.length s' then raise Unification;
-        List.iter2 (fun (x,t) (x',t') -> if x <> x' then raise Unification; unify tenv env t t') s s'
-      | _ -> failwith "TODO"
-    )
+    if List.length s <> List.length s' then raise Unification;
+    List.iter2 (fun (x,t) (x',t') -> if x <> x' then raise Unification; unify tenv env t t') s s'
   | Meta { value = Some t; _ }, _ -> unify tenv env t t'
   | _, Meta { value = Some t'; _ } -> unify tenv env t t'
   | Meta m, Meta m' when m = m' -> ()
@@ -74,12 +68,8 @@ and eval env e =
       let a = eval !env a in
       l, a
     in
-    let s =
-      match s with
-      | Some s -> List.map (fun (x,t) -> x, eval env t) s
-      | None -> List.map (fun (x,_) -> x, List.assoc x env) l
-    in
-    mk (Coh (n, l, a, Some s))
+    let s = List.map (fun (x,t) -> x, eval env t) s in
+    mk (Coh (n, l, a, s))
   | Var x ->
     (
       match List.assoc_opt x env with
@@ -121,7 +111,7 @@ and infer tenv env (e:Term.t) =
   (* printf "\n"; *)
   match e.desc with
   | Coh (n, l, a, s) ->
-    assert (s = None);
+    (* TODO: check s.... *)
     let l, a =
       let l' = ref [] in
       let rec aux tenv env = function
