@@ -31,7 +31,7 @@ let rec unify tenv env ?(alpha=[]) t t' =
     (* TODO: we could also identify same coherences with different names *)
     if n <> n' then raise Unification;
     if List.length l <> List.length l' then raise Unification;
-    (* TODO: take the beginning of the context in account in tenv *)
+    (* TODO: take the beginning of the context in account in tenv? *)
     List.iter2 (fun (x,a) (x',a') -> if x <> x' then raise Unification; unify tenv env a a') l l';
     unify tenv env a a';
     (

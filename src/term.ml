@@ -51,7 +51,7 @@ let rec to_string ?(pa=false) e =
   match e.desc with
   (* | Coh (l, a) -> Printf.sprintf "coh[%s|%s]" (List.map (fun (x,a) -> Printf.sprintf "%s:%s" x (to_string a)) l |> String.concat ",") (to_string a) *)
   (* | Coh _ -> "coh" *)
-  | Coh (n,_,_,s) -> Printf.sprintf "%s[%s]" n (String.concat "," @@ List.map (fun (x,t) -> Printf.sprintf "%s=%s" x (to_string t)) @@ Option.value ~default:[] s)
+  | Coh (n,_,_,s) -> Printf.sprintf "%s[%s]" n (String.concat ", " @@ List.map (fun (x,t) -> Printf.sprintf "%s=%s" x (to_string t)) @@ Option.value ~default:[] s)
   | Var x -> x
   | Abs (i, x, a, t) ->
     if i = `Implicit then

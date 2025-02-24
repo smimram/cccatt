@@ -5,8 +5,8 @@
   (progn
    (run ../src/cccatt.exe ccc.cccatt)
    (run ../src/cccatt.exe ccc2.cccatt)
-   (run ../src/cccatt.exe curry.cccatt)
    (run ../src/cccatt.exe curry-noimplicit.cccatt)
+   (run ../src/cccatt.exe curry.cccatt)
    (run ../src/cccatt.exe curry2.cccatt)
    (run ../src/cccatt.exe curien.cccatt)
    (run ../src/cccatt.exe birds.cccatt)

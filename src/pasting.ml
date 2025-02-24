@@ -44,7 +44,8 @@ let check_ccc a =
     let rec depth a =
       match a.desc with
       | Var _ -> 0
-      | Hom (a, b) -> max (1 + depth a) (depth b)
+      | Hom _ -> 0
+      | Arr (_, a, b) -> max (1 + depth a) (depth b)
       | _ -> assert false
     in
     if depth a > !Setting.dimension then failure a.pos "pasting has depth %d but we are limited to %d" (depth a) !Setting.dimension
