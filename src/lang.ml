@@ -44,13 +44,8 @@ let rec unify tenv env ?(alpha=[]) t t' =
     let t' = check tenv env t' m.ty in
     m.value <- Some t'
   | _, Meta m' ->
-    (* Printf.printf "In this case\n%!"; *)
-    (* if m'.value = None then print_endline "empty metavariable."; *)
     if has_metavariable m' t then raise Unification;
-    (* Printf.printf "Don't have metavariable\n%!"; *)
-    (* Printf.printf "check %s : %s\n%!" (to_string t) (to_string m'.ty); *)
     let t = check tenv env t m'.ty in
-    (* print_endline "passed!"; *)
     m'.value <- Some t
   | _ -> raise Unification
 
