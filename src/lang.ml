@@ -111,7 +111,7 @@ and infer tenv env (e:Term.t) =
   (* printf "\n"; *)
   match e.desc with
   | Coh (n, l, a, s) ->
-    (* TODO: check s.... *)
+    (* TODO: check and use s.... *)
     let l, a =
       let l' = ref [] in
       let rec aux tenv env = function
