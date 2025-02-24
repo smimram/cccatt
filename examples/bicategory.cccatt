@@ -43,3 +43,9 @@ coh assoc2 {a b : .} {f g h i : a -> b} (α : f -> g) (β : g -> h) (γ : h -> i
 coh co12id2 {a b c : .} (f : a -> b) (g : b -> c) : co12 f (id2 g) = id2 (co1 f g)
 
 coh co12co2 {a b c : .} (f : a -> b) {g g' g'' : b -> c} (α : g -> g') (β : g' -> g'') : co12 f (co2 α β) = co2 (co12 f α) (co12 f β)
+
+coh co21id2 {a b c : .} (f : a -> b) (g : b -> c) : co21 (id2 f) g = id2 (co1 f g)
+
+coh co21co2 {a b c : .} {f f' f'' :  a -> b} (α : f -> f') (β : f' -> f'') (g : b -> c) : co21 (co2 α β) g = co2 (co21 α g) (co21 β g)
+
+# coh co2unitl {a b : .} {f g : a -> b} (α : f -> g) : co2 (co12 id1 α) (unitl g) = co2 (unitl f) α
