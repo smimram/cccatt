@@ -37,6 +37,9 @@ let rec unify tenv env ?(alpha=[]) t t' =
     (
       match s, s' with
       | None, None -> ()
+      | Some s, Some s' ->
+        if List.length s <> List.length s' then raise Unification;
+        List.iter2 (fun (x,t) (x',t') -> if x <> x' then raise Unification; unify tenv env t t') s s'
       | _ -> failwith "TODO"
     )
   | Meta { value = Some t; _ }, _ -> unify tenv env t t'
@@ -47,8 +50,13 @@ let rec unify tenv env ?(alpha=[]) t t' =
     let t' = check tenv env t' m.ty in
     m.value <- Some t'
   | _, Meta m' ->
+    (* Printf.printf "In this case\n%!"; *)
+    (* if m'.value = None then print_endline "empty metavariable."; *)
     if has_metavariable m' t then raise Unification;
+    (* Printf.printf "Don't have metavariable\n%!"; *)
+    (* Printf.printf "check %s : %s\n%!" (to_string t) (to_string m'.ty); *)
     let t = check tenv env t m'.ty in
+    (* print_endline "passed!"; *)
     m'.value <- Some t
   | _ -> raise Unification
 

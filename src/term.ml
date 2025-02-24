@@ -211,26 +211,31 @@ let is_metavariable e =
 (** All metavariables of a term. *)
 let metavariables e =
   let rec aux e acc =
-  match e.desc with
-  | Coh (_, l, a, s) -> assert (s = None); List.fold_left (fun acc (_, a) -> aux a acc) acc l |> aux a
-  | Var _ -> acc
-  | Abs (_, _, a, t) -> acc |> aux a |> aux t
-  | App (_, t, u) -> acc |> aux t |> aux u
-  | Obj -> acc
-  | Pi (_, _, a, b)
-  | Hom (a, b)
-  | Prod (a, b) -> acc |> aux a |> aux b
-  | One -> acc
-  | Arr (a, t, u)
-  | Id (a, t, u) -> acc |> aux a |> aux t |> aux u
-  | Meta m ->
-    (
-      let acc = if List.memq m acc then acc else m::acc in
-      match m.value with
-      | Some v -> acc |> aux v |> aux m.ty
-      | None -> acc |> aux m.ty
-    )
-  | Type -> acc
+    match e.desc with
+    | Coh (_, _, _, s) ->
+      (
+        match s with
+        | Some s -> List.fold_left (fun acc (_,t) -> aux t acc) acc s
+        | None -> acc
+      )
+    | Var _ -> acc
+    | Abs (_, _, a, t) -> acc |> aux a |> aux t
+    | App (_, t, u) -> acc |> aux t |> aux u
+    | Obj -> acc
+    | Pi (_, _, a, b)
+    | Hom (a, b)
+    | Prod (a, b) -> acc |> aux a |> aux b
+    | One -> acc
+    | Arr (a, t, u)
+    | Id (a, t, u) -> acc |> aux a |> aux t |> aux u
+    | Meta m ->
+      (
+        let acc = if List.memq m acc then acc else m::acc in
+        match m.value with
+        | Some v -> acc |> aux v |> aux m.ty
+        | None -> acc |> aux m.ty
+      )
+    | Type -> acc
   in
   aux e []
 
