@@ -88,6 +88,9 @@ let check ~pos l a =
       | Id (a, t, u) -> mk (Id (rewrite a, rewrite t, rewrite u))
       | Obj -> e
       | App (i, t, u) -> mk (App (i, rewrite t, rewrite u))
+      | Coh (n, l, a, s) ->
+        let s = List.map (fun (x,t) -> x, rewrite t) s in
+        mk (Coh (n, l, a, s))
       | Meta { value = Some t; _ } -> rewrite t
       | Meta { value = None; _ } -> error ~pos:e.pos "unresolved metvariable %s when checking pasting conditions" (to_string e)
       | _ -> error ~pos:e.pos "TODO: in rewrite handle %s" (to_string e)
@@ -140,6 +143,7 @@ let check ~pos l a =
         | One -> fv
         | Id (a, t, u) -> fv |> aux a |> aux t |> aux u
         | App (_, t, u) -> fv |> aux t |> aux u
+        | Coh (_,_,_,s) -> List.fold_left (fun fv (_,t) -> aux t fv) fv s
         | _ -> failwith "TODO: fv handle %s" (to_string a)
       in
       aux a []
