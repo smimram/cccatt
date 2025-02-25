@@ -16,7 +16,7 @@ let utf8_length s =
     in
     aux 0 0
 
-let utf8_advance s lexbuf = utf8 ~n:(utf8_length s) lexbuf
+let utf8_advance s lexbuf = utf8 ~n:(String.length s - utf8_length s) lexbuf
 }
 
 let space = ' ' | '\t' | '\r'
@@ -45,7 +45,7 @@ rule token = parse
   | "=" { EQ }
   | ":=" { EQDEF }
   | "_" { HOLE }
-  | (first_letter letter* as str) { IDENT str }
+  | (first_letter letter* as str) { utf8_advance str lexbuf; IDENT str }
   | space+ { token lexbuf }
   | "#-#"([^'\n']* as s) { Setting.parse s; token lexbuf }
   | "#"[^'\n']* { token lexbuf }
