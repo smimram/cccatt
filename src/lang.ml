@@ -111,7 +111,8 @@ and infer tenv env (e:Term.t) =
   (* printf "\n"; *)
   match e.desc with
   | Coh (n, l, a, s) ->
-    (* TODO: check and use s.... *)
+    (* NOTE: we don't check s because we always start with the identity substitution and trust invariants *)
+    let env' = s@env in
     let l, a =
       let l' = ref [] in
       let rec aux tenv env = function
@@ -121,11 +122,11 @@ and infer tenv env (e:Term.t) =
           aux ((x,eval env a)::tenv) ((x,var ~pos:a.pos x)::env) l
         | [] -> check tenv env a (mk ~pos:a.pos Type)
       in
-      let a = aux tenv env l in
+      let a = aux tenv env' l in
       List.rev !l', a
     in
     Pasting.check ~pos l a;
-    mk ~pos (Coh (n, l, a, s)), eval env a
+    mk ~pos (Coh (n, l, a, s)), eval env' a
   | Var x ->
     (
       match List.assoc_opt x tenv with
@@ -200,7 +201,6 @@ and check tenv env e a =
     try if not (Setting.has_elements ()) || not (b.desc = Obj && a.desc = Type) then unify tenv env b a; e
     with
     | Unification | Type_error _ ->
-      (* printf "  check error: %s\n%!" (Printexc.to_string _e); *)
       if is_implicit_pi b && not (is_implicit_pi a) then
         let e = mk ~pos:e.pos (App (`Implicit, e, hole ~pos:e.pos ())) in
         check tenv env e a
