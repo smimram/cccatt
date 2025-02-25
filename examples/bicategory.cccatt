@@ -51,3 +51,9 @@ coh co21co2 {a b c : .} {f f' f'' :  a -> b} (α : f -> f') (β : f' -> f'') (g 
 coh co2unitl {a b : .} {f g : a -> b} (α : f -> g) : co2 (co12 id1 α) (unitl g) = co2 (unitl f) α
 
 coh co2unitr {a b : .} {f g : a -> b} (α : f -> g) : co2 (co21 α id1) (unitr g) = co2 (unitr f) α
+
+coh co12assoc {a b c d : .} (f : a -> b) (g : b -> c) {h h' : c -> d} (α : h -> h') : co2 (assoc f g h) (co12 f (co12 g α)) = co2 (co12 (co1 f g) α) (assoc f g h')
+
+# co121....
+
+coh co21assoc {a b c d : .} {f f' : a -> b} (α : f -> f') (g : b -> c) (h : c -> d) : co2 (co21 (co21 α g) h) (assoc f' g h) = co2 (assoc f g h) (co21 α (co1 g h))
