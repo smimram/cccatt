@@ -40,7 +40,7 @@ coh unitr2 {a b : .} {f g : a -> b} (α : f -> g) : co2 α (id2 _) = α
 
 coh assoc2 {a b : .} {f g h i : a -> b} (α : f -> g) (β : g -> h) (γ : h -> i) : co2 (co2 α β) γ = co2 α (co2 β γ)
 
-coh co12id2 {a b c : .} (f : a -> b) (g : b -> c) : co12 f (id2 g) = id2 (co1 f g)
+# coh co12id2 {a b c : .} (f : a -> b) (g : b -> c) : co12 f (id2 g) = id2 (co1 f g)
 
 # coh co12co2 {a b c : .} (f : a -> b) {g g' g'' : b -> c} (α : g -> g') (β : g' -> g'') : co12 f (co2 α β) = co2 (co12 f α) (co12 f β)
 
