@@ -5,6 +5,7 @@ open Common
 open Term
 
 exception Unification
+exception Type_error of Pos.t * t * t (* at pos got type a instead of b *)
 
 (** Make sure that two values are equal (and raise [Unification] if this cannot be the case). *)
 (* The first argument is the alpha-conversion to apply to t *)
@@ -44,8 +45,12 @@ let rec unify tenv env ?(alpha=[]) t t' =
     let t' = check tenv env t' m.ty in
     m.value <- Some t'
   | _, Meta m' ->
+    (* print_endline "** term with meta"; *)
     if has_metavariable m' t then raise Unification;
+    (* print_endline "** no loop"; *)
+    (* printf "check %s : %s\n%!" (to_string t) (to_string m'.ty); *)
     let t = check tenv env t m'.ty in
+    (* print_endline "** checked"; *)
     m'.value <- Some t
   | _ -> raise Unification
 
@@ -194,11 +199,12 @@ and check tenv env e a =
     let e, b = infer tenv env e in
     try if not (Setting.has_elements ()) || not (b.desc = Obj && a.desc = Type) then unify tenv env b a; e
     with
-    | (* Unification *) _ ->
+    | Unification | Type_error _ ->
+      (* printf "  check error: %s\n%!" (Printexc.to_string _e); *)
       if is_implicit_pi b && not (is_implicit_pi a) then
         let e = mk ~pos:e.pos (App (`Implicit, e, hole ~pos:e.pos ())) in
         check tenv env e a
-      else failure e.pos "got %s but %s expected" (to_string b) (to_string a)
+      else raise (Type_error (e.pos, b, a))
 
 let print_metavariables_elaboration m =
   List.iter
@@ -255,4 +261,6 @@ let exec_command (tenv, env) p =
     tenv, env
 
 (** Execute a program. *)
-let exec = List.fold_left exec_command
+let exec env cmd =
+  try List.fold_left exec_command env cmd
+  with Type_error (pos, a, b) -> failure pos "got %s but %s expected" (to_string a) (to_string b)
