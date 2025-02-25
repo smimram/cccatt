@@ -54,6 +54,22 @@ coh co2unitr {a b : .} {f g : a -> b} (α : f -> g) : co2 (co21 α id1) (unitr g
 
 coh co12assoc {a b c d : .} (f : a -> b) (g : b -> c) {h h' : c -> d} (α : h -> h') : co2 (assoc f g h) (co12 f (co12 g α)) = co2 (co12 (co1 f g) α) (assoc f g h')
 
-# co121....
+coh co121assoc {a b c d : .} (f : a -> b) {g g' : b -> c} (α : g -> g') (h : c -> d) : co2 (co21 (co12 f α) h) (assoc f g' h) = co2 (assoc f g h) (co12 f (co21 α h))
 
 coh co21assoc {a b c d : .} {f f' : a -> b} (α : f -> f') (g : b -> c) (h : c -> d) : co2 (co21 (co21 α g) h) (assoc f' g h) = co2 (assoc f g h) (co21 α (co1 g h))
+
+coh xch {a b c : .} {f f' : a -> b} {g g' : b -> c} (α : f -> f') (β : g -> g') : co2 (co21 α g) (co12 f' β) = co2 (co12 f β) (co21 α g')
+
+coh unitl-invr {a b : .} (f : a -> b) : co2 (unitl f) (unitl' f) = id2 _
+
+coh unitl-invl {a b : .} (f : a -> b) : co2 (unitl' f) (unitl f) = id2 _
+
+coh unitr-invr {a b : .} (f : a -> b) : co2 (unitr f) (unitr' f) = id2 _
+
+coh unitr-invl {a b : .} (f : a -> b) : co2 (unitr' f) (unitr f) = id2 _
+
+coh assoc-invl {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : co2 (assoc f g h) (assoc' f g h) = id2 _
+
+coh assoc-invr {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : co2 (assoc' f g h) (assoc f g h) = id2 _
+
+# coh invl-invr 
