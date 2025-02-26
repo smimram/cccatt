@@ -39,7 +39,7 @@ rule token = parse
   | "→" { utf8 ~n:2 lexbuf; ARR }
   | "=>" { HOM }
   | "⇒" { utf8 ~n:2 lexbuf; HOM }
-  | "*" { utf8 lexbuf; TIMES }
+  | "*" { TIMES }
   | "×" { utf8 lexbuf; TIMES }
   | "1" { ONE }
   | "=" { EQ }
