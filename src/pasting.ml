@@ -68,7 +68,7 @@ let check ~pos l a =
   in
   (* printf "**** without variables: %s\n%!" (to_string (pis_explicit l a)); *)
 
-  (* Remove indentities in arguments. *)
+  (* Remove identities/higher arrows in the context. *)
   let vars, l, a =
     (* Apply rewriting rules. *)
     let rec rewrite rw (e:Term.t) =
@@ -106,6 +106,7 @@ let check ~pos l a =
     in
 
     (* Orient identities on variables as rewriting rules and normalize l. *)
+    (* TODO: set dim to 0 and check that we are not a coboundary *)
     let rec aux rw = function
       | (_, {desc = Id (_, {desc = Var x; _}, t); _})::l -> aux (add_rule rw x t) l
       | (_, {desc = Id (_, t, {desc = Var x; _}); _})::l -> aux (add_rule rw x t) l
@@ -224,6 +225,7 @@ let check ~pos l a =
     let a, b = get_arr a in
     let eq = eq_var in
     (* Check that we have a unique path from b to a. *)
+    (* TODO: ensure that we have explored all the context *)
     let rec check seen b =
       (* Find the unique antecedent. *)
       let rec find = function
@@ -245,6 +247,7 @@ let check ~pos l a =
     check [] b
 
   | `Monoidal ->
+
     (* Make sure that the types are arrows between tensor expressions. *)
     let rec get_tens a =
       match (unmeta a).desc with
@@ -317,6 +320,7 @@ let check ~pos l a =
     check [] b
 
   | `Cartesian ->
+
     let module S = Set.Make(struct type nonrec t = t let compare = compare_var end) in
     let rec get_prod ?(distinct=false) a =
       let a0 = a in
@@ -354,6 +358,7 @@ let check ~pos l a =
     if not (S.subset b available) then failure pos "some variables cannot be produced: %s" (S.diff b available |> S.to_seq |> List.of_seq |> List.map to_string |> String.concat ", ")
 
   | `Symmetric_monoidal ->
+
     let module S = Set.Make(struct type nonrec t = t let compare = compare_var end) in
     (* Make sure that the types are arrows between tensor expressions. *)
     let rec get_tens a =
