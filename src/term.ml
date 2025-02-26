@@ -39,6 +39,12 @@ and meta =
     ty : t;
   }
 
+let rec is_pi e =
+  match e.desc with
+  | Pi _ -> true
+  | Meta m when m.value <> None -> is_pi @@ Option.get m.value
+  | _ -> false
+
 (** String representation of an expression. This should mostly be useful for debugging (we want to print values). *)
 let rec to_string ?(pa=false) e =
   let rec dim e =
@@ -63,10 +69,11 @@ let rec to_string ?(pa=false) e =
     if i = `Implicit then Printf.sprintf "%s {%s}" (to_string ~pa:(isnt_app t) t) (to_string u) |> pa
     else Printf.sprintf "%s %s" (to_string ~pa:(isnt_app t) t) (to_string ~pa:true u) |> pa
   | Pi (i, x, a, t) ->
+    let arr = if is_pi t then "" else " ⤳" in
     if i = `Implicit then
-      Printf.sprintf "{%s : %s} ⤳ %s" x (to_string a) (to_string t) |> pa
+      Printf.sprintf "{%s : %s}%s %s" x (to_string a) arr (to_string t) |> pa
     else
-      Printf.sprintf "(%s : %s) ⤳ %s" x (to_string a) (to_string t) |> pa
+      Printf.sprintf "(%s : %s)%s %s" x (to_string a) arr (to_string t) |> pa
   | Obj -> "."
     
   | Arr (a, t, u) -> Printf.sprintf "%s %s %s" (to_string ~pa:true t) (if dim a = !Setting.dimension then "=" else "→") (to_string u) |> pa
