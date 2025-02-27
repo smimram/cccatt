@@ -7,7 +7,7 @@
    ;; ("\\<\\(Hom\\|Type\\)\\>\\|->" . font-lock-builtin-face)
    ;; ("\\<\\(\\)\\>" . font-lock-constant-face)
    ("\\<let[ \t]+\\([^ (=]*\\)" 1 'font-lock-function-name-face)
-   ("\\<coh[ \t]+\\([^ (=]*\\)" 1 'font-lock-function-name-face)
+   ("\\<[n]?coh[ \t]+\\([^ (=]*\\)" 1 'font-lock-function-name-face)
   )
 )
 

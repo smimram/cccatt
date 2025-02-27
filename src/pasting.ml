@@ -225,26 +225,24 @@ let check ~pos l a =
     let a, b = get_arr a in
     let eq = eq_var in
     (* Check that we have a unique path from b to a. *)
-    (* TODO: ensure that we have explored all the context *)
-    let rec check seen b =
-      (* Find the unique antecedent. *)
-      let rec find = function
-        | (a,b')::l when eq b b' ->
+    let rec check seen l b =
+      if l = [] then
+        begin
+          if not (eq a b) then failure b.pos "no producer for %s" (to_string b)
+        end
+      else
+      if eq a b
+      then failure pos "useless hypothesis: %s" (String.concat ", " @@ List.map (fun (a, b) -> to_string @@ mk (Arr (mk Obj, a, b))) l)
+      else
+        match List.find_and_remove_opt (fun (_,b') -> eq b b') l with
+        | Some ((a, _), l) ->
           List.iter (fun (_,b') -> if eq b b' then failure b'.pos "multiple producers for %s" (to_string b)) l;
-          Some a
-        | _::l -> find l
-        | [] -> None
-      in
-      let seen = b::seen in
-      match find l with
-      | Some a ->
-        if List.exists (fun a' -> eq a a') seen then failure pos "cyclic dependencies";
-        check seen a
-      | None ->
-        (* Note that we ensure that a is terminal so that there is no cycle (ie another path from a to b) *)
-        if not (eq a b) then failure b.pos "no producer for %s" (to_string b)
+          List.iter (fun a' -> if eq a a' then failure a'.pos "cyclic dependencies %s already produced" (to_string a)) seen;
+          check (a::seen) l a
+        | None ->
+          failure b.pos "no producer for %s" (to_string b)
     in
-    check [] b
+    check [] l b
 
   | `Monoidal ->
 
