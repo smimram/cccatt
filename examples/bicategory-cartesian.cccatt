@@ -1,0 +1,6 @@
+# Cartesian bicategories
+#
+# mode: cartesian
+# dimension: 2
+
+include "bicategory.cccatt"

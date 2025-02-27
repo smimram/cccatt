@@ -12,7 +12,7 @@ let () =
     List.fold_left
       (fun envs f ->
          Printf.printf "=^.^= checking %s\n" f;
-         Lang.exec envs (Prover.parse_file f)
+         Lang.exec envs (Lang.parse_file f)
       ) ([], []) !files |> ignore
   with
   | e ->

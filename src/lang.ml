@@ -225,7 +225,41 @@ let print_unelaborated_metavariables m =
          warning "unelaborated ?%d at %s" m.id (Pos.Option.to_string m.source_pos)
     ) (List.sort compare m)
 
-let exec_command (tenv, env) p =
+(** Parse a string. *)
+let parse s =
+  let lexbuf = Lexing.from_string s in
+  try
+    Parser.prog Lexer.token lexbuf
+  with
+  | Failure s when s = "lexing: empty token" ->
+    let pos = Lexing.lexeme_end_p lexbuf in
+    Common.error
+      "lexing error in file %s at line %d, character %d"
+      pos.Lexing.pos_fname
+      pos.Lexing.pos_lnum
+      (pos.Lexing.pos_cnum - pos.Lexing.pos_bol)
+  | Parsing.Parse_error ->
+    let pos = (Lexing.lexeme_end_p lexbuf) in
+    Common.error
+      "parsing error in file %s at word \"%s\", line %d, character %d"
+      pos.Lexing.pos_fname
+      (Lexing.lexeme lexbuf)
+      pos.Lexing.pos_lnum
+      (pos.Lexing.pos_cnum - pos.Lexing.pos_bol - 1)
+
+(** Parse a file. *)
+let parse_file f =
+  let sin =
+    let fi = open_in f in
+    let flen = in_channel_length fi in
+    let buf = Bytes.create flen in
+    really_input fi buf 0 flen;
+    close_in fi;
+    buf
+  in
+  parse (Bytes.to_string sin)
+
+let rec exec_command (tenv, env) p =
   match p with
   | Let (x, a, e) ->
     (* printf "*** let %s := %s\n%!" x (to_string e); *)
@@ -260,8 +294,10 @@ let exec_command (tenv, env) p =
     (try Pasting.check ~pos:a.pos l a; failure a.pos "expression accepted as a coherence" with _ -> ());
     message "not a coherence %s : %s" x (to_string @@ pis_explicit l a);
     tenv, env
+  | Include fname ->
+    exec (tenv,env) (parse_file fname)
 
 (** Execute a program. *)
-let exec env cmd =
+and exec env cmd =
   try List.fold_left exec_command env cmd
   with Type_error (pos, a, b) -> failure pos "got %s but %s expected" (to_string a) (to_string b)

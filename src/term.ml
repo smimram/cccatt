@@ -140,6 +140,7 @@ type command =
   | Let of string * t option * t (** declare a value *)
   | Check of t (** infer the type of an expression *)
   | NCoh of string * context * t (** ensure that we are *not* coherent *)
+  | Include of string (** include another file *)
 
 (** A program. *)
 type prog = command list

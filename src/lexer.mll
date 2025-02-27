@@ -45,6 +45,7 @@ rule token = parse
   | "=" { EQ }
   | ":=" { EQDEF }
   | "_" { HOLE }
+  | "include \""([^'"']* as filename)"\"" { INCLUDE filename }
   | (first_letter letter* as str) { utf8_advance str lexbuf; IDENT str }
   | space+ { token lexbuf }
   | "#-#"([^'\n']* as s) { Setting.parse s; token lexbuf }
