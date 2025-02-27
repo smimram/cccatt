@@ -32,3 +32,7 @@ coh pairing-eta {a b c : .} (h : a -> b * c) : pairing (comp h fst) (comp h snd)
 # Tests
 
 coh S {a b c : .} (f : a * b -> c) (g : a -> b) : a -> c
+
+coh S' {a b : .} (g : a -> b) : a -> a * b
+
+coh S'' {a : .} : a -> a * a

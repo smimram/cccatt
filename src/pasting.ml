@@ -111,9 +111,9 @@ let check ~pos l a =
       | (_, {desc = Id (_, {desc = Var x; _}, t); _})::l -> aux (add_rule rw x t) l
       | (_, {desc = Id (_, t, {desc = Var x; _}); _})::l -> aux (add_rule rw x t) l
       | (_, {desc = Arr (o, {desc = Var x; _}, t); _})::l
-        when not (List.mem x (List.map fst rw)) && dim o >= 1 -> aux (add_rule rw x t) l
+        when dim o >= 1 -> aux (add_rule rw x t) l
       | (_, {desc = Arr (o, t, {desc = Var x; _}); _})::l
-        when not (List.mem x (List.map fst rw)) && dim o >= 1 -> aux (add_rule rw x t) l
+        when dim o >= 1 -> aux (add_rule rw x t) l
       | (_, {desc = Id _; pos})::_ -> failure pos "could not eliminate identity"
       | (x, a)::l ->
         let a = rewrite rw a in

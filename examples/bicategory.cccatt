@@ -75,3 +75,8 @@ coh assoc-invr {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : co2 (assoc
 coh invl-invr {a b c : .} (f : a -> b) (g : b -> c) : co2 (assoc f id1 g) (co12 f (unitl g)) = co21 (unitr f) g
 
 coh pentagon {a b c d e : .} (f : a -> b) (g : b -> c) (h : c -> d) (i : d -> e) : co2 (assoc (co1 f g) h i) (assoc f g (co1 h i)) = co2 (co21 (assoc f g h) i) (co2 (assoc f (co1 g h) i) (co12 f (assoc g h i)))
+
+# Tests
+
+## TODO: the following should be accepted...
+# coh inv2 {a b : .} {f g : a -> b} (α : f -> g) : g -> f
