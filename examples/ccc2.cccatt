@@ -60,5 +60,4 @@ coh kill-id : kill ={1 ⇒ 1} id
 
 # Test
 
-## TODO: the following should be accepted
-# coh prod-eta {a b c : .} (f : a -> b * c) : comp dupl (prod (comp f fst) (comp f snd)) = f
+coh prod-eta {a b c : .} (f : a => b * c) : comp dupl (prod (comp f fst) (comp f snd)) = f
