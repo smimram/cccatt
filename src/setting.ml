@@ -70,3 +70,8 @@ let parse s =
     dimension := n;
     !dim_callback n
   | k -> error "Unknown setting: %s" k
+
+let save, restore =
+  let l = ref [] in
+  (fun () -> l := (!mode,!dimension) :: !l),
+  (fun () -> let m,d = List.hd !l in l := List.tl !l; mode := m; dimension := d)

@@ -295,7 +295,10 @@ let rec exec_command (tenv, env) p =
     message "not a coherence %s : %s" x (to_string @@ pis_explicit l a);
     tenv, env
   | Include fname ->
-    exec (tenv,env) (parse_file fname)
+    Setting.save ();
+    let env = exec (tenv,env) (parse_file fname) in
+    Setting.restore ();
+    env
 
 (** Execute a program. *)
 and exec env cmd =

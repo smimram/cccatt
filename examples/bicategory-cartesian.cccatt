@@ -4,3 +4,5 @@
 # dimension: 2
 
 include "bicategory.cccatt"
+
+coh pairing {a b c : .} (f : a -> b) (g : a -> c) : a -> b * c
