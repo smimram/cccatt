@@ -33,7 +33,7 @@ let rec unify tenv env ?(alpha=[]) t t' =
     if n <> n' then raise Unification;
     if List.length l <> List.length l' then raise Unification;
     (* TODO: take the beginning of the context in account in tenv? *)
-    List.iter2 (fun (x,a) (x',a') -> if x <> x' then raise Unification; unify tenv env a a') l l';
+    List.iter2 (fun (i,x,a) (i',x',a') -> if i <> i' || x <> x' then raise Unification; unify tenv env a a') l l';
     unify tenv env a a';
     if List.length s <> List.length s' then raise Unification;
     List.iter2 (fun (x,t) (x',t') -> if x <> x' then raise Unification; unify tenv env t t') s s'
@@ -64,7 +64,7 @@ and eval env e =
   | Coh (n, l, a, s) ->
     let l, a =
       let env = ref env in
-      let l = List.map (fun (x,a) -> let a = eval !env a in env := (x, var x) :: !env; x, a) l in
+      let l = List.map (fun (i,x,a) -> let a = eval !env a in env := (x, var x) :: !env; i,x,a) l in
       let a = eval !env a in
       l, a
     in
@@ -116,16 +116,16 @@ and infer tenv env (e:Term.t) =
     let l, a =
       let l' = ref [] in
       let rec aux tenv env = function
-        | (x,a)::l ->
+        | (i,x,a)::l ->
           let a = check tenv env a (mk ~pos:a.pos Type) in
-          l' := (x,a) :: !l';
+          l' := (i,x,a) :: !l';
           aux ((x,eval env a)::tenv) ((x,var ~pos:a.pos x)::env) l
         | [] -> check tenv env a (mk ~pos:a.pos Type)
       in
       let a = aux tenv env' l in
       List.rev !l', a
     in
-    Pasting.check ~pos l a;
+    Pasting.check ~pos (List.map (fun (_,x,a) -> x,a) l) a;
     mk ~pos (Coh (n, l, a, s)), eval env' a
   | Var x ->
     (

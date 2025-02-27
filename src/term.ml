@@ -11,7 +11,7 @@ type t =
   }
 
 and desc =
-  | Coh  of string * context * t * substitution (** coherence *)
+  | Coh  of string * (implicit * string * t) list * t * substitution (** coherence *)
   | Var  of string (** variable *)
   | Abs  of implicit * string * t * t (** abstraction *)
   | App  of implicit * t * t (** application *)
@@ -57,7 +57,8 @@ let rec to_string ?(pa=false) e =
   match e.desc with
   (* | Coh (l, a) -> Printf.sprintf "coh[%s|%s]" (List.map (fun (x,a) -> Printf.sprintf "%s:%s" x (to_string a)) l |> String.concat ",") (to_string a) *)
   (* | Coh _ -> "coh" *)
-  | Coh (n,_,_,s) -> Printf.sprintf "%s[%s]" n (String.concat ", " @@ List.map (fun (x,t) -> Printf.sprintf "%s=%s" x (to_string t)) s)
+  (* | Coh (n,_,_,s) -> Printf.sprintf "%s[%s]" n (String.concat ", " @@ List.map (fun (x,t) -> Printf.sprintf "%s=%s" x (to_string t)) s) *)
+  | Coh (n,l,_,s) -> Printf.sprintf "%s[%s]" n (String.concat "," @@ List.filter_map Fun.id @@ List.map2 (fun (i,_,_) (_,t) -> if i = `Explicit then Some (to_string t) else None) l s)
   | Var x -> x
   | Abs (i, x, a, t) ->
     if i = `Implicit then
@@ -129,8 +130,7 @@ let abs_coh ?pos name l a =
   let rec aux = function
     | (i,x,a)::l -> mk (Abs (i,x, a, aux l))
     | [] ->
-      let l = List.map (fun (_i,x,a) -> x,a) l in
-      let s = List.map (fun (x,_) -> x, var ?pos x) l in
+      let s = List.map (fun (_,x,_) -> x, var ?pos x) l in
       mk (Coh (name, l, a, s))
   in
   aux l
