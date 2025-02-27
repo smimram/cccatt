@@ -129,13 +129,13 @@ coh L {a b : .} : (a ⇒ a ⇒ b) ⇒ a ⇒ b
 
 # Owl
 # λxy.y(xy)
-#coh O {a b :. } : ((a ⇒ b) ⇒ a) ⇒ (a ⇒ b) ⇒ b
+ncoh O {a b :. } : ((a ⇒ b) ⇒ a) ⇒ (a ⇒ b) ⇒ b
 
 # Phoenix. (Big) Phi combinator. This is the same function as starling'.
 coh Phi {a b c d : .} : (b ⇒ c ⇒ d) ⇒ (a ⇒ b) ⇒ (a ⇒ c) ⇒ a ⇒ d
 
 # Psi combinator - psi bird
-# coh psi {a b c : .} : (b ⇒ b ⇒ c) ⇒ (a ⇒ b) ⇒ a ⇒ a ⇒ c
+ncoh psi {a b c : .} : (b ⇒ b ⇒ c) ⇒ (a ⇒ b) ⇒ a ⇒ a ⇒ c
 
 # Quacky
 coh Q4 {a b c : .} : a ⇒ (a ⇒ b) ⇒ (b ⇒ c) ⇒ c
@@ -181,10 +181,10 @@ coh T {a b : .} : a ⇒ (a ⇒ b) ⇒ b
 coh V {a b c : .} : a ⇒ b ⇒ (a ⇒ b ⇒ c) ⇒ c
 
 # Vireo once removed (V*)
-# coh Vs {a b d : .} : (b ⇒ a ⇒ b ⇒ d) ⇒ a ⇒ b ⇒ b ⇒ d
+ncoh Vs {a b d : .} : (b ⇒ a ⇒ b ⇒ d) ⇒ a ⇒ b ⇒ b ⇒ d
 
 # Vireo twice removed (V**)
-# coh Vss {a b c e : .} : (a ⇒ c ⇒ b ⇒ c ⇒ e) ⇒ a ⇒ b ⇒ c ⇒ c ⇒ e
+ncoh Vss {a b c e : .} : (a ⇒ c ⇒ b ⇒ c ⇒ e) ⇒ a ⇒ b ⇒ c ⇒ c ⇒ e
 
 # Warbler. Elementary duplicator. Corresponds to ω* (Mocking once removed).
 # λfx.fxx

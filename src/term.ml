@@ -139,7 +139,7 @@ let abs_coh ?pos name l a =
 type command =
   | Let of string * t option * t (** declare a value *)
   | Check of t (** infer the type of an expression *)
-  | NCoh of context * t (** ensure that we are *not* coherent *)
+  | NCoh of string * context * t (** ensure that we are *not* coherent *)
 
 (** A program. *)
 type prog = command list

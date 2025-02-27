@@ -255,9 +255,10 @@ let exec_command (tenv, env) p =
     let e, a = infer tenv env e in
     message "check %s : %s" (Pos.to_string e.pos) (to_string a);
     tenv, env
-  | NCoh (l, a) ->
+  | NCoh (x, l, a) ->
     check tenv env (pis ~pos:a.pos (List.map (fun (x,a) -> `Explicit,x,a) l) a) (mk ~pos:a.pos Type) |> ignore;
     (try Pasting.check ~pos:a.pos l a; failure a.pos "expression accepted as a coherence" with _ -> ());
+    message "not a coherence %s : %s" x (to_string @@ pis_explicit l a);
     tenv, env
 
 (** Execute a program. *)
