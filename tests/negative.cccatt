@@ -22,7 +22,7 @@ ncoh _ (a b : .) : (b ⇒ a) ⇒ a ⇒ a
 ncoh _ (a b : .) : b ⇒ b ⇒ a ⇒ a
 
 # We are not trivial
-ncoh _ (a : .) (x y : a) : x = y
+ncoh _ (a : .) (x y : a) : x ⇔ y
 
 # We are not trivial
-ncoh _ (a b : .) (f g : a ⇒ b) : f = g
+ncoh _ (a b : .) (f g : a ⇒ b) : f ⇔ g

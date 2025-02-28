@@ -9,12 +9,12 @@ coh S {a b c : .} : (a => b => c) => (a => b) => a => c
 coh ap {a b : .} (t : a => b) (u : a) : b
 
 let ap-I {a : .} (x : a) := ap I x
-coh eval-ap-I {a : .} (x : a) : ap I x = x
+coh eval-ap-I {a : .} (x : a) : ap I x <=> x
 
 let ap-K {a b : .} (x : a) : b => a := ap K x
 
 let ap-K {a b : .} (x : a) (y : b) := ap (ap K x) y
-coh ap-K {a b : .} (x : a) (y : b) : ap (ap K x) y = x
+coh ap-K {a b : .} (x : a) (y : b) : ap (ap K x) y <=> x
 
 let I {a : .} : a => a := ap (ap S K) K
 
@@ -43,25 +43,25 @@ let id {a : .} (x : a) := ap I x
 
 ## Testing identities
 
-coh refl {a : .} (x : a) : x = x
+coh refl {a : .} (x : a) : x <=> x
 
-coh sym {a : .} {x y : a} (p : x = y) : y = x
+coh sym {a : .} {x y : a} (p : x <=> y) : y <=> x
 
-coh trans {a : .} {x y z : a} (p : x = y) (q : y = z) : x = z
+coh trans {a : .} {x y z : a} (p : x <=> y) (q : y <=> z) : x <=> z
 
-coh ap-cong {a b : .} {t t' : a => b} {u u' : a} (p : t = t') (q : u = u') : ap t u = ap t' u'
+coh ap-cong {a b : .} {t t' : a => b} {u u' : a} (p : t <=> t') (q : u <=> u') : ap t u <=> ap t' u'
 
-coh comp-cong {a b c : .} {f f' : a => b} {g g' : b => c} (p : f = f') (q : g = g') : comp f g = comp f' g'
+coh comp-cong {a b c : .} {f f' : a => b} {g g' : b => c} (p : f <=> f') (q : g <=> g') : comp f g <=> comp f' g'
 
-coh ap-I {a : .} (x : a) : ap I x = x
+coh ap-I {a : .} (x : a) : ap I x <=> x
 
-coh ap-K {a b : .} (x : a) (y : b) : ap (ap K x) y = x
+coh ap-K {a b : .} (x : a) (y : b) : ap (ap K x) y <=> x
 
-coh ap-comp {a b c : .} (f : a => b) (g : b => c) (x : a) : ap (comp f g) x = ap g (ap f x)
+coh ap-comp {a b c : .} (f : a => b) (g : b => c) (x : a) : ap (comp f g) x <=> ap g (ap f x)
 
 # I is derivable
-# coh SKK (a b : .) : ap (a => b => a) (a => a) (ap (a => (b => a) => a) ((a => b => a) => a => a) (S a (b => a) a) (K a (b => a))) (K a b) = I a
-coh SKK {a b : .} : ap (ap S K) (K {a} {b}) = I
+# coh SKK (a b : .) : ap (a => b => a) (a => a) (ap (a => (b => a) => a) ((a => b => a) => a => a) (S a (b => a) a) (K a (b => a))) (K a b) <=> I a
+coh SKK {a b : .} : ap (ap S K) (K {a} {b}) <=> I
 
 ## Church numerals with pi-types
 
@@ -115,17 +115,17 @@ coh pair {a b : .} (_ : a) (_ : b) : a × b
 
 coh diag {a : .} : a => a * a
 
-coh diag-pair {a : .} (x : a) : ap diag x = pair x x
+coh diag-pair {a : .} (x : a) : ap diag x <=> pair x x
 
-coh fst-pair {a b : .} (x : a) (y : b) : fst (pair x y) = x
+coh fst-pair {a b : .} (x : a) (y : b) : fst (pair x y) <=> x
 
-coh snd-pair {a b : .} (x : a) (y : b) : fst (pair x y) = x
+coh snd-pair {a b : .} (x : a) (y : b) : fst (pair x y) <=> x
 
 coh pair-sym {a b : .} (_ : a × b) : (b × a)
 
 let pair-sym' {a b : .} (x : a × b) := pair (snd x) (fst x)
 
-coh pair-syms {a b : .} (x : a × b) : pair-sym x = pair-sym' x
+coh pair-syms {a b : .} (x : a × b) : pair-sym x <=> pair-sym' x
 
 coh pair1 {a b : .} {a' b' : .} (f : a => a') (g : b => b') : (a * b => a' * b')
 
@@ -138,19 +138,19 @@ coh curry {a b c : .} : (a * b => c) => (a => b => c)
 
 coh uncurry {a b c : .} : (a => b => c) => (a * b => c)
 
-coh curry-uncurry {a b c : .} : comp curry uncurry = I {a * b => c}
+coh curry-uncurry {a b c : .} : comp curry uncurry <=> I {a * b => c}
 
-coh uncurry-curry {a b c : .} : comp uncurry curry = I {a => b => c}
+coh uncurry-curry {a b c : .} : comp uncurry curry <=> I {a => b => c}
 
 ## Curry's axioms
 
-# coh ax1 {a b c : .} : ap (ap S (ap (ap S (ap K S)) (ap (ap S (ap K K)) (ap (ap S (ap K S)) K)))) (ap K K) = ap S (ap (K {c}) (K {b} {a}))
+# coh ax1 {a b c : .} : ap (ap S (ap (ap S (ap K S)) (ap (ap S (ap K K)) (ap (ap S (ap K S)) K)))) (ap K K) <=> ap S (ap (K {c}) (K {b} {a}))
 
-# coh ax2 {a b : .} : ap (ap S (ap (ap S (ap K S)) K)) (ap K I) = I {a => b}
+# coh ax2 {a b : .} : ap (ap S (ap (ap S (ap K S)) K)) (ap K I) <=> I {a => b}
 
-# coh ax3 {a b : .} : ap S (ap K I) = I {a => b}
-# coh ax3 {a b : .} : ap S (ap (K {a}) (I {b})) = I
+# coh ax3 {a b : .} : ap S (ap K I) <=> I {a => b}
+# coh ax3 {a b : .} : ap S (ap (K {a}) (I {b})) <=> I
 
-# coh ax4 {a b c : .} : ap (ap S (ap K S)) (ap S (ap K K)) = K {a => c} {a => b}
+# coh ax4 {a b c : .} : ap (ap S (ap K S)) (ap S (ap K K)) <=> K {a => c} {a => b}
 
-# coh ax5 {a b c d : .} : ap (ap S (ap K (ap S (ap K S)))) (ap (ap S (ap K S)) (ap S (ap K S))) = ap (ap S (ap (ap S (ap K S)) (ap (ap S (ap K K)) (ap (ap S (ap K S)) (ap (ap S (ap K (ap S (ap K S)))) S))))) (ap (K {c => b => a => d}) S)
+# coh ax5 {a b c d : .} : ap (ap S (ap K (ap S (ap K S)))) (ap (ap S (ap K S)) (ap S (ap K S))) <=> ap (ap S (ap (ap S (ap K S)) (ap (ap S (ap K K)) (ap (ap S (ap K S)) (ap (ap S (ap K (ap S (ap K S)))) S))))) (ap (K {c => b => a => d}) S)
