@@ -5,10 +5,10 @@ coh co1 (a b c : .) (f : a -> b) (g : b -> c) : a -> c
 
 coh pa (a b c : .) (f : a -> b) (g : a -> c) : a -> b * c
 
-coh fst {a b : .} : a * b -> a
+coh fst (a b : .) : a * b -> a
 
-coh snd {a b : .} : a * b -> b
+coh snd (a b : .) : a * b -> b
 
-coh pa2 (a b c : .) (f : a -> b) (g : a -> c) (h : a -> b * c) (α : co1 a (b * c) b h fst -> f) (β : co1 a (b * c) c h snd -> g) : h -> pa a b c f g
+coh pa2 (a b c : .) (f : a -> b) (g : a -> c) (h : a -> b * c) (α : co1 a (b * c) b h (fst b c) -> f) (β : co1 a (b * c) c h (snd b c) -> g) : h -> pa a b c f g
 
-let bug {a b c : .} (f : a -> b) (g : a -> c) (h : a -> b * c) : pa a b c f g -> h := pa2 a b c f g h _ _
+let bug (a b c : .) (f : a -> b) (g : a -> c) (h : a -> b * c) : pa a b c f g -> h := pa2 a b c f g h _ _
