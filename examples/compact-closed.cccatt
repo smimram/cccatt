@@ -9,4 +9,12 @@ coh eta {a : .} : 1 -> a * !a
 
 coh eps {a : .} : a * !a -> 1
 
-# coh zig-zag {a : .} : co5 tunitl' (te eta id) tassoc (te id eps) tunitr = id {a}
+coh nn {a : .} : !!a -> a
+
+coh nn' {a : .} : a -> !!a
+
+coh nn-nn' {a : .} : co nn nn' = id {!!a}
+
+coh nn'-nn {a : .} : co nn' nn = id {a}
+
+coh zig-zag {a : .} : co5 tunitl' (te eta id) tassoc (te id eps) tunitr ={!!a -> a} nn
