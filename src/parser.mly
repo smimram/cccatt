@@ -57,7 +57,6 @@ expr:
   | expr EQ expr { if Setting.has_elements () then mk (Id (hole ~pos:(defpos()) (), $1, $3)) else mk (Arr (hole ~pos:(defpos()) (), $1, $3)) }
   | expr EQ LACC expr RACC expr %prec EQ { if Setting.has_elements () then mk (Id ($4, $1, $6)) else mk (Arr ($4, $1, $6)) }
   | expr TIMES expr { mk (Prod ($1, $3)) }
-  | ONE { mk One }
   | aexpr { $1 }
 
 aexpr:
@@ -70,6 +69,7 @@ sexpr:
   | OBJ { mk Obj }
   | IDENT { mk (Var $1) }
   | HOLE { hole ~pos:(defpos()) ~real:true () }
+  | ONE { mk One }
   | LPAR expr RPAR { $2 }
 
 args:
