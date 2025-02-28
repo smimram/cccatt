@@ -13,6 +13,9 @@ let cartesian = [%blob "../examples/cartesian.cccatt"]
 let bicategory = [%blob "../examples/bicategory.cccatt"]
 let cartesian_bicategory = [%blob "../examples/bicategory-cartesian.cccatt"]
 
+let () =
+  Js_of_ocaml.Sys_js.create_file ~name:"bicategory.cccatt" ~content:bicategory
+
 let get = function
   | "none" -> ""
   | "tests" -> tests
