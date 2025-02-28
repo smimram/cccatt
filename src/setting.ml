@@ -44,7 +44,7 @@ let on_dim f =
   dim_callback := fun n -> g n; f n
 
 let set_dim n =
-  message "setting dimension to %d" n;
+  message "setting dimension to %s" (if n = max_int then "∞" else string_of_int n);
   dimension := n;
   !dim_callback n
 
