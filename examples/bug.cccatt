@@ -21,5 +21,4 @@ coh id (a : .) : a -> a
 
 coh pa2 (a b : .) (f g : a -> b) (α : co1 a b b g (id b) -> f) : pa a b f -> g
 
-let bug (a b : .) (f : a -> b) (g : a -> b) : pa a b f -> g := pa2 a b f g _ _
-
+let bug (a b : .) (f : a -> b) (g : a -> b) : pa a b f -> g := pa2 a b f g _
