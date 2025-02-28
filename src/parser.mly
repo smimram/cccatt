@@ -19,12 +19,13 @@ let pis ?pos l a =
 %}
 
 %token LET CHECK NCOH FUN TO HOLE
-%token COH HOM EQ EQDEF OBJ TIMES ONE
+%token COH ARR HOM EQ EQDEF OBJ TIMES ONE
 %token LPAR RPAR LACC RACC COL
 %token <string> IDENT
-%token <string> SETTING
+%token <string> INCLUDE
 %token EOF
 
+%right ARR
 %right TO
 %right HOM
 %right TIMES
@@ -35,15 +36,15 @@ let pis ?pos l a =
 %%
 
 prog:
-  | SETTING prog { Setting.parse $1; $2 }
   | cmd prog { $1::$2 }
   | EOF { [] }
 
 cmd:
-  | COH IDENT args COL expr { Let ($2, None, abs_coh ~pos:(defpos()) $3 $5) }
-  | NCOH args COL expr { NCoh (List.map (fun (_,x,a) -> x,a) $2, $4) }
+  | COH ident args COL expr { Let ($2, None, abs_coh ~pos:(defpos()) $2 $3 $5) }
+  | NCOH ident args COL expr { NCoh ($2, List.map (fun (_,x,a) -> x,a) $3, $5) }
   | LET IDENT args type_opt EQDEF expr { Let ($2, Option.map (pis $3) $4, abss $3 $6) }
   | CHECK expr { Check $2 }
+  | INCLUDE { Include $1 }
 
 type_opt:
   | COL expr { Some $2 }
@@ -51,9 +52,10 @@ type_opt:
 
 expr:
   | FUN args TO expr { abss $2 $4 }
+  | expr ARR expr { mk (Arr (hole ~pos:(defpos()) (), $1, $3)) }
   | expr HOM expr { mk (Hom ($1, $3)) }
-  | expr EQ expr { mk (Id (hole ~pos:(defpos()) (), $1, $3)) }
-  | expr EQ LACC expr RACC expr %prec EQ { mk (Id ($4, $1, $6)) }
+  | expr EQ expr { if Setting.has_elements () then mk (Id (hole ~pos:(defpos()) (), $1, $3)) else mk (Arr (hole ~pos:(defpos()) (), $1, $3)) }
+  | expr EQ LACC expr RACC expr %prec EQ { if Setting.has_elements () then mk (Id ($4, $1, $6)) else mk (Arr ($4, $1, $6)) }
   | expr TIMES expr { mk (Prod ($1, $3)) }
   | ONE { mk One }
   | aexpr { $1 }

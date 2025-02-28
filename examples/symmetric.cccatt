@@ -2,6 +2,7 @@
 # Symmetric monoidal categories
 #
 #-# mode: symmetric monoidal category
+#-# dimension: 1
 
 # Basic constructions (see monoidal for more)
 

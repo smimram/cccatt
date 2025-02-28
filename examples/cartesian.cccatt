@@ -1,6 +1,7 @@
 # Cartesian categories
 #
 #-# mode: cartesian category
+#-# dimension: 1
 
 # Generators
 
@@ -27,3 +28,11 @@ coh term-rule {a : .} (f : a -> 1) : f = term
 coh comp-fst {a b c : .} (f : a -> b) (g : a -> c) : comp (pairing f g) fst = f
 coh comp-snd {a b c : .} (f : a -> b) (g : a -> c) : comp (pairing f g) snd = g
 coh pairing-eta {a b c : .} (h : a -> b * c) : pairing (comp h fst) (comp h snd) = h
+
+# Tests
+
+coh S {a b c : .} (f : a * b -> c) (g : a -> b) : a -> c
+
+coh S' {a b : .} (g : a -> b) : a -> a * b
+
+coh S'' {a : .} : a -> a * a

@@ -1,0 +1,18 @@
+# Cartesian categories: functorial variant
+#
+#-# mode: cartesian category
+#-# dimension: 1
+
+# Generators
+
+coh comp {a b c : .} (f : a -> b) (g : b -> c) : a -> c
+
+coh id {a : .} : a -> a
+
+coh tens {a a' b b' : .} (f : a -> b) (f' : a' -> b') : a * a' -> b * b'
+
+coh dup {a : .} : a -> a * a
+
+# coh
+
+# TODO: finish as in ccc2

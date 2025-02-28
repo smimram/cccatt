@@ -22,7 +22,7 @@ let debug s = Console.console##debug (Js.string s)
 let env = ref ([],[])
 
 let loop s =
-  env := Lang.exec !env (Prover.parse s)
+  env := Lang.exec !env (Lang.parse s)
 
 [%%if ocaml_version = (4,14,1)]
 let number_of_int n = n

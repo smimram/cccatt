@@ -1,20 +1,21 @@
 # λ-calculus with SKI combinators
 #
 #-# mode: ccc
+#-# dimension: 1
 
 ## Combinators
 
-coh I {a : .} : a → a
+coh I {a : .} : a ⇒ a
 
-coh K {a b : .} : a → b → a
+coh K {a b : .} : a ⇒ b ⇒ a
 
-coh S {a b c : .} : (a → b → c) → (a → b) → a → c
+coh S {a b c : .} : (a ⇒ b ⇒ c) ⇒ (a ⇒ b) ⇒ a ⇒ c
 
-coh ap {a b : .} (t : a → b) (u : a) : b
+coh ap {a b : .} (t : a ⇒ b) (u : a) : b
 
-let ap2 {a b c : .} (t : a -> b -> c) (x : a) (y : b) := ap (ap t x) y
+let ap2 {a b c : .} (t : a ⇒ b ⇒ c) (x : a) (y : b) := ap (ap t x) y
 
-let ap3 {a b c d : .} (t : a -> b -> c -> d) (x : a) (y : b) (z : c) := ap (ap2 t x y) z
+let ap3 {a b c d : .} (t : a ⇒ b ⇒ c ⇒ d) (x : a) (y : b) (z : c) := ap (ap2 t x y) z
 
 ## Reduction rules
 
@@ -22,30 +23,30 @@ coh I-red {a : .} (x : a) : ap I x = x
 
 coh K-red {a b : .} (x : a) (y : b) : ap2 K x y = x
 
-coh S-red {a b c : .} (x : a -> b -> c) (y : a -> b) (z : a) : ap3 S x y z = ap (ap x z) (ap y z)
+coh S-red {a b c : .} (x : a ⇒ b ⇒ c) (y : a ⇒ b) (z : a) : ap3 S x y z = ap (ap x z) (ap y z)
 
 ## Curry's axioms
 
 coh ax1 {a b c : .} : ap (ap S (ap (ap S (ap K S)) (ap (ap S (ap K K)) (ap (ap S (ap K S)) K)))) (ap K K) = ap S (ap (K {_} {c}) (K {b} {a}))
 
-coh ax2 {a b : .} : ap (ap S (ap (ap S (ap K S)) K)) (ap K I) = I {a -> b}
+coh ax2 {a b : .} : ap (ap S (ap (ap S (ap K S)) K)) (ap K I) = I {a ⇒ b}
 
-coh ax3 {a b : .} : ap S (ap K I) = I {a -> b}
+coh ax3 {a b : .} : ap S (ap K I) = I {a ⇒ b}
 
-coh ax4 {a b c : .} : ap (ap S (ap K S)) (ap S (ap K K)) = K {a -> c} {a -> b}
+coh ax4 {a b c : .} : ap (ap S (ap K S)) (ap S (ap K K)) = K {a ⇒ c} {a ⇒ b}
 
 coh ax5 {a b c d : .} :
   ap (ap S (ap K (ap S (ap K S)))) (ap (ap S (ap K S)) (ap S (ap K S)))
-  ={ (a -> b -> c -> d) -> (a -> b -> c) -> (a -> b) -> a -> d }
+  ={ (a ⇒ b ⇒ c ⇒ d) ⇒ (a ⇒ b ⇒ c) ⇒ (a ⇒ b) ⇒ a ⇒ d }
   ap (ap S (ap (ap S (ap K S)) (ap (ap S (ap K K)) (ap (ap S (ap K S)) (ap (ap S (ap K (ap S (ap K S)))) S))))) (ap (K) S)
 
 ## Products
 
-coh P {a b : .} : a -> b -> a * b
+coh P {a b : .} : a ⇒ b ⇒ a * b
 
-coh P1 {a b : .} : a * b -> a
+coh P1 {a b : .} : a * b ⇒ a
 
-coh P2 {a b : .} : a * b -> b
+coh P2 {a b : .} : a * b ⇒ b
 
 coh T : 1
 
@@ -55,10 +56,10 @@ coh P2-red {a b : .} (x : a) (y : b) : ap P2 (ap2 P x y) = y
 
 coh Peta {a b : .} (x : a * b) : ap (ap P (ap P1 x)) (ap P2 x) = x
 
-coh prod1 {a b c : .} : ap (ap S (ap K (ap S (ap K (ap S (ap K P1)))))) (ap (ap S (ap K S)) (ap S (ap K P))) = K {a -> c} {a -> b}
+coh prod1 {a b c : .} : ap (ap S (ap K (ap S (ap K (ap S (ap K P1)))))) (ap (ap S (ap K S)) (ap S (ap K P))) = K {a ⇒ c} {a ⇒ b}
 
-coh prod2 {a b c : .} : ap (ap S (ap K (ap S (ap K (ap S (ap K P2)))))) (ap (ap S (ap K S)) (ap S (ap K P))) = ap (K {_} {a -> c}) (I {a -> b})
+coh prod2 {a b c : .} : ap (ap S (ap K (ap S (ap K (ap S (ap K P2)))))) (ap (ap S (ap K S)) (ap S (ap K P))) = ap (K {_} {a ⇒ c}) (I {a ⇒ b})
 
-coh prodext {a b c : .} : ap (ap S (ap (ap S (ap K S)) (ap (ap S (ap K (ap S (ap K P)))) (ap S (ap K P1))))) (ap S (ap K P2)) = I {a -> b * c}
+coh prodext {a b c : .} : ap (ap S (ap (ap S (ap K S)) (ap (ap S (ap K (ap S (ap K P)))) (ap S (ap K P1))))) (ap S (ap K P2)) = I {a ⇒ b * c}
 
-coh term : ap K T ={1 -> 1} I
+coh term : ap K T ={1 ⇒ 1} I

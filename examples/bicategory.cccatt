@@ -1,0 +1,82 @@
+#
+# Bicategories
+#
+# See for instance _Bicategories in univalent foundations_ by Ahrens et al.
+#
+#-# mode: category
+#-# dimension: 2
+
+## Data
+
+coh id1 {a : .} : a -> a
+
+coh co1 {a b c : .} (f : a -> b) (g : b -> c) : a -> c
+
+coh id2 {a b : .} (f : a -> b) : f -> f
+
+coh co2 {a b : .} {f g h : a -> b} (α : f -> g) (β : g → h) : f -> h
+
+coh co12 {a b c : .} (f : a -> b) {g g' : b -> c}  (α : g -> g') : co1 f g -> co1 f g'
+
+coh co21 {a b c : .} {f f' : a -> b} (α : f -> f') (g : b -> c) : co1 f g -> co1 f' g
+
+coh unitl {a b : .} (f : a -> b) : co1 id1 f -> f
+
+coh unitl' {a b : .} (f : a -> b) : f -> co1 id1 f
+
+coh unitr {a b : .} (f : a -> b) : co1 f id1 -> f
+
+coh unitr' {a b : .} (f : a -> b) : f -> co1 f id1
+
+coh assoc {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : co1 (co1 f g) h -> co1 f (co1 g h)
+
+coh assoc' {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : co1 f (co1 g h) -> co1 (co1 f g) h
+
+## Axioms
+
+coh unitl2 {a b : .} {f g : a -> b} (α : f -> g) : co2 (id2 _) α = α
+
+coh unitr2 {a b : .} {f g : a -> b} (α : f -> g) : co2 α (id2 _) = α
+
+coh assoc2 {a b : .} {f g h i : a -> b} (α : f -> g) (β : g -> h) (γ : h -> i) : co2 (co2 α β) γ = co2 α (co2 β γ)
+
+coh co12id2 {a b c : .} (f : a -> b) (g : b -> c) : co12 f (id2 g) = id2 (co1 f g)
+
+coh co12co2 {a b c : .} (f : a -> b) {g g' g'' : b -> c} (α : g -> g') (β : g' -> g'') : co12 f (co2 α β) = co2 (co12 f α) (co12 f β)
+
+coh co21id2 {a b c : .} (f : a -> b) (g : b -> c) : co21 (id2 f) g = id2 (co1 f g)
+
+coh co21co2 {a b c : .} {f f' f'' :  a -> b} (α : f -> f') (β : f' -> f'') (g : b -> c) : co21 (co2 α β) g = co2 (co21 α g) (co21 β g)
+
+coh co2unitl {a b : .} {f g : a -> b} (α : f -> g) : co2 (co12 id1 α) (unitl g) = co2 (unitl f) α
+
+coh co2unitr {a b : .} {f g : a -> b} (α : f -> g) : co2 (co21 α id1) (unitr g) = co2 (unitr f) α
+
+coh co12assoc {a b c d : .} (f : a -> b) (g : b -> c) {h h' : c -> d} (α : h -> h') : co2 (assoc f g h) (co12 f (co12 g α)) = co2 (co12 (co1 f g) α) (assoc f g h')
+
+coh co121assoc {a b c d : .} (f : a -> b) {g g' : b -> c} (α : g -> g') (h : c -> d) : co2 (co21 (co12 f α) h) (assoc f g' h) = co2 (assoc f g h) (co12 f (co21 α h))
+
+coh co21assoc {a b c d : .} {f f' : a -> b} (α : f -> f') (g : b -> c) (h : c -> d) : co2 (co21 (co21 α g) h) (assoc f' g h) = co2 (assoc f g h) (co21 α (co1 g h))
+
+coh xch {a b c : .} {f f' : a -> b} {g g' : b -> c} (α : f -> f') (β : g -> g') : co2 (co21 α g) (co12 f' β) = co2 (co12 f β) (co21 α g')
+
+coh unitl-invr {a b : .} (f : a -> b) : co2 (unitl f) (unitl' f) = id2 _
+
+coh unitl-invl {a b : .} (f : a -> b) : co2 (unitl' f) (unitl f) = id2 _
+
+coh unitr-invr {a b : .} (f : a -> b) : co2 (unitr f) (unitr' f) = id2 _
+
+coh unitr-invl {a b : .} (f : a -> b) : co2 (unitr' f) (unitr f) = id2 _
+
+coh assoc-invl {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : co2 (assoc f g h) (assoc' f g h) = id2 _
+
+coh assoc-invr {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : co2 (assoc' f g h) (assoc f g h) = id2 _
+
+coh invl-invr {a b c : .} (f : a -> b) (g : b -> c) : co2 (assoc f id1 g) (co12 f (unitl g)) = co21 (unitr f) g
+
+coh pentagon {a b c d e : .} (f : a -> b) (g : b -> c) (h : c -> d) (i : d -> e) : co2 (assoc (co1 f g) h i) (assoc f g (co1 h i)) = co2 (co21 (assoc f g h) i) (co2 (assoc f (co1 g h) i) (co12 f (assoc g h i)))
+
+# Tests
+
+## TODO: the following should not be accepted for (2,0)-bicategories (we actually have (2,1)-bicategories)
+coh inv2 {a b : .} {f g : a -> b} (α : f -> g) : g -> f

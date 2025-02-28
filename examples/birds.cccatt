@@ -11,117 +11,117 @@
 # Applicator
 # This is the same as I* (identity once removed).
 # λfx.fx
-coh A {a b : .} : (a -> b) -> a -> b
+coh A {a b : .} : (a ⇒ b) ⇒ a ⇒ b
 
 # Bluebird
 # This corresponds to categorical composition. It also performs "once removing".
 # λfgx.g(fx)
-coh B {a b c : .} : (b -> c) -> (a -> b) -> a -> c
+coh B {a b c : .} : (b ⇒ c) ⇒ (a ⇒ b) ⇒ a ⇒ c
 
 # Bluebird'. Same as Dove.
 # λfxgy.fx(gy)
-coh B' {a b c d : .} : (a -> c -> d) -> a -> (b -> c) -> b -> d
+coh B' {a b c d : .} : (a ⇒ c ⇒ d) ⇒ a ⇒ (b ⇒ c) ⇒ b ⇒ d
 
 # Blackbird
 # λfgxy.g(fxy)
-coh B1 {a b c d : .} : (c -> d) -> (a -> b -> c) -> a -> b -> d
+coh B1 {a b c d : .} : (c ⇒ d) ⇒ (a ⇒ b ⇒ c) ⇒ a ⇒ b ⇒ d
 
 # Bunting
 # λfgxyz.f(gxyz)
-coh B2 {a b c d e : .} : (d -> e) -> (a -> b -> c -> d) -> a -> b -> c -> e
+coh B2 {a b c d e : .} : (d ⇒ e) ⇒ (a ⇒ b ⇒ c ⇒ d) ⇒ a ⇒ b ⇒ c ⇒ e
 
 # Becard
 # λfghx.h(g(fx))
-coh B3 {a b c d : .} : (c -> d) -> (b -> c) -> (a -> b) -> a -> d
+coh B3 {a b c d : .} : (c ⇒ d) ⇒ (b ⇒ c) ⇒ (a ⇒ b) ⇒ a ⇒ d
 
 # Cardinal
 # This bird produces crossed variants. This is the Thrush once removed.
 # λfxy.fyx
-coh C {a b c : .} : (a -> b -> c) -> b -> a -> c
+coh C {a b c : .} : (a ⇒ b ⇒ c) ⇒ b ⇒ a ⇒ c
 
 # Cardinal'
 # λfgxy.f(gy)x
-coh C' {a b c d : .} : (c -> a -> d) -> (b -> c) -> a -> b -> d
+coh C' {a b c d : .} : (c ⇒ a ⇒ d) ⇒ (b ⇒ c) ⇒ a ⇒ b ⇒ d
 
 # Cardinal once removed (C*)
 # λfxyz.fxzy
-coh Cs {a b c d : .} : (a -> c -> b -> d) -> a -> b -> c -> d
+coh Cs {a b c d : .} : (a ⇒ c ⇒ b ⇒ d) ⇒ a ⇒ b ⇒ c ⇒ d
 
 # Cardinal twice removed (C**)
 # λfxyzw.fxywz
-coh Css {a b c d e : .} : (a -> b -> d -> c -> e) -> a -> b -> c -> d -> e
+coh Css {a b c d e : .} : (a ⇒ b ⇒ d ⇒ c ⇒ e) ⇒ a ⇒ b ⇒ c ⇒ d ⇒ e
 
 # Dove. Same as Bluebird'.
 # λfxgy.fx(gy)
-coh D {a b c d : .} : (a -> c -> d) -> a -> (b -> c) -> b -> d
+coh D {a b c d : .} : (a ⇒ c ⇒ d) ⇒ a ⇒ (b ⇒ c) ⇒ b ⇒ d
 
 # Dickcissel
 # λfxygz.fxy(gz)
-coh D1 {a b c d e : .} : (a -> b -> d -> e) -> a -> b -> (c -> d) -> c -> e
+coh D1 {a b c d e : .} : (a ⇒ b ⇒ d ⇒ e) ⇒ a ⇒ b ⇒ (c ⇒ d) ⇒ c ⇒ e
 
 # Dovekie
-coh D2 {a b c d e : .} : (c -> d -> e) -> (a -> c) -> a -> (b -> d) -> b -> e
+coh D2 {a b c d e : .} : (c ⇒ d ⇒ e) ⇒ (a ⇒ c) ⇒ a ⇒ (b ⇒ d) ⇒ b ⇒ e
 
 # Eagle
-coh E {a b c d e : .} : (a -> d -> e) -> a -> (b -> c -> d) -> b -> c -> e
+coh E {a b c d e : .} : (a ⇒ d ⇒ e) ⇒ a ⇒ (b ⇒ c ⇒ d) ⇒ b ⇒ c ⇒ e
 
 # Eagle bald (E-)
-coh Em {a b c d e f g : .} : (e -> f -> g) -> (a -> b -> e) -> a -> b -> (c -> d -> f) -> c -> d -> g
+coh Em {a b c d e f g : .} : (e ⇒ f ⇒ g) ⇒ (a ⇒ b ⇒ e) ⇒ a ⇒ b ⇒ (c ⇒ d ⇒ f) ⇒ c ⇒ d ⇒ g
 
 # Finch
-coh F {a b c : .} : a -> b -> (b -> a -> c) -> c
+coh F {a b c : .} : a ⇒ b ⇒ (b ⇒ a ⇒ c) ⇒ c
 
 # Finch once removed (F*)
-coh Fs {a b c d : .} : (c -> b -> a -> d) -> a -> b -> c -> d
+coh Fs {a b c d : .} : (c ⇒ b ⇒ a ⇒ d) ⇒ a ⇒ b ⇒ c ⇒ d
 
 # Finch twice removed (F**)
-coh Fss {a b c d e : .} : (a -> d -> c -> b -> e) -> a -> b -> c -> d -> e
+coh Fss {a b c d e : .} : (a ⇒ d ⇒ c ⇒ b ⇒ e) ⇒ a ⇒ b ⇒ c ⇒ d ⇒ e
 
 # Goldfinch
 # λfgxy.fy(gx)
-coh G {a b c d : .} : (b -> c -> d) -> (a -> c) -> a -> b -> d
+coh G {a b c d : .} : (b ⇒ c ⇒ d) ⇒ (a ⇒ c) ⇒ a ⇒ b ⇒ d
 
 # Hummingbird
 # λfxy.fxyx
-coh H {a b c : .} : (a -> b -> a -> c) -> a -> b -> c
+coh H {a b c : .} : (a ⇒ b ⇒ a ⇒ c) ⇒ a ⇒ b ⇒ c
 
 # Idiot or identity bird.
 # λx.x
-coh I {a : .} : a -> a
+coh I {a : .} : a ⇒ a
 
 # Identity once removed
 # This is the same as B.
 # λfx.fx
-coh Is {a b : .} : (a -> b) -> a -> b
+coh Is {a b : .} : (a ⇒ b) ⇒ a ⇒ b
 
 # Identity twice removed
 # λfxy.fxy
-coh Iss {a b c : .} : (a -> b -> c) -> a -> b -> c
+coh Iss {a b c : .} : (a ⇒ b ⇒ c) ⇒ a ⇒ b ⇒ c
 
 # Alternative J combinator - this is the J combintor of Joy, Rayward-Smith and Burton (see. Antoni Diller 'Compiling Functional Languages' page 104). It is not the J - jay combinator of the literature.
-coh Jalt {a b c : .} : (a -> c) -> a -> b -> c
+coh Jalt {a b c : .} : (a ⇒ c) ⇒ a ⇒ b ⇒ c
 
 # J' combinator - from Joy, Rayward-Smith and Burton.
-coh Kalt' {a b c d : .} : (a -> b -> d) -> a -> b -> c -> d
+coh Kalt' {a b c d : .} : (a ⇒ b ⇒ d) ⇒ a ⇒ b ⇒ c ⇒ d
 
 # Jay. Discovered in 1935 by Barkley Rosser, along with I generates all non-erasing terms.
 # λfxyz.fx(fzy)
-# coh J {a b : .} : (a -> b -> b) -> a -> b -> a -> b
+# coh J {a b : .} : (a ⇒ b ⇒ b) ⇒ a ⇒ b ⇒ a ⇒ b
 
 # Kestrel or Konstant bird.
 # K x returns the konstant x. Curryfied first projection.
 # λxy.x
-coh K {a b : .} : a -> b -> a
+coh K {a b : .} : a ⇒ b ⇒ a
 
 # Kite
 # This is the konstant idiot: K I
 # Curryfied second projection. Corresponds to the encoding of false in the lambda calculus.
 # λxy.y
-coh Ki {a b : .} : a -> b -> b
+coh Ki {a b : .} : a ⇒ b ⇒ b
 
 # Lark (L)
 # λfx.fxx
-coh L {a b : .} : (a -> a -> b) -> a -> b
+coh L {a b : .} : (a ⇒ a ⇒ b) ⇒ a ⇒ b
 
 # M. Mocking bird. Also known as ω.
 # λx.xx
@@ -129,85 +129,85 @@ coh L {a b : .} : (a -> a -> b) -> a -> b
 
 # Owl
 # λxy.y(xy)
-#coh O {a b :. } : ((a -> b) -> a) -> (a -> b) -> b
+ncoh O {a b :. } : ((a ⇒ b) ⇒ a) ⇒ (a ⇒ b) ⇒ b
 
 # Phoenix. (Big) Phi combinator. This is the same function as starling'.
-coh Phi {a b c d : .} : (b -> c -> d) -> (a -> b) -> (a -> c) -> a -> d
+coh Phi {a b c d : .} : (b ⇒ c ⇒ d) ⇒ (a ⇒ b) ⇒ (a ⇒ c) ⇒ a ⇒ d
 
 # Psi combinator - psi bird
-# coh psi {a b c : .} : (b -> b -> c) -> (a -> b) -> a -> a -> c
+ncoh psi {a b c : .} : (b ⇒ b ⇒ c) ⇒ (a ⇒ b) ⇒ a ⇒ a ⇒ c
 
 # Quacky
-coh Q4 {a b c : .} : a -> (a -> b) -> (b -> c) -> c
+coh Q4 {a b c : .} : a ⇒ (a ⇒ b) ⇒ (b ⇒ c) ⇒ c
 
 # Queer. Reverse composition.
 # λgfx.f(gx)
-coh Q {a b c : .} : (a -> b) -> (b -> c) -> a -> c
+coh Q {a b c : .} : (a ⇒ b) ⇒ (b ⇒ c) ⇒ a ⇒ c
 
 # Quirky
-coh Q3 {a b c : .} : (a -> b) -> a -> (b -> c) -> c
+coh Q3 {a b c : .} : (a ⇒ b) ⇒ a ⇒ (b ⇒ c) ⇒ c
 
 # Quixotic
-coh Q1 {a b c : .} : (b -> c) -> a -> (a -> b) -> c
+coh Q1 {a b c : .} : (b ⇒ c) ⇒ a ⇒ (a ⇒ b) ⇒ c
 
 # Quizzical
-coh Q2 {a b c : .} : a -> (b -> c) -> (a -> b) -> c
+coh Q2 {a b c : .} : a ⇒ (b ⇒ c) ⇒ (a ⇒ b) ⇒ c
 
 # Robin
-coh R {a b c : .} : a -> (b -> a -> c) -> b -> c
+coh R {a b c : .} : a ⇒ (b ⇒ a ⇒ c) ⇒ b ⇒ c
 
 # Robin once removed (R*)
-coh Rs {a b c d : .} : (b -> c -> a -> d) -> a -> b -> c -> d
+coh Rs {a b c d : .} : (b ⇒ c ⇒ a ⇒ d) ⇒ a ⇒ b ⇒ c ⇒ d
 
 # Robin twice removed (R**)
-coh Rss {a b c d e : .} : (a -> c -> d -> b -> e) -> a -> b -> c -> d -> e
+coh Rss {a b c d e : .} : (a ⇒ c ⇒ d ⇒ b ⇒ e) ⇒ a ⇒ b ⇒ c ⇒ d ⇒ e
 
 # Starling
 # λfgx.fx(gx)
-coh S {a b c : .} : (a -> b -> c) -> (a -> b) -> a -> c
+coh S {a b c : .} : (a ⇒ b ⇒ c) ⇒ (a ⇒ b) ⇒ a ⇒ c
 
 # Starling'. Turner's Φ. This is the same function as phoenix.
-coh S' {a b c d : .} : (b -> c -> d) -> (a -> b) -> (a -> c) -> a -> d
+coh S' {a b c d : .} : (b ⇒ c ⇒ d) ⇒ (a ⇒ b) ⇒ (a ⇒ c) ⇒ a ⇒ d
 
 # Thrush. Transposed application. This is the crossed idiot once removed (CI*).
 # λxf.fx
-coh T {a b : .} : a -> (a -> b) -> b
+coh T {a b : .} : a ⇒ (a ⇒ b) ⇒ b
 
 # Turing.
 # λfx.f((xx)f)
 
 # Vireo. Pairing.
 # λxyf.fxy
-coh V {a b c : .} : a -> b -> (a -> b -> c) -> c
+coh V {a b c : .} : a ⇒ b ⇒ (a ⇒ b ⇒ c) ⇒ c
 
 # Vireo once removed (V*)
-# coh Vs {a b d : .} : (b -> a -> b -> d) -> a -> b -> b -> d
+ncoh Vs {a b d : .} : (b ⇒ a ⇒ b ⇒ d) ⇒ a ⇒ b ⇒ b ⇒ d
 
 # Vireo twice removed (V**)
-# coh Vss {a b c e : .} : (a -> c -> b -> c -> e) -> a -> b -> c -> c -> e
+ncoh Vss {a b c e : .} : (a ⇒ c ⇒ b ⇒ c ⇒ e) ⇒ a ⇒ b ⇒ c ⇒ c ⇒ e
 
 # Warbler. Elementary duplicator. Corresponds to ω* (Mocking once removed).
 # λfx.fxx
-coh W {a b : .} : (a -> a -> b) -> a -> b
+coh W {a b : .} : (a ⇒ a ⇒ b) ⇒ a ⇒ b
 
 # Crossed warbler.
 # λxf.fxx
-coh W1 {a b : .} : a -> (a -> a -> b) -> b
+coh W1 {a b : .} : a ⇒ (a ⇒ a ⇒ b) ⇒ b
 
 # Warbler once removed (W*)
 # λfxy.fxyy
-coh Ws {a b c : .} : (a -> b -> b -> c) -> a -> b -> c
+coh Ws {a b c : .} : (a ⇒ b ⇒ b ⇒ c) ⇒ a ⇒ b ⇒ c
 
 # Warbler twice removed (W**)
 # λfxyz.fxyzz
-coh Wss {a b c d : .} : (a -> b -> c -> c -> d) -> a -> b -> c -> d
+coh Wss {a b c d : .} : (a ⇒ b ⇒ c ⇒ c ⇒ d) ⇒ a ⇒ b ⇒ c ⇒ d
 
 # Iota.
 # Generates all terms by itself.
 # λx.xSK
-coh iota {a b c d e f : .} : (((a -> b -> c) -> (a -> b) -> a -> c) -> (d -> e -> d) -> f) -> f 
+coh iota {a b c d e f : .} : (((a ⇒ b ⇒ c) ⇒ (a ⇒ b) ⇒ a ⇒ c) ⇒ (d ⇒ e ⇒ d) ⇒ f) ⇒ f 
 
-coh ap {a b : .} (f : a -> b) (x : a) : b
+coh ap {a b : .} (f : a ⇒ b) (x : a) : b
 
 #
 # Derivations of certain birds from others
@@ -215,19 +215,19 @@ coh ap {a b : .} (f : a -> b) (x : a) : b
 
 # From B
 
-coh D-B {a b c d : .} : D ={(a -> c -> d) -> a -> (b -> c) -> b -> d} ap B B
+coh D-B {a b c d : .} : D ={(a ⇒ c ⇒ d) ⇒ a ⇒ (b ⇒ c) ⇒ b ⇒ d} ap B B
 
-coh E-B {a b c d e : .} : E ={(a -> d -> e) -> a -> (b -> c -> d) -> b -> c -> e} ap B (ap (ap B B) B)
+coh E-B {a b c d e : .} : E ={(a ⇒ d ⇒ e) ⇒ a ⇒ (b ⇒ c ⇒ d) ⇒ b ⇒ c ⇒ e} ap B (ap (ap B B) B)
 
 # From B and T
 
-coh R-BT {a b c : .} : R ={a -> (b -> a -> c) -> b -> c} ap (ap B B) T
+coh R-BT {a b c : .} : R ={a ⇒ (b ⇒ a ⇒ c) ⇒ b ⇒ c} ap (ap B B) T
 
 #
 # Relationship with SK
 #
 
 # # Owl can be defined
-# let O {a b : .} : ((a -> b) -> a) -> (a -> b) -> b := ap Ws C
+# let O {a b : .} : ((a ⇒ b) ⇒ a) ⇒ (a ⇒ b) ⇒ b := ap Ws C
 
-coh blackbird-bluebird {a b c d : .} : B1 ={(c -> d) -> (a -> b -> c) -> a -> b -> d} ap (ap B B) B
+coh blackbird-bluebird {a b c d : .} : B1 ={(c ⇒ d) ⇒ (a ⇒ b ⇒ c) ⇒ a ⇒ b ⇒ d} ap (ap B B) B

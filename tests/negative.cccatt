@@ -1,26 +1,28 @@
 ## Sanity checks: negative tests
 
 # Not habited
-ncoh (a : .) : a
+ncoh _ (a : .) : a
 
 # Not habited
-ncoh (a b : .) : a → b
+ncoh _ (a b : .) : a ⇒ b
 
 # Not habited and non-terminating
-ncoh (a : .) : (a → a) → a
+ncoh _ (a : .) : (a ⇒ a) ⇒ a
 
 # Not contractible
-ncoh (a : .) : a → a → a
+ncoh _ (a : .) : a ⇒ a ⇒ a
 
 # Not contractible
-ncoh (a : .) : (a → a) → a → a
+ncoh _ (a : .) : (a ⇒ a) ⇒ a ⇒ a
 
 # Contractible but not a coherence
-ncoh (a b : .) : (b → a) → a → a
+ncoh _ (a b : .) : (b ⇒ a) ⇒ a ⇒ a
 
 # Deterministic but not a coherence
-ncoh (a b : .) : b → b → a → a
+ncoh _ (a b : .) : b ⇒ b ⇒ a ⇒ a
 
-ncoh (a : .) (x y : a) : x = y
+# We are not trivial
+ncoh _ (a : .) (x y : a) : x = y
 
-ncoh (a b : .) (f g : a → b) : f = g
+# We are not trivial
+ncoh _ (a b : .) (f g : a ⇒ b) : f = g

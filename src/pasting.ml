@@ -6,7 +6,7 @@ open Term
 
 (** Check whether a type is a pasting scheme in the theory of ccc, for an implicational formula. *)
 let check_ccc a =
-  (* printf "* check_ps %s\n%!" (to_string a); *)
+  (* printf "* check ccc: %s\n%!" (to_string a); *)
   let rec target a =
     match a.desc with
     | Var x -> x
@@ -44,18 +44,18 @@ let check_ccc a =
     let rec depth a =
       match a.desc with
       | Var _ -> 0
-      | Hom (a, b) -> max (1 + depth a) (depth b)
+      | Hom _ -> 0
+      | Arr (_, a, b) -> max (1 + depth a) (depth b)
       | _ -> assert false
     in
-    match !Setting.depth with
-    | Some d -> if depth a > d then failure a.pos "pasting has depth %d but we are limited to %d" (depth a) d
-    | None -> ()
+    if depth a > !Setting.dimension then failure a.pos "pasting has depth %d but we are limited to %d" (depth a) !Setting.dimension
   in
   prove [] [] a
 
 (** Whether a type in a context is a pasting scheme. *)
 let check ~pos l a =
-  (* printf "* check_ps: %s\n%!" (to_string (pis l a)); *)
+  (* printf "* check_ps: %s\n%!" (to_string (pis_explicit l a)); *)
+
   (* Remove variable declarations from the context. *)
   let vars, l =
     let split_vars l =
@@ -66,7 +66,9 @@ let check ~pos l a =
     in
     split_vars l
   in
-  (* Remove indentities in arguments. *)
+  (* printf "**** without variables: %s\n%!" (to_string (pis_explicit l a)); *)
+
+  (* Remove identities/higher arrows in the context. *)
   let vars, l, a =
     (* Apply rewriting rules. *)
     let rec rewrite rw (e:Term.t) =
@@ -79,25 +81,39 @@ let check ~pos l a =
           | Some e' -> mk e'.desc
           | None -> e
         )
+      | Arr (a, t, u) -> mk (Arr (rewrite a, rewrite t, rewrite u))
       | Hom (a, b) -> mk (Hom (rewrite a, rewrite b))
       | Prod (a, b) -> mk (Prod (rewrite a, rewrite b))
       | One -> mk One
       | Id (a, t, u) -> mk (Id (rewrite a, rewrite t, rewrite u))
       | Obj -> e
       | App (i, t, u) -> mk (App (i, rewrite t, rewrite u))
+      | Coh (n, l, a, s) ->
+        let s = List.map (fun (x,t) -> x, rewrite t) s in
+        mk (Coh (n, l, a, s))
       | Meta { value = Some t; _ } -> rewrite t
       | Meta { value = None; _ } -> error ~pos:e.pos "unresolved metvariable %s when checking pasting conditions" (to_string e)
       | _ -> error ~pos:e.pos "TODO: in rewrite handle %s" (to_string e)
     in
+
+    (* Add a new rule to the rewriting system. *)
+    let add_rule rw x t =
+      assert (not (has_fv x t));
+      assert (not (List.exists (fun (y,_) -> x = y) rw));
+      let t = rewrite rw t in
+      let rw = List.map (fun (y,u) -> y, rewrite [x,t] u) rw in
+      ((x,t)::rw)
+    in
+
     (* Orient identities on variables as rewriting rules and normalize l. *)
+    (* TODO: set dim to 0 and check that we are not a coboundary *)
     let rec aux rw = function
-      | (_, {desc = Id (_, {desc = Var x; _}, t); _})::l
-      | (_, {desc = Id (_, t, {desc = Var x; _}); _})::l ->
-        assert (not (has_fv x t));
-        let t = rewrite rw t in
-        let rw = List.map (fun (y,u) -> y, rewrite [x,t] u) rw in
-        (* printf "rewrite: %s -> %s\n%!" x (to_string t); *)
-        aux ((x,t)::rw) l
+      | (_, {desc = Id (_, {desc = Var x; _}, t); _})::l -> aux (add_rule rw x t) l
+      | (_, {desc = Id (_, t, {desc = Var x; _}); _})::l -> aux (add_rule rw x t) l
+      | (_, {desc = Arr (o, {desc = Var x; _}, t); _})::l
+        when dim o >= 1 -> aux (add_rule rw x t) l
+      | (_, {desc = Arr (o, t, {desc = Var x; _}); _})::l
+        when dim o >= 1 -> aux (add_rule rw x t) l
       | (_, {desc = Id _; pos})::_ -> failure pos "could not eliminate identity"
       | (x, a)::l ->
         let a = rewrite rw a in
@@ -112,7 +128,8 @@ let check ~pos l a =
     let vars = List.diff vars (List.map fst rw) in
     vars, l, rewrite rw a
   in
-  (* printf "**** after removal: %s\n%!" (to_string (pis l a)); *)
+  (* printf "**** after removal: %s\n%!" (to_string (pis_explicit l a)); *)
+
   (* Ensure that the declared variables are exactly the free variables. *)
   let () =
     let a = homs ~pos (List.map snd l) a in
@@ -121,11 +138,13 @@ let check ~pos l a =
         match a.desc with
         | Var x -> if not (List.mem x fv) then x::fv else fv
         | Obj -> fv
+        | Arr (a, t, u) -> fv |> aux a |> aux t |> aux u
         | Hom (a, b) -> fv |> aux a |> aux b
         | Prod (a, b) -> fv |> aux a |> aux b
         | One -> fv
         | Id (a, t, u) -> fv |> aux a |> aux t |> aux u
         | App (_, t, u) -> fv |> aux t |> aux u
+        | Coh (_,_,_,s) -> List.fold_left (fun fv (_,t) -> aux t fv) fv s
         | _ -> failwith "TODO: fv handle %s" (to_string a)
       in
       aux a []
@@ -133,18 +152,28 @@ let check ~pos l a =
     let d = List.diff vars (fv a) in
     if d <> [] then failure a.pos "unused variables: %s" (String.concat ", " d)
   in
+
   (* An identity is provable when its type is contractible. *)
   let a =
-    match a.desc with
-    | Id (a, _, _) -> a
-    | _ -> a
+    let rec aux a =
+      match a.desc with
+      | Arr(a, _, _) when not (is_obj a) -> aux a
+      | Id (a, _, _) -> aux a
+      | _ -> a
+    in
+    aux a
   in
   match !Setting.mode with
 
   | `Cartesian_closed ->
+
     (* Turn products into arrows. *)
     let rec deproduct e =
       match e.desc with
+      | Arr (o, a, b) when is_obj o ->
+        let aa = deproduct a in
+        let bb = deproduct b in
+        List.map (fun b -> homs ~pos:e.pos aa b) bb
       | Hom (a, b) ->
         let aa = deproduct a in
         let bb = deproduct b in
@@ -180,12 +209,14 @@ let check ~pos l a =
 *)
 
   | `Category ->
+
     let get_arr a =
       match (unmeta a).desc with
-      | Hom (a, b) ->
-        if not (is_var a) then failure a.pos "variable expected";
-        if not (is_var b) then failure b.pos "variable expected";
-        a, b
+      | Arr (a, t, u) ->
+        if not (is_obj a) then failure a.pos "1-dimensional arrow expected";
+        if not (is_var t) then failure t.pos "variable expected";
+        if not (is_var u) then failure u.pos "variable expected";
+        t, u
       | _ ->
         failure a.pos "arrow expected"
     in
@@ -194,27 +225,27 @@ let check ~pos l a =
     let a, b = get_arr a in
     let eq = eq_var in
     (* Check that we have a unique path from b to a. *)
-    let rec check seen b =
-      (* Find the unique antecedent. *)
-      let rec find = function
-        | (a,b')::l when eq b b' ->
+    let rec check seen l b =
+      if l = [] then
+        begin
+          if not (eq a b) then failure b.pos "no producer for %s" (to_string b)
+        end
+      else
+      if eq a b
+      then failure pos "useless hypothesis: %s" (String.concat ", " @@ List.map (fun (a, b) -> to_string @@ mk (Arr (mk Obj, a, b))) l)
+      else
+        match List.find_and_remove_opt (fun (_,b') -> eq b b') l with
+        | Some ((a, _), l) ->
           List.iter (fun (_,b') -> if eq b b' then failure b'.pos "multiple producers for %s" (to_string b)) l;
-          Some a
-        | _::l -> find l
-        | [] -> None
-      in
-      let seen = b::seen in
-      match find l with
-      | Some a ->
-        if List.exists (fun a' -> eq a a') seen then failure pos "cyclic dependencies";
-        check seen a
-      | None ->
-        (* Note that we ensure that a is terminal so that there is no cycle (ie another path from a to b) *)
-        if not (eq a b) then failure b.pos "no producer for %s" (to_string b)
+          List.iter (fun a' -> if eq a a' then failure a'.pos "cyclic dependencies %s already produced" (to_string a)) seen;
+          check (a::seen) l a
+        | None ->
+          failure b.pos "no producer for %s" (to_string b)
     in
-    check [] b
+    check [] l b
 
   | `Monoidal ->
+
     (* Make sure that the types are arrows between tensor expressions. *)
     let rec get_tens a =
       match (unmeta a).desc with
@@ -225,7 +256,7 @@ let check ~pos l a =
     in
     let get_arr a =
       match (unmeta a).desc with
-      | Hom (a, b) ->
+      | Arr (o, a, b) when is_obj o ->
         let a' = get_tens a in
         let b' = get_tens b in
         if a' = [] then failure a.pos "type cannot be empty";
@@ -287,6 +318,7 @@ let check ~pos l a =
     check [] b
 
   | `Cartesian ->
+
     let module S = Set.Make(struct type nonrec t = t let compare = compare_var end) in
     let rec get_prod ?(distinct=false) a =
       let a0 = a in
@@ -302,7 +334,7 @@ let check ~pos l a =
     in
     let get_arr a =
       match (unmeta a).desc with
-      | Hom (a, b) -> (a, b)
+      | Arr (o, a, b) when is_obj o -> (a, b)
       | _ -> failure a.pos "arrow expected"
     in
     let l = List.map snd l in
@@ -324,6 +356,7 @@ let check ~pos l a =
     if not (S.subset b available) then failure pos "some variables cannot be produced: %s" (S.diff b available |> S.to_seq |> List.of_seq |> List.map to_string |> String.concat ", ")
 
   | `Symmetric_monoidal ->
+
     let module S = Set.Make(struct type nonrec t = t let compare = compare_var end) in
     (* Make sure that the types are arrows between tensor expressions. *)
     let rec get_tens a =
@@ -340,7 +373,7 @@ let check ~pos l a =
     in
     let get_arr a =
       match (unmeta a).desc with
-      | Hom (a, b) ->
+      | Arr (o, a, b) when is_obj o ->
         let a' = get_tens a in
         let b' = get_tens b in
         if S.is_empty a' then failure a.pos "type cannot be empty";
@@ -405,5 +438,5 @@ let check ~pos l a =
     in
     let env = prove [] a in
     if env <> [] then failure pos "unused hypothesis: %s" (env |> List.map to_string |> String.concat ", ")
-      
+
   | _ -> failwith "unhandled mode"
