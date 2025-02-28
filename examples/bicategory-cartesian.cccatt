@@ -2,8 +2,8 @@
 #
 # See for instance _A type theory for cartesian closed bicategories_ by Fiore and Saville
 #
-# mode: cartesian
-# dimension: 2
+#-# mode: cartesian
+#-# dimension: 2
 
 include "bicategory.cccatt"
 
