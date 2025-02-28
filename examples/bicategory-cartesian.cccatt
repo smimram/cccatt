@@ -41,4 +41,8 @@ coh pa2-cong {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} {α α' : co
 
 ## Admissible rules
 
-# let pa-id2 {a b c : .} (f : a -> b * c) : pa2 (id2 _) (id2 _) -> _ := _
+coh pa-fun {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : pa f g -> pa f' g'
+
+coh pa-id2 {a b c : .} (f : a -> b) (g : a -> c) : pa-fun (id2 f) (id2 g) -> id2 (pa f g)
+
+coh pa-fun-co2 {a b c : .} {f f' f'' : a -> b} {g g' g'' : a -> c} (α : f -> f') (α' : f' -> f'') (β : g -> g') (β' : g' -> g'') : co2 (pa-fun α β) (pa-fun α' β') = pa-fun (co2 α α') (co2 β β')
