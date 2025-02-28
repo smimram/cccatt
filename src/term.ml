@@ -20,6 +20,7 @@ and desc =
   | Arr  of t * t * t (** arrow type *)
   | Hom  of t * t (** internal hom type *)
   | Prod of t * t (** product type *)
+  | Op   of t (** opposite of a type *)
   | One (** terminal type *)
   | Meta of meta (** a variable to be unified *)
   | Obj  (** object type *)
@@ -81,6 +82,7 @@ let rec to_string ?(pa=false) e =
   | Hom (a, b) -> Printf.sprintf "%s ⇒ %s" (to_string ~pa:true a) (to_string b) |> pa
   | Prod (a, b) -> Printf.sprintf "%s × %s" (to_string ~pa:true a) (to_string b) |> pa
   | One -> "1"
+  | Op a -> "! " ^ to_string ~pa:true a
   | Id (a, t, u) ->
     Printf.sprintf "(%s = %s : %s)" (to_string ~pa:true t) (to_string ~pa:true u) (to_string ~pa:true a) |> pa
   | Meta m ->
@@ -234,6 +236,7 @@ let metavariables e =
     | One -> acc
     | Arr (a, t, u)
     | Id (a, t, u) -> acc |> aux a |> aux t |> aux u
+    | Op a -> acc |> aux a
     | Meta m ->
       (
         let acc = if List.memq m acc then acc else m::acc in

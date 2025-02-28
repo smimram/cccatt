@@ -99,6 +99,7 @@ and eval env e =
   | Arr (a, t, u) -> mk (Arr (eval env a, eval env t, eval env u))
   | Hom (a, b) -> mk (Hom (eval env a, eval env b))
   | Prod (a, b) -> mk (Prod (eval env a, eval env b))
+  | Op a -> mk (Op (eval env a))
   | One -> mk One
   | Type -> mk Type
   | Meta { value = Some t; _ } -> eval env t
@@ -185,6 +186,9 @@ and infer tenv env (e:Term.t) =
   | One ->
     if not (Setting.has_one ()) then failure e.pos "unit not allowed in this mode";
     mk ~pos One, mk ~pos Obj
+  | Op a ->
+    let a = check tenv env a (mk ~pos:a.pos Obj) in
+    mk ~pos (Op a), mk ~pos Obj
   | Type ->
     mk ~pos Type, mk ~pos Type
   | Meta m ->

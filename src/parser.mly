@@ -19,7 +19,7 @@ let pis ?pos l a =
 %}
 
 %token LET NCOH FUN TO HOLE
-%token COH ARR HOM EQ IEQ EQDEF OBJ TIMES ONE
+%token COH ARR HOM EQ IEQ EQDEF OBJ TIMES ONE OP
 %token LPAR RPAR LACC RACC COL
 %token <string> IDENT
 %token <string> INCLUDE
@@ -56,6 +56,7 @@ expr:
   | expr EQ eqtype expr { mk (Arr ($3, $1, $4)) }
   | expr IEQ eqtype expr { mk (Id ($3, $1, $4)) }
   | expr TIMES expr { mk (Prod ($1, $3)) }
+  | OP expr { mk (Op $2) }
   | aexpr { $1 }
 
 aexpr:
