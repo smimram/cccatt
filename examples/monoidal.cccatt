@@ -12,6 +12,8 @@ coh co {a b c : .} (f : a -> b) (g : b -> c) : a -> c
 
 let co3 {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) := co f (co g h)
 
+let co5 {a0 a1 a2 a3 a4 a5 : .} (f1 : a0 -> a1) (f2 : a1 -> a2) (f3 : a2 -> a3) (f4 : a3 -> a4) (f5 : a4 -> a5) := co f1 (co f2 (co f3 (co f4 f5)))
+
 coh unitl {a b : .} (f : a -> b) : co id f = f
 
 coh unitr {a b : .} (f : a -> b) : co f id = f
@@ -22,42 +24,42 @@ coh assoc {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) : co (co f g) h =
 
 coh te {a a' b b' : .} (f : a -> a') (g : b -> b') : a * b -> a' * b'
 
-coh assoc {a b c : .} : (a * b) * c -> a * (b * c)
+coh tassoc {a b c : .} : (a * b) * c -> a * (b * c)
 
-coh assoc' {a b c : .} : a * (b * c) -> (a * b) * c
+coh tassoc' {a b c : .} : a * (b * c) -> (a * b) * c
 
-coh unitl {a : .} : 1 * a -> a
+coh tunitl {a : .} : 1 * a -> a
 
-coh unitl' {a : .} : a -> 1 * a
+coh tunitl' {a : .} : a -> 1 * a
 
-coh unitr {a : .} : a * 1 -> a
+coh tunitr {a : .} : a * 1 -> a
 
-coh unitr' {a : .} : a -> a * 1
+coh tunitr' {a : .} : a -> a * 1
 
 ## Invertibility
 
-coh unitl-unitl' {a : .} : co unitl unitl' = id {1 * a}
+coh tunitl-tunitl' {a : .} : co tunitl tunitl' = id {1 * a}
 
-coh unitl'-unitl {a : .} : co unitl' unitl = id {a}
+coh tunitl'-tunitl {a : .} : co tunitl' tunitl = id {a}
 
-coh unitr-unitr' {a : .} : co unitr unitr' = id {a * 1}
+coh tunitr-tunitr' {a : .} : co tunitr tunitr' = id {a * 1}
 
-coh unitr'-unitr {a : .} : co unitr' unitr = id {a}
+coh tunitr'-tunitr {a : .} : co tunitr' tunitr = id {a}
 
-coh assoc-assoc' {a b c : .} : co assoc assoc' = id {(a * b) * c}
+coh tassoc-tassoc' {a b c : .} : co tassoc tassoc' = id {(a * b) * c}
 
-coh assoc'-assoc {a b c : .} : co assoc' assoc = id {a * (b * c)}
+coh tassoc'-tassoc {a b c : .} : co tassoc' tassoc = id {a * (b * c)}
 
 ## Naturality
 
-coh unitl-nat {a b : .} (f : a -> b) : co (te id f) unitl = co unitl f
+coh tunitl-nat {a b : .} (f : a -> b) : co (te id f) tunitl = co tunitl f
 
-coh unitr-nat {a b : .} (f : a -> b) : co (te f id) unitr = co unitr f
+coh tunitr-nat {a b : .} (f : a -> b) : co (te f id) tunitr = co tunitr f
 
-coh assoc-nat {a a' b b' c c' : .} (f : a -> a') (g : b -> b') (h : c -> c') : co (te (te f g) h) assoc = co assoc (te f (te g h))
+coh tassoc-nat {a a' b b' c c' : .} (f : a -> a') (g : b -> b') (h : c -> c') : co (te (te f g) h) tassoc = co tassoc (te f (te g h))
 
 ## Axioms
 
-coh triangle {a b : .} : co assoc (te id unitl) ={ (a * 1) * b -> a * b } te unitr id
+coh triangle {a b : .} : co tassoc (te id tunitl) ={ (a * 1) * b -> a * b } te tunitr id
 
-coh pentagon {a b c d : .} : co3 (te assoc id) assoc (te id assoc) ={ ((a * b) * c) * d -> a * (b * (c * d)) } co assoc assoc
+coh pentagon {a b c d : .} : co3 (te tassoc id) tassoc (te id tassoc) ={ ((a * b) * c) * d -> a * (b * (c * d)) } co tassoc tassoc

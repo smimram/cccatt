@@ -87,6 +87,7 @@ let check ~pos l a =
       | One -> mk One
       | Id (a, t, u) -> mk (Id (rewrite a, rewrite t, rewrite u))
       | Obj -> e
+      | Op a -> mk (Op (rewrite a))
       | App (i, t, u) -> mk (App (i, rewrite t, rewrite u))
       | Coh (n, l, a, s) ->
         let s = List.map (fun (x,t) -> x, rewrite t) s in
@@ -145,6 +146,7 @@ let check ~pos l a =
         | Hom (a, b) -> fv |> aux a |> aux b
         | Prod (a, b) -> fv |> aux a |> aux b
         | One -> fv
+        | Op a -> fv |> aux a
         | Id (a, t, u) -> fv |> aux a |> aux t |> aux u
         | App (_, t, u) -> fv |> aux t |> aux u
         | Coh (_,_,_,s) -> List.fold_left (fun fv (_,t) -> aux t fv) fv s
@@ -447,7 +449,8 @@ let check ~pos l a =
       | One -> S.empty, S.empty
       | Prod (a, b) -> union (get_tens a) (get_tens b)
       | Op a -> neg @@ get_tens a
-      | _ -> failure a.pos "unhandled type"
+      | Arr (o, a, b) when is_obj o -> union (neg @@ get_tens a) (get_tens b)
+      | _ -> failure a.pos "unhandled type: %s" @@ to_string a
     in
     let l = List.fold_left union (S.empty,S.empty) @@ List.map get_tens @@ List.map snd l in
     let v, v' = union (neg l) (get_tens a) in

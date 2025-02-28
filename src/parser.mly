@@ -30,6 +30,7 @@ let pis ?pos l a =
 %right HOM
 %right TIMES
 %right EQ IEQ
+%nonassoc OP
 
 %start prog
 %type <Term.prog> prog
