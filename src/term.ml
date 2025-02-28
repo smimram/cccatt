@@ -199,12 +199,12 @@ let rec has_fv x e =
   | _ -> error ~pos:e.pos "has_fv: handle %s" (to_string e)
 
 let is_var e =
-  match e.desc with
+  match (unmeta e).desc with
   | Var _ -> true
   | _ -> false
 
 let is_obj e =
-  match e.desc with
+  match (unmeta e).desc with
   | Obj -> true
   | _ -> false
 

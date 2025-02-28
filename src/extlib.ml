@@ -16,6 +16,15 @@ module List = struct
       else Option.map (fun (y, l) -> y, x::l) (find_and_remove_opt p l)
     | [] -> None
 
+  let rec find_map_and_remove_opt f = function
+    | x::l ->
+      (
+        match f x with
+        | Some x' -> Some (x', l)
+        | None -> Option.map (fun (y, l) -> y, x::l) (find_map_and_remove_opt f l)
+      )
+    | [] -> None
+
   let included l1 l2 =
     List.for_all (fun x -> mem x l2) l1
 

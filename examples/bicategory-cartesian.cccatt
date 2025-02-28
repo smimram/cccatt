@@ -39,6 +39,8 @@ coh pa2-eta {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} (α : h -> pa
 # cong
 # coh pa2-cong {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} {α α' : co1 h fst -> f} {β β' : co1 h snd -> g} (_ : α -> α') (_ : β -> β') : pa2 h α β -> pa2 h α' β'
 
+coh pa2-cong-todo {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} {α : co1 h fst -> f} {β : co1 h snd -> g} : pa2 h α β -> pa2 h α β
+
 ## Admissible rules
 
 # let pa-id2 {a : .} : pa (i

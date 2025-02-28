@@ -96,46 +96,49 @@ let check ~pos l a =
       | _ -> error ~pos:e.pos "TODO: in rewrite handle %s" (to_string e)
     in
 
-    (* Add a new rule to the rewriting system. *)
-    let add_rule rw x t =
-      assert (not (has_fv x t));
-      assert (not (List.exists (fun (y,_) -> x = y) rw));
-      let t = rewrite rw t in
-      let rw = List.map (fun (y,u) -> y, rewrite [x,t] u) rw in
-      ((x,t)::rw)
-    in
-
     (* Orient identities on variables as rewriting rules and normalize l. *)
-    (* TODO: set dim to 0 and check that we are not a coboundary *)
-    let rec aux rw = function
-      | (_, {desc = Id (_, {desc = Var x; _}, t); _})::l -> aux (add_rule rw x t) l
-      | (_, {desc = Id (_, t, {desc = Var x; _}); _})::l -> aux (add_rule rw x t) l
-      | (_, {desc = Arr (o, {desc = Var x; _}, t); _})::l
-        when not (has_fv x t) && not (List.exists (fun (y,_) -> x = y) rw) && dim o >= 1 -> aux (add_rule rw x t) l
-      | (_, {desc = Arr (o, t, {desc = Var x; _}); _})::l
-        when not (has_fv x t) && not (List.exists (fun (y,_) -> x = y) rw) && dim o >= 1 -> aux (add_rule rw x t) l
-      | (_, {desc = Id _; pos})::_ -> failure pos "could not eliminate identity"
-      | (x, a)::l ->
-        let a = rewrite rw a in
-        let rw, l = aux rw l in
-        rw, (x,a)::l
-      | [] -> rw, []
+    (* TODO: check that we are not a coboundary *)
+    (* TODO: this makes us construct (∞,1)-categories, we should also investigate (∞,∞)-... *)
+    let rec simplify rw l =
+      let check (r, a) =
+        let valid (x,t) =
+          (* occurs check *)
+          not (has_fv x t) &&
+          (* the rule is not a boundary *)
+          not (List.exists (fun (_,a) -> has_fv r a) l) &&
+          (* there is no rewrite rule on this already *)
+          not (List.exists (fun (y,_) -> x = y) rw)
+        in
+        match a.desc with
+        | Id (_, {desc = Var x; _}, t) -> Some (x,t)
+        | Id (_, t, {desc = Var x; _}) -> Some (x,t)
+        | Arr (o, {desc = Var x; _}, t) when valid (x,t) && dim o >= 1 -> Some (x,t)
+        | Arr (o, t, {desc = Var x; _}) when valid (x,t) && dim o >= 1 -> Some (x,t)
+        | _ -> None
+      in
+      match List.find_map_and_remove_opt check l with
+      | Some ((x,t),l) ->
+        (* printf "add rule %s -> %s\n" x (to_string t); *)
+        let t = rewrite rw t in
+        let rw = List.map (fun (y,u) -> y, rewrite [x,t] u) rw in
+        let rw = (x,t)::rw in
+        simplify rw l
+      | None -> rw, l
     in
-    let rw, l = aux [] l in
-    (* printf "rw: %s\n%!" (List.map (fun (x,t) -> Printf.sprintf "%s -> %s" x (to_string t)) rw |> String.concat ", "); *)
+    let rw, l = simplify [] l in
     (* Remove rewritten variables. *)
     let l = List.filter (fun (x,_) -> not (List.mem_assoc x rw)) l in
     let vars = List.diff vars (List.map fst rw) in
     vars, l, rewrite rw a
   in
-  (* printf "**** after removal: %s\n%!" (to_string (pis_explicit l a)); *)
+  (* printf "**** after simplification: %s\n%!" (to_string (pis_explicit l a)); *)
 
   (* Ensure that the declared variables are exactly the free variables. *)
   let () =
     let a = homs ~pos (List.map snd l) a in
     let fv a =
       let rec aux a fv =
-        match a.desc with
+        match (unmeta a).desc with
         | Var x -> if not (List.mem x fv) then x::fv else fv
         | Obj -> fv
         | Arr (a, t, u) -> fv |> aux a |> aux t |> aux u
@@ -145,7 +148,7 @@ let check ~pos l a =
         | Id (a, t, u) -> fv |> aux a |> aux t |> aux u
         | App (_, t, u) -> fv |> aux t |> aux u
         | Coh (_,_,_,s) -> List.fold_left (fun fv (_,t) -> aux t fv) fv s
-        | _ -> failwith "TODO: fv handle %s" (to_string a)
+        | _ -> failure a.pos "TODO: fv handle %s" (to_string a)
       in
       aux a []
     in
@@ -213,7 +216,7 @@ let check ~pos l a =
     let get_arr a =
       match (unmeta a).desc with
       | Arr (a, t, u) ->
-        if not (is_obj a) then failure a.pos "1-dimensional arrow expected";
+        if not (is_obj a) then failure a.pos "1-dimensional arrow expected, got %s" (to_string a);
         if not (is_var t) then failure t.pos "variable expected";
         if not (is_var u) then failure u.pos "variable expected";
         t, u
@@ -319,6 +322,7 @@ let check ~pos l a =
 
   | `Cartesian ->
 
+    (* printf "cartesian pasing scheme : %s ⊢ %s\n" (string_of_context l) (to_string a); *)
     let module S = Set.Make(struct type nonrec t = t let compare = compare_var end) in
     let rec get_prod ?(distinct=false) a =
       let a0 = a in
