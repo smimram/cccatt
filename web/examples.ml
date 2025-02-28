@@ -10,6 +10,8 @@ let category = [%blob "../examples/category.cccatt"]
 let monoidal = [%blob "../examples/monoidal.cccatt"]
 let symmetric = [%blob "../examples/symmetric.cccatt"]
 let cartesian = [%blob "../examples/cartesian.cccatt"]
+let bicategory = [%blob "../examples/bicategory.cccatt"]
+let cartesian_bicategory = [%blob "../examples/bicategory-cartesian.cccatt"]
 
 let get = function
   | "none" -> ""
@@ -25,4 +27,6 @@ let get = function
   | "monoidal" -> monoidal
   | "symmetric" -> symmetric
   | "cartesian" -> cartesian
+  | "bicategory" -> bicategory
+  | "cartesian-bicategory" -> cartesian_bicategory
   | _ -> ""

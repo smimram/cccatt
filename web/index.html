@@ -27,8 +27,8 @@
 
       <div id="dropdowns">
         <div class="dropdown">
-          <label for="examples">Examples:</label>
-          <select name="examples" id="examples">
+          <label for="example">Example:</label>
+          <select name="example" id="example">
             <option value="none">None</option>
             <option value="ccc">Cartesian closed categories</option>
             <option value="ccc2">Cartesian closed categories (take 2)</option>
@@ -40,13 +40,15 @@
             <option value="symmetric">Symmetric monoidal categories</option>
             <option value="cartesian">Cartesian categories</option>
             <option value="linear">Linear λ-calculus</option>
+            <option value="bicategory">Bicategories</option>
+            <option value="cartesian-bicategory">Cartesian bicategories</option>
             <option value="tests">Tests</option>
             <option value="implicit">Tests with implicit arguments</option>
           </select>
         </div>
 
         <div class="dropdown">
-          <label for="examples">Mode:</label>
+          <label for="mode">Mode:</label>
           <select name="mode" id="mode">
             <option value="ccc">Cartesian closed categories</option>
             <option value="category">Categories</option>
@@ -55,6 +57,11 @@
             <option value="smcc">Symmetric monoidal closed categories</option>
             <option value="cartesian category">Cartesian categories</option>
           </select>
+        </div>
+
+        <div class="dropdown">
+          <label for="dim">Dim:</label>
+          <input name="dim" id="dim" type="number" value="1" size="1"/>
         </div>
       </div>
 

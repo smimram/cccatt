@@ -37,8 +37,9 @@ let run _ =
   let output = get_element_by_id "output" |> Html.CoerceTo.textarea |> jsget in
   let send = get_element_by_id "send" |> Html.CoerceTo.button |> jsget in
   let clear = get_element_by_id "clear" |> Html.CoerceTo.button |> jsget in
-  let examples = get_element_by_id "examples" |> Html.CoerceTo.select |> jsget in
+  let example = get_element_by_id "example" |> Html.CoerceTo.select |> jsget in
   let mode = get_element_by_id "mode" |> Html.CoerceTo.select |> jsget in
+  let dim = get_element_by_id "dim" |> Html.CoerceTo.input |> jsget in
 
   let print s =
     let s = Js.to_string output##.value ^ s in
@@ -49,7 +50,7 @@ let run _ =
     print ("=¡.¡= Error: " ^ s ^ "\n")
   in
   let set_mode () =
-    let mode = mode##.value |> Js.to_string in
+    let mode = Js.to_string mode##.value in
     Setting.parse ("mode : " ^ mode)
   in
   let read () =
@@ -65,7 +66,7 @@ let run _ =
   let load_example () =
     mode##.value := Js.string "ccc";
     set_mode ();
-    input##.value := examples##.value |> Js.to_string |> Examples.get |> Js.string;
+    input##.value := example##.value |> Js.to_string |> Examples.get |> Js.string;
     do_send ();
   in
   Common.print_fun := print;
@@ -83,6 +84,7 @@ let run _ =
        in
        mode##.value := Js.string m
     );
+  Setting.on_dim (fun d -> dim##.value := Js.string @@ string_of_int d);
 
   send##.onclick :=
     Html.handler
@@ -97,7 +99,7 @@ let run _ =
          output##.value := Js.string "";
          Js.bool true
       );
-  examples##.onchange :=
+  example##.onchange :=
     Html.handler
       (fun _ ->
          load_example ();
@@ -109,6 +111,12 @@ let run _ =
          set_mode ();
          Js.bool true
       );
+  dim##.onchange :=
+    Html.handler
+      (fun _ ->
+         Setting.set_dim @@ int_of_string @@ Js.to_string dim##.value;
+         Js.bool true
+      );
 
   input##focus;
   input##select;
@@ -117,7 +125,7 @@ let run _ =
     let ex = Url.Current.get_fragment () in
     if ex <> "" then
       (
-        examples##.value := Js.string ex;
+        example##.value := Js.string ex;
         load_example ()
       )
   end;
