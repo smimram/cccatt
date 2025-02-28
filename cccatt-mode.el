@@ -3,7 +3,7 @@
 (defvar cccatt-font-lock-keywords
  '(
    ("#.*" . 'font-lock-comment-face)
-   ("\\<\\(let\\|coh\\|ncoh\\|include\\)\\>\\|:\\|=\\|→\\|->\\|⇒\\|=>\\|×\\|*\\|\\." . font-lock-keyword-face)
+   ("\\<\\(let\\|coh\\|ncoh\\|include\\)\\>\\|:\\|=\\|→\\|->\\|⇒\\|=>\\|⇔\\|<=>\\|×\\|*\\|\\." . font-lock-keyword-face)
    ;; ("\\<\\(Hom\\|Type\\)\\>\\|->" . font-lock-builtin-face)
    ;; ("\\<\\(\\)\\>" . font-lock-constant-face)
    ("\\<let[ \t]+\\([^ (=]*\\)" 1 'font-lock-function-name-face)

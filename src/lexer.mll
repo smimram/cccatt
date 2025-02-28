@@ -43,6 +43,8 @@ rule token = parse
   | "×" as s { utf8 s lexbuf; TIMES }
   | "1" { ONE }
   | "=" { EQ }
+  | "<=>" { IEQ }
+  | "⇔" as s { utf8 s lexbuf; IEQ }
   | ":=" { EQDEF }
   | "_" { HOLE }
   | "include \""([^'"']* as filename)"\"" { INCLUDE filename }

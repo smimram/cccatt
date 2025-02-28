@@ -19,7 +19,7 @@ let pis ?pos l a =
 %}
 
 %token LET NCOH FUN TO HOLE
-%token COH ARR HOM EQ EQDEF OBJ TIMES ONE
+%token COH ARR HOM EQ IEQ EQDEF OBJ TIMES ONE
 %token LPAR RPAR LACC RACC COL
 %token <string> IDENT
 %token <string> INCLUDE
@@ -29,7 +29,7 @@ let pis ?pos l a =
 %right TO
 %right HOM
 %right TIMES
-%right EQ
+%right EQ IEQ
 
 %start prog
 %type <Term.prog> prog
@@ -53,8 +53,8 @@ expr:
   | FUN args TO expr { abss $2 $4 }
   | expr ARR expr { mk (Arr (hole ~pos:(defpos()) (), $1, $3)) }
   | expr HOM expr { mk (Hom ($1, $3)) }
-  | expr EQ expr { if Setting.has_elements () then mk (Id (hole ~pos:(defpos()) (), $1, $3)) else mk (Arr (hole ~pos:(defpos()) (), $1, $3)) }
-  | expr EQ LACC expr RACC expr %prec EQ { if Setting.has_elements () then mk (Id ($4, $1, $6)) else mk (Arr ($4, $1, $6)) }
+  | expr EQ eqtype expr { mk (Arr ($3, $1, $4)) }
+  | expr IEQ eqtype expr { mk (Id ($3, $1, $4)) }
   | expr TIMES expr { mk (Prod ($1, $3)) }
   | aexpr { $1 }
 
@@ -75,6 +75,10 @@ args:
   | LPAR idents COL expr RPAR args { (List.map (fun x -> `Explicit, x, $4) $2)@$6 }
   | LACC idents COL expr RACC args { (List.map (fun x -> `Implicit, x, $4) $2)@$6 }
   | { [] }
+
+eqtype:
+  | LACC expr RACC { $2 }
+  | { hole ~pos:(defpos()) () }
 
 ident:
   | HOLE { "_" }
