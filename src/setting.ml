@@ -43,6 +43,11 @@ let on_dim f =
   let g = !dim_callback in
   dim_callback := fun n -> g n; f n
 
+let set_dim n =
+  message "setting dimension to %d" n;
+  dimension := n;
+  !dim_callback n
+
 let parse s =
   let k, v = String.split_on_first_char ':' s in
   let k = String.trim k in
@@ -66,12 +71,10 @@ let parse s =
     !mode_callback !mode
   | "dim" | "dimension" ->
     let n = if v = "oo" || v = "∞" then max_int else int_of_string v in
-    message "setting dimension to %d" n;
-    dimension := n;
-    !dim_callback n
+    set_dim n
   | k -> error "Unknown setting: %s" k
 
 let save, restore =
   let l = ref [] in
   (fun () -> l := (!mode,!dimension) :: !l),
-  (fun () -> let m,d = List.hd !l in l := List.tl !l; mode := m; dimension := d)
+  (fun () -> let m,d = List.hd !l in l := List.tl !l; mode := m; set_dim d)
