@@ -97,6 +97,7 @@ let check ~pos l a =
     in
 
     (* Orient identities on variables as rewriting rules and normalize l. *)
+    (* TODO: we implicitly assume that all variable names are distinct in pasting schemes *)
     (* TODO: check that we are not a coboundary *)
     (* TODO: this makes us construct (∞,1)-categories, we should also investigate (∞,∞)-... *)
     let rec simplify rw l =
@@ -119,6 +120,7 @@ let check ~pos l a =
       match List.find_map_and_remove_opt check l with
       | Some ((x,t),l) ->
         (* printf "add rule %s -> %s\n" x (to_string t); *)
+        let l = List.filter (fun (x',_) -> x <> x') l in
         let t = rewrite rw t in
         let rw = List.map (fun (y,u) -> y, rewrite [x,t] u) rw in
         let rw = (x,t)::rw in
@@ -126,8 +128,6 @@ let check ~pos l a =
       | None -> rw, l
     in
     let rw, l = simplify [] l in
-    (* Remove rewritten variables. *)
-    let l = List.filter (fun (x,_) -> not (List.mem_assoc x rw)) l in
     let vars = List.diff vars (List.map fst rw) in
     vars, l, rewrite rw a
   in

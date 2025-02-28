@@ -37,9 +37,7 @@ coh pa2-snd {a b c : .} {f : a -> b} {g : a -> c} (h : a -> b * c) (α : co1 h f
 coh pa2-eta {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} (α : h -> pa f g) : α -> pa2 h (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g))
 
 # cong
-# coh pa2-cong {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} {α α' : co1 h fst -> f} {β β' : co1 h snd -> g} (_ : α -> α') (_ : β -> β') : pa2 h α β -> pa2 h α' β'
-
-coh pa2-cong-todo {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} {α : co1 h fst -> f} {β : co1 h snd -> g} : pa2 h α β -> pa2 h α β
+coh pa2-cong {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} {α α' : co1 h fst -> f} {β β' : co1 h snd -> g} (_ : α -> α') (_ : β -> β') : pa2 h α β -> pa2 h α' β'
 
 ## Admissible rules
 
