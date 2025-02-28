@@ -2,7 +2,7 @@
 open Lexing
 open Parser
 
-let utf8 ?(n=1) lexbuf =
+let advance_pos n lexbuf =
   let pos = lexbuf.lex_curr_p in
   lexbuf.lex_curr_p <- { pos with pos_bol = pos.pos_bol + n }
 
@@ -16,7 +16,8 @@ let utf8_length s =
     in
     aux 0 0
 
-let utf8_advance s lexbuf = utf8 ~n:(String.length s - utf8_length s) lexbuf
+(** Correct position for strings with utf8 characters. *)
+let utf8 s lexbuf = advance_pos (String.length s - utf8_length s) lexbuf
 }
 
 let space = ' ' | '\t' | '\r'
@@ -36,17 +37,17 @@ rule token = parse
   | "}" { RACC }
   | ":" { COL }
   | "->" { ARR }
-  | "→" { utf8 ~n:2 lexbuf; ARR }
+  | "→" as s { utf8 s lexbuf; ARR }
   | "=>" { HOM }
-  | "⇒" { utf8 ~n:2 lexbuf; HOM }
+  | "⇒" as s { utf8 s lexbuf; HOM }
   | "*" { TIMES }
-  | "×" { utf8 lexbuf; TIMES }
+  | "×" as s { utf8 s lexbuf; TIMES }
   | "1" { ONE }
   | "=" { EQ }
   | ":=" { EQDEF }
   | "_" { HOLE }
   | "include \""([^'"']* as filename)"\"" { INCLUDE filename }
-  | (first_letter letter* as str) { utf8_advance str lexbuf; IDENT str }
+  | (first_letter letter* as s) { utf8 s lexbuf; IDENT s }
   | space+ { token lexbuf }
   | "#-#"([^'\n']* as s) { Setting.parse s; token lexbuf }
   | "#"[^'\n']* { token lexbuf }
