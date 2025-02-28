@@ -12,6 +12,7 @@ type mode = [
   | `Symmetric_monoidal_closed
   | `Cartesian
   | `Cartesian_closed
+  | `Compact_closed
 ]
 
 let mode = ref (`Cartesian_closed : mode)
@@ -21,9 +22,11 @@ let has_elements () = List.mem !mode [`Cartesian_closed]
 
 let has_hom () = List.mem !mode [`Symmetric_monoidal_closed; `Cartesian_closed]
 
-let has_prod () = List.mem !mode [`Monoidal; `Symmetric_monoidal; `Symmetric_monoidal_closed; `Cartesian; `Cartesian_closed]
+let has_prod () = List.mem !mode [`Monoidal; `Symmetric_monoidal; `Symmetric_monoidal_closed; `Cartesian; `Cartesian_closed; `Compact_closed]
 
 let has_one () = has_prod ()
+
+let has_op () = List.mem !mode [`Compact_closed]
 
 (** Callback when the mode is changed. *)
 let mode_callback = ref (fun _ -> ())
@@ -64,6 +67,7 @@ let parse s =
         | "symmetric monoidal category" | "smc" -> `Symmetric_monoidal
         | "symmetric monoidal closed category" | "smcc" -> `Symmetric_monoidal_closed
         | "monoidal category" -> `Monoidal
+        | "compact closed" -> `Compact_closed
         | m -> error "Unknown mode: %s" m
       );
     !mode_callback !mode

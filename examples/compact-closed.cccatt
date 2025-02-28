@@ -1,0 +1,24 @@
+# Compact closed categories
+#
+#-# mode: compact closed
+#-# dim: 1
+
+include "monoidal.cccatt"
+
+coh eta {a : .} : 1 -> a * !a
+
+coh eps {a : .} : !a * a -> 1
+
+# coh nn {a : .} : !!a -> a
+
+# coh nn' {a : .} : a -> !!a
+
+# coh nn-nn' {a : .} : co nn nn' = id {!!a}
+
+# coh nn'-nn {a : .} : co nn' nn = id {a}
+
+# coh zig-zag {a : .} : co5 tunitl' (te eta id) tassoc (te id eps) tunitr ={!!a -> a} nn
+
+coh zig-zag {a : .} : co5 tunitl' (te eta id) tassoc (te id eps) tunitr = id {a}
+
+coh zag-zig {a : .} : co5 tunitr' (te id eta) tassoc' (te eps id) tunitl = id {!a}

@@ -47,6 +47,7 @@ rule token = parse
   | "⇔" as s { utf8 s lexbuf; IEQ }
   | ":=" { EQDEF }
   | "_" { HOLE }
+  | "!" { OP }
   | "include \""([^'"']* as filename)"\"" { INCLUDE filename }
   | (first_letter letter* as s) { utf8 s lexbuf; IDENT s }
   | space+ { token lexbuf }

@@ -22,6 +22,7 @@ let rec unify tenv env ?(alpha=[]) t t' =
   | Hom (a, b), Hom (a', b') -> unify tenv env a a'; unify tenv env b b'
   | Prod (a, b), Prod (a', b') -> unify tenv env a a'; unify tenv env b b'
   | One, One -> ()
+  | Op a, Op a' -> unify tenv env a a'
   | Pi (i, x, a, b), Pi (i', x', a', b') ->
     if i <> i' then raise Unification;
     unify tenv env a a';
@@ -99,6 +100,7 @@ and eval env e =
   | Arr (a, t, u) -> mk (Arr (eval env a, eval env t, eval env u))
   | Hom (a, b) -> mk (Hom (eval env a, eval env b))
   | Prod (a, b) -> mk (Prod (eval env a, eval env b))
+  | Op a -> mk (Op (eval env a))
   | One -> mk One
   | Type -> mk Type
   | Meta { value = Some t; _ } -> eval env t
@@ -185,6 +187,10 @@ and infer tenv env (e:Term.t) =
   | One ->
     if not (Setting.has_one ()) then failure e.pos "unit not allowed in this mode";
     mk ~pos One, mk ~pos Obj
+  | Op a ->
+    if not (Setting.has_op ()) then failure e.pos "duals not allowed in this mode";
+    let a = check tenv env a (mk ~pos:a.pos Obj) in
+    mk ~pos (Op a), mk ~pos Obj
   | Type ->
     mk ~pos Type, mk ~pos Type
   | Meta m ->

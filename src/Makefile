@@ -14,4 +14,4 @@ debug:
 	@dune exec ./cccatt.exe debug.cccatt
 
 explain:
-	ocamlc -c extlib.ml common.ml lang.ml && menhir --infer --explain parser.mly && rm *.cmi *.cmo parser.ml parser.mli && less parser.conflicts && rm parser.conflicts
+	ocamlc -c extlib.ml common.ml setting.ml term.ml pasting.ml && menhir --infer --explain parser.mly && rm *.cmi *.cmo parser.ml parser.mli && less parser.conflicts && rm parser.conflicts
