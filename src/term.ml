@@ -146,12 +146,13 @@ type command =
 type prog = command list
 
 let fresh_var_name =
-  let n = ref 0 in
-  fun () ->
-    incr n;
-    Printf.sprintf "x#%d" !n
+  let h = Hashtbl.create 100 in
+  fun x ->
+    let n = Option.value ~default:0 @@ Hashtbl.find_opt h x in
+    Hashtbl.replace h x (n+1);
+    x ^ "#" ^ string_of_int n
 
-let fresh_var () = fresh_var_name () |> var
+let fresh_var x = fresh_var_name x |> var
 
 (** Build multiple hom types. *)
 let rec homs ?pos l t =

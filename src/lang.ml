@@ -43,6 +43,7 @@ let rec unify tenv env ?(alpha=[]) t t' =
   | Meta m, _ ->
     if has_metavariable m t' then raise Unification;
     let t' = check tenv env t' m.ty in
+    (* printf "metavariable ?%d gets %s\n" m.id (to_string t); *)
     m.value <- Some t'
   | _, Meta m' ->
     (* print_endline "** term with meta"; *)
@@ -50,7 +51,7 @@ let rec unify tenv env ?(alpha=[]) t t' =
     (* print_endline "** no loop"; *)
     (* printf "check %s : %s\n%!" (to_string t) (to_string m'.ty); *)
     let t = check tenv env t m'.ty in
-    (* print_endline "** checked"; *)
+    (* printf "metavariable ?%d gets %s\n" m'.id (to_string t); *)
     m'.value <- Some t
   | _ -> raise Unification
 
@@ -74,10 +75,17 @@ and eval env e =
     (
       match List.assoc_opt x env with
       | Some v -> mk v.desc
-      | None -> failure e.pos "unexpected error: value for %s not found" x
+      | None ->
+        (
+          (* printf "environment: %s\n" (string_of_context env); *)
+          failure e.pos "unexpected error: value for %s not found" x
+        )
     )
+  | Pi (i, x, a, b) ->
+    let x' = if List.mem_assoc x env then fresh_var_name x else x in
+    mk (Pi (i, x', eval env a, eval ((x,var x')::env) b))
   | Abs (i,x,a,e) ->
-    let x' = if List.mem_assoc x env then fresh_var_name () else x in
+    let x' = if List.mem_assoc x env then fresh_var_name x else x in
     mk (Abs (i,x', eval env a, eval ((x,var x')::env) e))
   | App (i,t,u) ->
     (
@@ -89,9 +97,6 @@ and eval env e =
         eval ((x,u)::env) t
       | _ -> assert false
     )
-  | Pi (i, x, a, b) ->
-    let x' = if List.mem_assoc x env then fresh_var_name () else x in
-    mk (Pi (i, x', eval env a, eval ((x,var x')::env) b))
   | Obj -> mk Obj
   | Id (a, t, u) -> mk (Id (eval env a, eval env t, eval env u))
   | Arr (a, t, u) -> mk (Arr (eval env a, eval env t, eval env u))
