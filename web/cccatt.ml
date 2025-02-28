@@ -84,7 +84,7 @@ let run _ =
        in
        mode##.value := Js.string m
     );
-  Setting.on_dim (fun d -> dim##.value := Js.string @@ string_of_int d);
+  Setting.on_dim (fun d -> dim##.value := Js.string (if d = max_int then "∞" else string_of_int d));
 
   send##.onclick :=
     Html.handler
