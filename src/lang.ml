@@ -83,7 +83,8 @@ and eval env e =
     (
       match (eval env t).desc with
       | Abs (i',x,_,t) ->
-        if i <> i' then error "Application mismatch in %s (%s instead of %s application)" (to_string e) (string_of_implicit i) (string_of_implicit i');
+        if i <> i' then
+          error ~pos:e.pos "application mismatch in %s (%s instead of %s application)" (to_string e) (string_of_implicit i) (string_of_implicit i');
         let u = eval env u in
         eval ((x,u)::env) t
       | _ -> assert false
@@ -262,12 +263,13 @@ let parse_file f =
 let rec exec_command (tenv, env) p =
   match p with
   | Let (x, a, e) ->
-    (* printf "*** let %s := %s\n%!" x (to_string e); *)
+    (* printf "*** let %s : %s := %s\n%!" x (Option.value ~default:"?" @@ Option.map to_string a) (to_string e); *)
     (* print_endline "inferring"; *)
     let e, a =
       match a with
       | Some a ->
         let m = metavariables a in
+        let a = check tenv env a (mk Type) in
         let a = eval env a in
         print_metavariables_elaboration m;
         let e = check tenv env e a in

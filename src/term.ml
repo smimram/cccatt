@@ -194,7 +194,8 @@ let rec has_fv x e =
   | Meta { value = Some t; ty = ty; _ } -> has_fv x t || has_fv x ty
   | Meta { value = None; ty = ty; _ } -> has_fv x ty
   | One
-  | Obj -> false
+  | Obj
+  | Type -> false
   | _ -> error ~pos:e.pos "has_fv: handle %s" (to_string e)
 
 let is_var e =
