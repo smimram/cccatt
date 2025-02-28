@@ -187,6 +187,7 @@ and infer tenv env (e:Term.t) =
     if not (Setting.has_one ()) then failure e.pos "unit not allowed in this mode";
     mk ~pos One, mk ~pos Obj
   | Op a ->
+    if not (Setting.has_op ()) then failure e.pos "duals not allowed in this mode";
     let a = check tenv env a (mk ~pos:a.pos Obj) in
     mk ~pos (Op a), mk ~pos Obj
   | Type ->
