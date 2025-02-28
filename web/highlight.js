@@ -7,7 +7,7 @@
       case_insensitive: false,
       keywords: {
         $pattern: /[->a-z:*=×→.^?]+/,
-        keyword: ['defined','coh','=',':='],
+        keyword: ['defined','coh','ncoh','let','=',':='],
         operator: ['->','→','=>','⇒','*','×',':','.','=^\.^=','=\?\.\?=']
       },
       contains: [
