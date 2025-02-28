@@ -24,4 +24,6 @@ coh pa2 {a b c : .} {f : a -> b} {g : a -> c} (h : a -> b * c) (α : co1 h fst -
 # coh pa-eta {a b c : .} (f : a -> b * c) : f -> pa (co1 f fst) (co1 f snd)
 let pa-eta {a b c : .} (f : a -> b * c) : f -> pa (co1 f fst) (co1 f snd) := pa2 f (id2 (co1 f fst)) (id2 (co1 f snd))
 
-# coh pa2-fst {a b c : .} {f : a -> b} {g : a -> c} (h : a -> b * c) (α : co1 h fst -> f) (β : co1 h snd -> g) : co2 (co1 (pa2 h α β) fst) pa-fst -> α
+coh pa2-fst {a b c : .} {f : a -> b} {g : a -> c} (h : a -> b * c) (α : co1 h fst -> f) (β : co1 h snd -> g) : co2 (co21 (pa2 h α β) fst) (pa-fst f g) -> α
+
+coh pa2-snd {a b c : .} {f : a -> b} {g : a -> c} (h : a -> b * c) (α : co1 h fst -> f) (β : co1 h snd -> g) : co2 (co21 (pa2 h α β) snd) (pa-snd f g) -> β
