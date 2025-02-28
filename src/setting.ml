@@ -6,7 +6,6 @@ open Common
 (** Mode for checking pasting schemes. *)
 type mode = [
   | `Plain
-  | `Monoid
   | `Category
   | `Monoidal
   | `Symmetric_monoidal
@@ -59,7 +58,6 @@ let parse s =
       (
         match v with
         | "plain" -> `Plain
-        | "monoid" -> `Monoid
         | "category" -> `Category
         | "cartesian" | "cartesian category" -> `Cartesian
         | "cartesian closed" | "cartesian closed category" | "ccc" -> `Cartesian_closed

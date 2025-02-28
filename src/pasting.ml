@@ -196,7 +196,7 @@ let check ~pos l a =
 
   | `Plain ->
     let l = List.map snd l in
-    assert (List.mem a l)
+    if not (List.mem a l) then failure pos "cannot produce %s" (to_string a)
 
 (*
   | `Monoid ->
@@ -444,4 +444,4 @@ let check ~pos l a =
     let env = prove [] a in
     if env <> [] then failure pos "unused hypothesis: %s" (env |> List.map to_string |> String.concat ", ")
 
-  | _ -> failwith "unhandled mode"
+  (* | _ -> failwith "unhandled mode" *)
