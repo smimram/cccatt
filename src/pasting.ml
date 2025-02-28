@@ -198,19 +198,6 @@ let check ~pos l a =
     let l = List.map snd l in
     if not (List.mem a l) then failure pos "cannot produce %s" (to_string a)
 
-(*
-  | `Monoid ->
-    let rec get_prod a =
-      match (unmeta a).desc with
-      | Var _ -> [a]
-      | Prod (a,b) -> (get_prod a)@(get_prod b)
-      | One -> []
-      | _ -> failure a.pos "product expected"
-    in
-    let a = get_prod a in
-    let l = l |> List.map snd |> List.map get_prod in
-*)
-
   | `Category ->
 
     let get_arr a =
