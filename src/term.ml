@@ -196,6 +196,7 @@ let rec has_fv x e =
   | One
   | Obj
   | Type -> false
+  | Coh (_,_,_,s) -> List.exists (fun (_,t) -> has_fv x t) s
   | _ -> error ~pos:e.pos "has_fv: handle %s" (to_string e)
 
 let is_var e =
