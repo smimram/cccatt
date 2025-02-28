@@ -1,6 +1,6 @@
 (rule
  (alias runtest)
- (deps ccc.cccatt ccc2.cccatt curry.cccatt curry-noimplicit.cccatt curry2.cccatt curien.cccatt birds.cccatt category.cccatt linear.cccatt monoidal.cccatt symmetric.cccatt smcc.cccatt cartesian.cccatt cartesian2.cccatt bicategory.cccatt bicategory-cartesian.cccatt)
+ (deps ccc.cccatt ccc2.cccatt curry.cccatt curry-noimplicit.cccatt curry2.cccatt curien.cccatt birds.cccatt category.cccatt linear.cccatt monoidal.cccatt symmetric.cccatt smcc.cccatt cartesian.cccatt cartesian2.cccatt bicategory.cccatt bicategory-cartesian.cccatt bicategory-cartesian-closed.cccatt)
  (action
   (progn
    (run ../src/cccatt.exe ccc.cccatt)
@@ -19,6 +19,7 @@
    (run ../src/cccatt.exe cartesian2.cccatt)
    (run ../src/cccatt.exe bicategory.cccatt)
    (run ../src/cccatt.exe bicategory-cartesian.cccatt)
+   (run ../src/cccatt.exe bicategory-cartesian-closed.cccatt)
   )
  )
 )
