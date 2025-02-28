@@ -29,16 +29,16 @@ coh pa2 {a b c : .} {f : a -> b} {g : a -> c} (h : a -> b * c) (α : co1 h fst -
 let pa-eta {a b c : .} (f : a -> b * c) : f -> pa (co1 f fst) (co1 f snd) := pa2 f (id2 (co1 f fst)) (id2 (co1 f snd))
 
 # U1
-coh pa2-fst {a b c : .} {f : a -> b} {g : a -> c} (h : a -> b * c) (α : co1 h fst -> f) (β : co1 h snd -> g) : co2 (co21 (pa2 h α β) fst) (pa-fst f g) -> α
+coh pa2-fst {a b c : .} {f : a -> b} {g : a -> c} (h : a -> b * c) (α : co1 h fst -> f) (β : co1 h snd -> g) : co2 (co21 (pa2 h α β) fst) (pa-fst f g) = α
 
-coh pa2-snd {a b c : .} {f : a -> b} {g : a -> c} (h : a -> b * c) (α : co1 h fst -> f) (β : co1 h snd -> g) : co2 (co21 (pa2 h α β) snd) (pa-snd f g) -> β
+coh pa2-snd {a b c : .} {f : a -> b} {g : a -> c} (h : a -> b * c) (α : co1 h fst -> f) (β : co1 h snd -> g) : co2 (co21 (pa2 h α β) snd) (pa-snd f g) = β
 
 # U2
-coh pa2-eta {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} (α : h -> pa f g) : α -> pa2 h (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g))
+coh pa2-eta {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} (α : h -> pa f g) : α = pa2 h (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g))
 
 # cong
-coh pa2-cong {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} {α α' : co1 h fst -> f} {β β' : co1 h snd -> g} (_ : α -> α') (_ : β -> β') : pa2 h α β -> pa2 h α' β'
+coh pa2-cong {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} {α α' : co1 h fst -> f} {β β' : co1 h snd -> g} (_ : α -> α') (_ : β -> β') : pa2 h α β = pa2 h α' β'
 
 ## Admissible rules
 
-# let pa-id2 {a : .} : pa (i
+# let pa-id2 {a b c : .} (f : a -> b * c) : pa2 (id2 _) (id2 _) -> _ := _
