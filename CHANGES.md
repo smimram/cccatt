@@ -3,6 +3,7 @@
 
 - Add support for (∞,1)-categories (in particular, there is now proper support for substitutions in coherences).
 - Add support for hom (in addition to internal hom which is renamed ⇒).
+- Add support for compact closed categories.
 - Add type theory for (cartesian) bicategories.
 - Add `include` statement.
 - Basic utf8 support in the lexer (e.g. some greek characters).
