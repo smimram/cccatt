@@ -18,7 +18,7 @@ let pis ?pos l a =
   pis ~pos l a
 %}
 
-%token LET CHECK NCOH FUN TO HOLE
+%token LET NCOH FUN TO HOLE
 %token COH ARR HOM EQ EQDEF OBJ TIMES ONE
 %token LPAR RPAR LACC RACC COL
 %token <string> IDENT
@@ -43,7 +43,6 @@ cmd:
   | COH ident args COL expr { Let ($2, None, abs_coh ~pos:(defpos()) $2 $3 $5) }
   | NCOH ident args COL expr { NCoh ($2, List.map (fun (_,x,a) -> x,a) $3, $5) }
   | LET IDENT args type_opt EQDEF expr { Let ($2, Option.map (pis $3) $4, abss $3 $6) }
-  | CHECK expr { Check $2 }
   | INCLUDE { Include $1 }
 
 type_opt:

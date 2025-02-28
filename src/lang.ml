@@ -289,10 +289,6 @@ let rec exec_command (tenv, env) p =
     message "defined %s : %s" x (to_string a);
     (* printf "      %s\n%!" (to_string v); *)
     tenv, env
-  | Check e ->
-    let e, a = infer tenv env e in
-    message "check %s : %s" (Pos.to_string e.pos) (to_string a);
-    tenv, env
   | NCoh (x, l, a) ->
     check tenv env (pis ~pos:a.pos (List.map (fun (x,a) -> `Explicit,x,a) l) a) (mk ~pos:a.pos Type) |> ignore;
     (try Pasting.check ~pos:a.pos l a; failure a.pos "expression accepted as a coherence" with _ -> ());

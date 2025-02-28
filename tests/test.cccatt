@@ -27,10 +27,6 @@ let K' (a b : .) : a => b => b := ap (b => b) (a => b => b) (K (b => b) a) (I b)
 #An interesting example of a contractible type
 coh bla (a b c : .) : ((a => b) => c) => b => c
 
-## Test
-
-check I
-
 ## Testing variables
 
 let id := I
