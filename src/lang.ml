@@ -75,11 +75,8 @@ and eval env e =
     (
       match List.assoc_opt x env with
       | Some v -> mk v.desc
-      | None ->
-        (
-          (* printf "environment: %s\n" (string_of_context env); *)
-          failure e.pos "unexpected error: value for %s not found" x
-        )
+      | None -> mk (Var x)
+      (* failure e.pos "unexpected error: value for %s not found" x *)
     )
   | Pi (i, x, a, b) ->
     let x' = if List.mem_assoc x env then fresh_var_name x else x in
