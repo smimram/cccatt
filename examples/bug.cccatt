@@ -3,8 +3,6 @@
 
 coh co1 {a b c : .} (f : a -> b) (g : b -> c) : a -> c
 
-coh co2 {a b : .} {f g h : a -> b} (α : f -> g) (β : g → h) : f -> h
-
 coh pa {a b c : .} (f : a -> b) (g : a -> c) : a -> b * c
 
 coh fst {a b : .} : a * b -> a
