@@ -1,3 +1,5 @@
+# This example is inspired from cartesian bicategories. It shows that we need to be able to evaluate free variables as themselves. Namely, for Π-types we replace variables by fresh ones and we need to evaluate those. In particular, in coherences, we have substitutions which consist of values but we need to re-evaluate them to perform substitution.
+#
 # mode: cartesian
 # dimension: 2
 
@@ -23,4 +25,4 @@ coh pa2 (a b : .) (f g : a -> b) (α : co1 a b b g (id b) -> f) : pa a b f -> g
 
 # let bug (a b : .) (f : a -> b) (g : a -> b) : pa a b f -> g := pa2 a b f g _
 
-let bug (a b : .) := pa2 a
+let bug (a : .) := pa2 a
