@@ -182,7 +182,7 @@ let check ~pos l a =
       | One -> []
       | Var _
       | Obj -> [e]
-      | _ -> failwith "TODO: deproduct handle %s" (to_string e)
+      | _ -> failure e.pos "TODO: deproduct handle %s" (to_string e)
     in
     let aa =
       let l = List.map snd l in
@@ -335,6 +335,7 @@ let check ~pos l a =
     let get_arr a =
       match (unmeta a).desc with
       | Arr (o, a, b) when is_obj o -> (a, b)
+      | Arr (o, _, _) -> failure a.pos "1-dimensional arrow expected but got %s" (to_string o)
       | _ -> failure a.pos "arrow expected"
     in
     let l = List.map snd l in

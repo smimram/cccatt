@@ -61,7 +61,7 @@ let parse s =
         | "plain" -> `Plain
         | "monoid" -> `Monoid
         | "category" -> `Category
-        | "cartesian category" -> `Cartesian
+        | "cartesian" | "cartesian category" -> `Cartesian
         | "cartesian closed category" | "ccc" -> `Cartesian_closed
         | "symmetric monoidal category" | "smc" -> `Symmetric_monoidal
         | "symmetric monoidal closed category" | "smcc" -> `Symmetric_monoidal_closed
