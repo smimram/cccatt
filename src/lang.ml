@@ -235,8 +235,9 @@ let print_unelaborated_metavariables m =
     ) (List.sort compare m)
 
 (** Parse a string. *)
-let parse s =
+let parse ?filename s =
   let lexbuf = Lexing.from_string s in
+  lexbuf.lex_curr_p <- { lexbuf.lex_curr_p with pos_fname = Option.value ~default:"" filename };
   try
     Parser.prog Lexer.token lexbuf
   with
@@ -266,7 +267,7 @@ let parse_file f =
     close_in fi;
     buf
   in
-  parse (Bytes.to_string sin)
+  parse ~filename:f (Bytes.to_string sin)
 
 let rec exec_command (tenv, env) p =
   match p with
@@ -301,6 +302,11 @@ let rec exec_command (tenv, env) p =
     message "not a coherence %s : %s" x (to_string @@ pis_explicit l a);
     tenv, env
   | Include fname ->
+    let fname =
+      if Sys.file_exists fname then fname
+      else if Sys.file_exists (fname^".cccatt") then fname^".cccatt"
+      else fname
+    in
     Setting.save ();
     let env = exec (tenv,env) (parse_file fname) in
     Setting.restore ();
