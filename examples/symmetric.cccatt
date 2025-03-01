@@ -4,17 +4,7 @@
 #-# mode: symmetric monoidal category
 #-# dimension: 1
 
-# Basic constructions (see monoidal for more)
-
-coh id {a : .} : a -> a
-
-coh co {a b c : .} (f : a -> b) (g : b -> c) : a -> c
-
-let co3 {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) := co f (co g h)
-
-coh te {a a' b b' : .} (f : a -> a') (g : b -> b') : a * b -> a' * b'
-
-coh assoc {a b c : .} : (a * b) * c -> a * (b * c)
+include "monoidal"
 
 # Symmetry
 
@@ -22,6 +12,6 @@ coh sym {a b : .} : a * b -> b * a
 
 coh sym-inv {a b : .} : co sym sym ={a * b -> a * b} id
 
-coh sym-yb {a b c : .} : co3 (te sym id) assoc (te id sym) ={(a * b) * c -> b * (c * a)} co3 assoc sym assoc
+coh sym-yb {a b c : .} : co3 (te sym id) tassoc (te id sym) ={(a * b) * c -> b * (c * a)} co3 tassoc sym tassoc
 
 coh sym-nat {a a' b b' : .} (f : a -> a') (g : b -> b') : co (te f g) sym = co sym (te g f)

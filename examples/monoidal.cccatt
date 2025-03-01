@@ -12,6 +12,8 @@ coh co {a b c : .} (f : a -> b) (g : b -> c) : a -> c
 
 let co3 {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) := co f (co g h)
 
+let co4 {a0 a1 a2 a3 a4 : .} (f1 : a0 -> a1) (f2 : a1 -> a2) (f3 : a2 -> a3) (f4 : a3 -> a4) := co f1 (co f2 (co f3 f4))
+
 let co5 {a0 a1 a2 a3 a4 a5 : .} (f1 : a0 -> a1) (f2 : a1 -> a2) (f3 : a2 -> a3) (f4 : a3 -> a4) (f5 : a4 -> a5) := co f1 (co f2 (co f3 (co f4 f5)))
 
 let co6 {a0 a1 a2 a3 a4 a5 a6 : .} (f1 : a0 -> a1) (f2 : a1 -> a2) (f3 : a2 -> a3) (f4 : a3 -> a4) (f5 : a4 -> a5) (f6 : a5 -> a6) := co f1 (co f2 (co f3 (co f4 (co f5 f6))))

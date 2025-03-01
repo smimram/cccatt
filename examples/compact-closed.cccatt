@@ -3,7 +3,7 @@
 #-# mode: compact closed
 #-# dim: 1
 
-include "monoidal.cccatt"
+include "symmetric"
 
 coh eta {a : .} : 1 -> a * !a
 
@@ -22,3 +22,5 @@ coh eps {a : .} : !a * a -> 1
 coh zig-zag {a : .} : co5 tunitl' (te eta id) tassoc (te id eps) tunitr = id {a}
 
 coh zag-zig {a : .} : co5 tunitr' (te id eta) tassoc' (te eps id) tunitl = id {!a}
+
+# let trace {a : .} (f : a -> a) : co4 eta (te f id) sym eps

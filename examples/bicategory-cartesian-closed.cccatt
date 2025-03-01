@@ -6,3 +6,12 @@
 #-# dimension: 2
 
 include "bicategory-cartesian.cccatt"
+
+# lam
+coh abs {a b c : .} (f : a * b ⇒ c) : a ⇒ b ⇒ c
+
+# eval
+coh app {a b : .} : (a ⇒ b) * a ⇒ b
+
+# ϵ-intro
+# coh beta {a b c : .} (f : a * b => c) : app (abs f) = f
