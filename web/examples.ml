@@ -15,7 +15,9 @@ let bicategory = [%blob "../examples/bicategory.cccatt"]
 let cartesian_bicategory = [%blob "../examples/bicategory-cartesian.cccatt"]
 
 let () =
+  Js_of_ocaml.Sys_js.create_file ~name:"category.cccatt" ~content:category;
   Js_of_ocaml.Sys_js.create_file ~name:"monoidal.cccatt" ~content:monoidal;
+  Js_of_ocaml.Sys_js.create_file ~name:"symmetric.cccatt" ~content:symmetric;
   Js_of_ocaml.Sys_js.create_file ~name:"bicategory.cccatt" ~content:bicategory
 
 let get = function
