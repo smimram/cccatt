@@ -9,6 +9,8 @@ coh eta {a : .} : 1 -> a * !a
 
 coh eps {a : .} : !a * a -> 1
 
+let seps {a : .} : a * !a -> 1 := co sym eps
+
 # coh nn {a : .} : !!a -> a
 
 # coh nn' {a : .} : a -> !!a
@@ -29,7 +31,17 @@ ncoh bla {a : .} : a -> !a
 
 coh op {a b : .} (f : a -> b) : !b -> !a
 
-let trace {a : .} (f : a -> a) := co4 eta (te f id) sym eps
+# We don't expect this to be well-defined as a coherence, but this is derivable
+ncoh trace {a : .} (f : a -> a) : 1 -> 1
+let trace {a : .} (f : a -> a) := co3 eta (te f id) seps
 
-# TODO: we actually have a trivial form of compact closed category here...
-coh trivial-trace {a : .} (f : a -> a) : trace f = id
+ncoh trace {a b : .} (f : a -> b) (g : b -> a) : 1 -> 1
+
+# The trace should not be trivial
+ncoh trivial-trace {a : .} (f : a -> a) : trace f = id
+
+#TODO: current pasting condition refuses this whereas it could be accepted
+# coh ptrace {a b c : .} (f : a * c -> b * c) : a -> b
+
+# We can also define partial trace
+let ptrace  {a b c : .} (f : a * c -> b * c) := co5 (te id eta) tassoc' (te f id) tassoc (te id seps)

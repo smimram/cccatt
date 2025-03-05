@@ -10,6 +10,11 @@ module List = struct
     | _::l -> assoc' x l
     | [] -> raise Not_found
 
+  (** Count the number of elements satisfying a predicate. *)
+  let rec count p = function
+    | x::l -> if p x then 1 + count p l else count p l
+    | [] -> 0
+
   let rec find_and_remove_opt p = function
     | x::l ->
       if p x then Some (x, l)

@@ -437,6 +437,7 @@ let check ~pos l a =
   | `Compact_closed ->
 
     let module S = Set.Make(struct type nonrec t = t let compare = compare_var end) in
+    (* We consider pairs of sets of variables: the positive ones and the negative ones. *)
     let union (a,a') (b,b') =
       if not (S.disjoint a b) then failure pos "repeated variables: %s" (String.concat ", " @@ List.map to_string @@ S.elements @@ S.inter a b);
       if not (S.disjoint a' b') then failure pos "repeated variables: %s" (String.concat ", " @@ List.map to_string @@ S.elements @@ S.inter a' b');
@@ -452,8 +453,34 @@ let check ~pos l a =
       | Arr (o, a, b) when is_obj o -> union (neg @@ get_tens a) (get_tens b)
       | _ -> failure a.pos "unhandled type: %s" @@ to_string a
     in
-    let l = List.fold_left union (S.empty,S.empty) @@ List.map get_tens @@ List.map snd l in
-    let v, v' = union (neg l) (get_tens a) in
-    if not (S.equal v v') then failure pos "non-matched variables: %s" (String.concat ", " @@ List.map to_string @@ S.elements @@ S.union (S.diff v v') (S.diff v' v))
+    let v, v' =
+      let l = List.fold_left union (S.empty,S.empty) @@ List.map get_tens @@ List.map snd l in
+      union (neg l) (get_tens a)
+    in
+    (* Make sure that every positive variable is matched with exactly one corresponding negative variable, and conversely. *)
+    if not (S.equal v v') then failure pos "non-matched variables: %s" (String.concat ", " @@ List.map to_string @@ S.elements @@ S.union (S.diff v v') (S.diff v' v));
+    (* Make sure that we do not have cycles by constructing connected components. *)
+    let cc = ref @@ List.map S.singleton (S.to_list v) in
+    List.iter
+      (fun (_,a) ->
+         let (a,a') = get_tens a in
+         if not (S.disjoint a a') then
+           (
+             let x = S.choose @@ S.inter a a' in
+             failure x.pos "loop on %s" @@ to_string x
+           );
+         let v = S.union a a' in
+         let l,l' = List.partition (S.disjoint v) !cc in
+         if List.length l' <> S.cardinal v then
+           (
+             ignore @@ failure pos "wrong cardinal";
+             S.iter
+               (fun x ->
+                  if List.count (S.mem x) !cc > 1 then failure x.pos "loop on %s" @@ to_string x
+               ) v
+           );
+         let l' = List.fold_left S.union S.empty l' in
+         cc := l' :: l
+      ) l
 
   (* | _ -> failwith "unhandled mode" *)
