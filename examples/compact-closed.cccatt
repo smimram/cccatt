@@ -27,7 +27,7 @@ coh zag-zig {a : .} : co5 tunitr' (te id eta) tassoc' (te eps id) tunitl = id {!
 
 ncoh bla {a : .} : a -> !a
 
-# coh op {a b : .} (f : a -> b) : b -> a
+coh op {a b : .} (f : a -> b) : !b -> !a
 
 let trace {a : .} (f : a -> a) := co4 eta (te f id) sym eps
 
