@@ -436,7 +436,12 @@ let check ~pos l a =
 
   | `Compact_closed ->
 
-    let module S = Set.Make(struct type nonrec t = t let compare = compare_var end) in
+    let module S = struct
+      include Set.Make(struct type nonrec t = t let compare = compare_var end)
+      (* Backward compatibility. *)
+      let to_list s = List.of_seq @@ to_seq s
+    end
+    in
     (* We consider pairs of sets of variables: the positive ones and the negative ones. *)
     let union (a,a') (b,b') =
       if not (S.disjoint a b) then failure pos "repeated variables: %s" (String.concat ", " @@ List.map to_string @@ S.elements @@ S.inter a b);
