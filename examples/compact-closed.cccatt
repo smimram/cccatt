@@ -23,4 +23,7 @@ coh zig-zag {a : .} : co5 tunitl' (te eta id) tassoc (te id eps) tunitr = id {a}
 
 coh zag-zig {a : .} : co5 tunitr' (te id eta) tassoc' (te eps id) tunitl = id {!a}
 
-# let trace {a : .} (f : a -> a) : co4 eta (te f id) sym eps
+let trace {a : .} (f : a -> a) : co4 eta (te f id) sym eps
+
+# TODO: we actually have a trivial form of compact closed category here...
+coh trivial-trace {a : .} (f : a -> a) : trace f = id
