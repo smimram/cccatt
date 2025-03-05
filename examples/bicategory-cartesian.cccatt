@@ -5,7 +5,7 @@
 #-# mode: cartesian
 #-# dimension: 2
 
-include "bicategory.cccatt"
+include "bicategory"
 
 # tup
 coh pa {a b c : .} (f : a -> b) (g : a -> c) : a -> b * c

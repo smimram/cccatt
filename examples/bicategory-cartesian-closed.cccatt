@@ -5,7 +5,7 @@
 #-# mode: cartesian closed
 #-# dimension: 2
 
-include "bicategory-cartesian.cccatt"
+include "bicategory-cartesian"
 
 # lam
 coh abs {a b c : .} (f : a * b ⇒ c) : a ⇒ b ⇒ c
