@@ -6,7 +6,7 @@ open Term
 
 exception Unification
 exception Type_error of Pos.t * t * t (* at pos got type a instead of b *)
-
+  
 (** Make sure that two values are equal (and raise [Unification] if this cannot be the case). *)
 (* The first argument is the alpha-conversion to apply to t *)
 let rec unify tenv env ?(alpha=[]) t t' =
@@ -90,7 +90,7 @@ and eval env e =
       match (eval env t).desc with
       | Abs (i',x,_,t) ->
         if i <> i' then
-          error ~pos:e.pos "application mismatch in %s (%s instead of %s application)" (to_string e) (string_of_implicit i) (string_of_implicit i');
+          error ~pos:e.pos "application mismatch in %s (%s instead of %s application)" (to_string e) (string_of_icit i) (string_of_icit i');
         let u = eval env u in
         eval ((x,u)::env) t
       | _ -> assert false
@@ -143,15 +143,19 @@ and infer tenv env (e:Term.t) =
     let t, b = infer ((x,eval env a)::tenv) ((x, var ~pos:a.pos x)::env) t in
     mk ~pos (Abs (i,x,a,t)), mk ~pos (Pi (i, x, a, b))
   | App (i, t, u) ->
+    let t, a =
+      match i with
+      | `Implicit ->
+        infer tenv env t
+      | `Explicit ->
+        let t, a = infer tenv env t in
+        insert tenv env t a
+    in
     (
-      let t, a = infer tenv env t in
       match a.desc with
       | Pi (i', x, a, b) when i = i' ->
         let u = check tenv env u a in
         mk ~pos (App (i, t, u)), eval ((x, eval env u)::env) b
-      | Pi (`Implicit, _x, _a, _b) when i = `Explicit ->
-        let t = mk ~pos:t.pos (App (`Implicit, t, hole ~pos:t.pos ())) in
-        infer tenv env (mk ~pos (App (i, t, u)))
       | _ -> failure t.pos "of type %s but a function was expected" (to_string a)
     )
   | Pi (i, x, a, b) ->
@@ -207,13 +211,24 @@ and check tenv env e a =
     mk ~pos:e.pos (Abs(`Implicit,x,a,t))
   | _ ->
     let e, b = infer tenv env e in
-    try if not (Setting.has_elements ()) || not (b.desc = Obj && a.desc = Type) then unify tenv env b a; e
-    with
-    | Unification | Type_error _ ->
-      if is_implicit_pi b && not (is_implicit_pi a) then
-        let e = mk ~pos:e.pos (App (`Implicit, e, hole ~pos:e.pos ())) in
-        check tenv env e a
-      else raise (Type_error (e.pos, b, a))
+    let e, b = insert tenv env e b in
+    if not (Setting.has_elements ()) || not (b.desc = Obj && a.desc = Type) then
+      (
+        try unify tenv env b a
+        with Unification -> raise (Type_error (e.pos, b, a))
+      );
+    e
+
+(** Given a term of given type, apply all implicit arguments to metavariables. *)
+and insert tenv env t a =
+  match (unmeta a).desc with
+  | Pi (`Implicit,x,a,b) ->
+    let u = hole ~pos:t.pos () in
+    let u = check tenv env u a in
+    let t = mk ~pos:t.pos (App (`Implicit, t, u)) in
+    let b = eval ((x, eval env u)::env) b in
+    insert tenv env t b
+  | _ -> t, a
 
 let print_metavariables_elaboration m =
   List.iter

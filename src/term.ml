@@ -11,11 +11,11 @@ type t =
   }
 
 and desc =
-  | Coh  of string * (implicit * string * t) list * t * substitution (** coherence *)
+  | Coh  of string * (icit * string * t) list * t * substitution (** coherence *)
   | Var  of string (** variable *)
-  | Abs  of implicit * string * t * t (** abstraction *)
-  | App  of implicit * t * t (** application *)
-  | Pi   of implicit * string * t * t (** Π-type *)
+  | Abs  of icit * string * t * t (** abstraction *)
+  | App  of icit * t * t (** application *)
+  | Pi   of icit * string * t * t (** Π-type *)
   | Id   of t * t * t (** identity type *)
   | Arr  of t * t * t (** arrow type *)
   | Hom  of t * t (** internal hom type *)
@@ -26,7 +26,7 @@ and desc =
   | Obj  (** object type *)
   | Type (** the type of types *)
 
-and implicit = [`Explicit |  `Implicit]
+and icit = [`Explicit |  `Implicit]
 
 and context = (string * t) list
 
@@ -93,7 +93,7 @@ let rec to_string ?(pa=false) e =
     )
   | Type -> "Type"
 
-let string_of_implicit = function
+let string_of_icit = function
   | `Implicit -> "implicit"
   | `Explicit -> "explicit"
 
