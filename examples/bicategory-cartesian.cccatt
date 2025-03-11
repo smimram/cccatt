@@ -42,6 +42,9 @@ coh pa2-cong {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} {α α' : co
 ## Admissible rules
 
 coh paf {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : pa f g -> pa f' g'
+let paf {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : pa f g -> pa f' g' := pa2 {a} {b} {c} {f'} {g'} (pa f g) (co2 (pa-fst f g) α) (co2 (pa-snd f g) β)
+
+# TODO: show that other are also derivable
 
 coh paf-id2 {a b c : .} (f : a -> b) (g : a -> c) : paf (id2 f) (id2 g) -> id2 (pa f g)
 
