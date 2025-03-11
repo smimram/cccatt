@@ -31,6 +31,9 @@ ncoh bla {a : .} : a -> !a
 
 coh op {a b : .} (f : a -> b) : !b -> !a
 
+# The loop is non-trivial
+ncoh loop {a : .} : co (eta {a}) (seps {a}) = id
+
 # We don't expect this to be well-defined as a coherence, but this is derivable
 ncoh trace {a : .} (f : a -> a) : 1 -> 1
 let trace {a : .} (f : a -> a) := co3 eta (te f id) seps
