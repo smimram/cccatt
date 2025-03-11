@@ -41,22 +41,22 @@ coh pa2-cong {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} {α α' : co
 
 ## Admissible rules
 
-coh pa2 {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : pa f g -> pa f' g'
+coh paf {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : pa f g -> pa f' g'
 
-coh pa2-id2 {a b c : .} (f : a -> b) (g : a -> c) : pa2 (id2 f) (id2 g) -> id2 (pa f g)
+coh paf-id2 {a b c : .} (f : a -> b) (g : a -> c) : paf (id2 f) (id2 g) -> id2 (pa f g)
 
-coh pa2-co2 {a b c : .} {f f' f'' : a -> b} {g g' g'' : a -> c} (α : f -> f') (α' : f' -> f'') (β : g -> g') (β' : g' -> g'') : co2 (pa2 α β) (pa2 α' β') = pa2 (co2 α α') (co2 β β')
+coh paf-co2 {a b c : .} {f f' f'' : a -> b} {g g' g'' : a -> c} (α : f -> f') (α' : f' -> f'') (β : g -> g') (β' : g' -> g'') : co2 (paf α β) (paf α' β') = paf (co2 α α') (co2 β β')
 
 # ς-nat
-coh pa-eta-nat {a b c : .} {f f' : a -> b * c} (α : f -> f') : co2 α (pa-eta f') = co2 (pa-eta f) (pa2 (co21 α fst) (co21 α snd))
+coh pa-eta-nat {a b c : .} {f f' : a -> b * c} (α : f -> f') : co2 α (pa-eta f') = co2 (pa-eta f) (paf (co21 α fst) (co21 α snd))
 
 # ϖ-nat
-coh pa-fst-nat {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : co2 (co21 (pa2 α β) fst) (pa-fst f' g') = co2 (pa-fst f g) α
+coh pa-fst-nat {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : co2 (co21 (paf α β) fst) (pa-fst f' g') = co2 (pa-fst f g) α
 
-coh pa-snd-nat {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : co2 (co21 (pa2 α β) snd) (pa-snd f' g') = co2 (pa-snd f g) β
+coh pa-snd-nat {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : co2 (co21 (paf α β) snd) (pa-snd f' g') = co2 (pa-snd f g) β
 
 # triangle-law-1
-coh tl1 {a b c : .} (f : a -> b) (g : a -> c) : co2 (pa-eta (pa f g)) (pa2 (pa-fst f g) (pa-snd f g)) = id2 _
+coh tl1 {a b c : .} (f : a -> b) (g : a -> c) : co2 (pa-eta (pa f g)) (paf (pa-fst f g) (pa-snd f g)) = id2 _
 
 # triangle-law-2
 coh tl2-fst {a b c : .} (f : a -> b * c) : co2 (co21 (pa-eta f) fst) (pa-fst _ _) = id2 (co1 f fst)
