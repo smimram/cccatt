@@ -481,7 +481,8 @@ let check ~pos l a =
              ignore @@ failure pos "wrong cardinal";
              S.iter
                (fun x ->
-                  if List.count (S.mem x) !cc > 1 then failure x.pos "loop on %s" @@ to_string x
+                  if List.count (S.mem x) !cc > 1 then
+                    failure x.pos "loop on %s" @@ to_string x
                ) v
            );
          let l' = List.fold_left S.union S.empty l' in

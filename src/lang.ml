@@ -313,7 +313,23 @@ let rec exec_command (tenv, env) p =
     tenv, env
   | NCoh (x, l, a) ->
     check tenv env (pis ~pos:a.pos (List.map (fun (x,a) -> `Explicit,x,a) l) a) (mk ~pos:a.pos Type) |> ignore;
-    (try Pasting.check ~pos:a.pos l a; failure a.pos "expression accepted as a coherence" with _ -> ());
+    (
+      try
+        let l, a =
+          let l' = ref [] in
+          let rec aux tenv env = function
+            | (x,a)::l ->
+              let a = check tenv env a (mk ~pos:a.pos Type) in
+              l' := (x,a) :: !l';
+              aux ((x,eval env a)::tenv) ((x,var ~pos:a.pos x)::env) l
+            | [] -> check tenv env a (mk ~pos:a.pos Type)
+          in
+          let a = aux tenv env l in
+          List.rev !l', a
+        in
+        Pasting.check ~pos:a.pos l a; failure a.pos "expression accepted as a coherence"
+      with _ -> ()
+    );
     message "not a coherence %s : %s" x (to_string @@ pis_explicit l a);
     tenv, env
   | Include fname ->
