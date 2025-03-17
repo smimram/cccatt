@@ -21,3 +21,9 @@
  )
  (libraries js_of_ocaml cccatt)
 )
+
+(install
+ (files index.html)
+ (package cccatt)
+ (section share)
+)
