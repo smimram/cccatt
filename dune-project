@@ -1,4 +1,4 @@
-(lang dune 2.9)
+(lang dune 3.13)
 (name cccatt)
 (version 0.2.0)
 (generate_opam_files true)
@@ -9,7 +9,7 @@
 (homepage https://smimram.github.io/cccatt/)
 (bug_reports https://github.com/smimram/cccatt/issues)
 (documentation https://smimram.github.io/cccatt/)
-(using menhir 2.1)
+(using menhir 3.0)
 
 (package
  (name cccatt)

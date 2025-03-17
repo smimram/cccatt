@@ -12,7 +12,7 @@ doc: "https://smimram.github.io/cccatt/"
 bug-reports: "https://github.com/smimram/cccatt/issues"
 depends: [
   "ocaml"
-  "dune" {>= "2.9"}
+  "dune" {>= "3.13"}
   "odoc" {with-doc}
 ]
 build: [
@@ -24,11 +24,9 @@ build: [
     name
     "-j"
     jobs
-    "--promote-install-files=false"
     "@install"
     "@runtest" {with-test}
     "@doc" {with-doc}
   ]
-  ["dune" "install" "-p" name "--create-install-files" name]
 ]
 dev-repo: "git+https://github.com/smimram/cccatt.git"
