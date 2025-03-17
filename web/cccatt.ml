@@ -6,17 +6,10 @@ module Html = Dom_html
 
 let doc = Html.document
 
-let button txt action =
-  let button_type = Js.string "button" in
-  let b = Html.createInput ~_type:button_type doc in
-  b##.value := Js.string txt;
-  b##.onclick := Dom_html.handler (fun _ -> action (); Js._true);
-  b
-
 [%%if ocaml_version = (4,14,1)]
-let debug s = Firebug.console##debug (Js.string s)
+let _debug s = Firebug.console##debug (Js.string s)
 [%%else]
-let debug s = Console.console##debug (Js.string s)
+let _debug s = Console.console##debug (Js.string s)
 [%%endif]
 
 let env = ref ([],[])
