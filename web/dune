@@ -23,7 +23,7 @@
 )
 
 (install
- (files index.html)
+ (files index.html cccatt.css highlight.js)
  (package cccatt)
  (section share)
 )
