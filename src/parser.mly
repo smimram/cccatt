@@ -1,21 +1,8 @@
 %{
 (** Parser for the CCaTT language. *)
-
 open Term
 
-let defpos () = Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()
-
-let mk ?pos e =
-  let pos = Option.value ~default:(defpos ()) pos in
-  mk ~pos e
-
-let abss ?pos l e =
-  let pos = Option.value ~default:(defpos ()) pos in
-  abss ~pos l e
-
-let pis ?pos l a =
-  let pos = Option.value ~default:(defpos ()) pos in
-  pis ~pos l a
+let mk ~pos e = mk ~pos e
 %}
 
 %token LET NCOH FUN TO HOLE
@@ -41,7 +28,7 @@ prog:
   | EOF { [] }
 
 cmd:
-  | COH ident args COL expr { Let ($2, None, abs_coh ~pos:(defpos()) $2 $3 $5) }
+  | COH ident args COL expr { Let ($2, None, abs_coh ~pos:$loc $2 $3 $5) }
   | NCOH ident args COL expr { NCoh ($2, List.map (fun (_,x,a) -> x,a) $3, $5) }
   | LET IDENT args type_opt EQDEF expr { Let ($2, Option.map (pis $3) $4, abss $3 $6) }
   | INCLUDE { Include $1 }
@@ -51,26 +38,26 @@ type_opt:
   | { None }
 
 expr:
-  | FUN args TO expr { abss $2 $4 }
-  | expr ARR expr { mk (Arr (hole ~pos:(defpos()) (), $1, $3)) }
-  | expr HOM expr { mk (Hom ($1, $3)) }
-  | expr EQ eqtype expr { mk (Arr ($3, $1, $4)) }
-  | expr IEQ eqtype expr { mk (Id ($3, $1, $4)) }
-  | expr TIMES expr { mk (Prod ($1, $3)) }
-  | OP expr { mk (Op $2) }
+  | FUN args TO expr { abss ~pos:$loc $2 $4 }
+  | expr ARR expr { mk ~pos:$loc (Arr (hole ~pos:$loc (), $1, $3)) }
+  | expr HOM expr { mk ~pos:$loc (Hom ($1, $3)) }
+  | expr EQ eqtype expr { mk ~pos:$loc (Arr ($3, $1, $4)) }
+  | expr IEQ eqtype expr { mk ~pos:$loc (Id ($3, $1, $4)) }
+  | expr TIMES expr { mk ~pos:$loc (Prod ($1, $3)) }
+  | OP expr { mk ~pos:$loc (Op $2) }
   | aexpr { $1 }
 
 aexpr:
-  | aexpr sexpr { mk (App (`Explicit, $1, $2)) }
-  | aexpr LACC expr RACC { mk (App (`Implicit, $1, $3)) }
+  | aexpr sexpr { mk ~pos:$loc (App (`Explicit, $1, $2)) }
+  | aexpr LACC expr RACC { mk ~pos:$loc (App (`Implicit, $1, $3)) }
   | sexpr { $1 }
 
 /* Simple expression */
 sexpr:
-  | OBJ { mk Obj }
-  | IDENT { mk (Var $1) }
-  | HOLE { hole ~pos:(defpos()) ~real:true () }
-  | ONE { mk One }
+  | OBJ { mk ~pos:$loc Obj }
+  | IDENT { mk ~pos:$loc (Var $1) }
+  | HOLE { hole ~pos:$loc ~real:true () }
+  | ONE { mk ~pos:$loc One }
   | LPAR expr RPAR { $2 }
 
 args:
@@ -82,7 +69,7 @@ args:
 
 eqtype:
   | LACC expr RACC { $2 }
-  | { hole ~pos:(defpos()) () }
+  | { hole ~pos:$loc () }
 
 ident:
   | HOLE { "_" }

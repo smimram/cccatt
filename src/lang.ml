@@ -253,25 +253,12 @@ let print_unelaborated_metavariables m =
 let parse ?filename s =
   let lexbuf = Lexing.from_string s in
   lexbuf.lex_curr_p <- { lexbuf.lex_curr_p with pos_fname = Option.value ~default:"" filename };
-  try
-    Parser.prog Lexer.token lexbuf
+  try Parser.prog Lexer.token lexbuf
   with
   | Failure s when s = "lexing: empty token" ->
-    let pos = Lexing.lexeme_end_p lexbuf in
-    Common.error
-      "lexing error in file %s at line %d, character %d"
-      pos.Lexing.pos_fname
-      pos.Lexing.pos_lnum
-      (pos.Lexing.pos_cnum - pos.Lexing.pos_bol)
-  | Parsing.Parse_error
+    Common.error "lexing error %s" (Pos.to_string @@ Pos.lexeme lexbuf)
   | Parser.Error ->
-    let pos = (Lexing.lexeme_end_p lexbuf) in
-    Common.error
-      "parsing error in file %s at word \"%s\", line %d, character %d"
-      pos.Lexing.pos_fname
-      (Lexing.lexeme lexbuf)
-      pos.Lexing.pos_lnum
-      (pos.Lexing.pos_cnum - pos.Lexing.pos_bol - 1)
+    Common.error "parsing error at word \"%s\", %s" (Lexing.lexeme lexbuf) (Pos.to_string @@ Pos.lexeme lexbuf)
 
 (** Parse a file. *)
 let parse_file f =

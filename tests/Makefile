@@ -1,5 +1,8 @@
 all:
 
 test:
-	make -C errors $@
+	$(MAKE) -C errors $@
 	@dune runtest -f
+
+clean:
+	$(MAKE) -C .. $@
