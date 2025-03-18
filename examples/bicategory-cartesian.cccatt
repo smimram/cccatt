@@ -47,6 +47,17 @@ let paf {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g'
 # TODO: show that other are also derivable
 
 coh paf-id2 {a b c : .} (f : a -> b) (g : a -> c) : paf (id2 f) (id2 g) -> id2 (pa f g)
+# let paf-id2 {a b c : .} (f : a -> b) (g : a -> c) : paf (id2 f) (id2 g) -> id2 (pa f g) := co3 (pa2-cong (inv3 (pa2-fst _ _ _)) _) (inv3 (pa2-eta (id2 _)))
+
+# pa2[pa[?2080,?2114],co2[co21[id2[pa[?2080,?2114]],fst[]],pa-fst[?2080,?2114]],co2[co21[id2[pa[?2080,?2114]],snd[]],pa-snd[?2080,?2114]]] = id2[pa[?2080,?2114]]
+# pa2[pa[?2080,?2114],co2[co21[pa2[pa[?2080,?2114],?2086,?126],fst[]],pa-fst[?2080,?2114]],?2092] = ?2072
+
+# co2[pa-fst[f,g],id2[f]] = co2[co21[id2[pa[f,g]],fst[]],pa-fst[f,g]]
+
+# pa2[pa[f,g],co2[pa-fst[f,g],id2[f]],co2[pa-snd[f,g],id2[g]]] = pa2[pa[f,g],co2[co21[id2[pa[f,g]],fst[]],pa-fst[f,g]],co2[co21[id2[pa[f,g]],snd[]],pa-snd[f,g]]]
+
+# pa2[pa[f,g],co2[co21[id2[pa[f,g]],fst[]],pa-fst[f,g]],co2[co21[id2[pa[f,g]],snd[]],pa-snd[f,g]]] = id2[pa[f,g]]
+# pa2[pa[f,g],co2[pa-fst[f,g],id2[f]],co2[pa-snd[f,g],id2[g]]] = id2[pa[f,g]] expected
 
 coh paf-co2 {a b c : .} {f f' f'' : a -> b} {g g' g'' : a -> c} (α : f -> f') (α' : f' -> f'') (β : g -> g') (β' : g' -> g'') : co2 (paf α β) (paf α' β') = paf (co2 α α') (co2 β β')
 

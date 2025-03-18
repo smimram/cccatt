@@ -246,7 +246,7 @@ let print_unelaborated_metavariables m =
   List.iter
     (fun (m:meta) ->
        if m.value = None then
-         warning "unelaborated ?%d at %s" m.id (Pos.Option.to_string m.source_pos)
+         warning "unelaborated ?%d at %s of type %s" m.id (Pos.Option.to_string m.source_pos) (to_string m.ty)
     ) (List.sort compare m)
 
 (** Parse a string. *)
