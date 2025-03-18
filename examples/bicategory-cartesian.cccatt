@@ -57,10 +57,20 @@ coh co2-co21 {a b c : .} {f g h : a -> b} (α : f -> g) (β : g -> h) (k : b -> 
 # TODO: show that other are also derivable
 coh paf-id2 {a b c : .} (f : a -> b) (g : a -> c) : paf (id2 f) (id2 g) -> id2 (pa f g)
 let paf-id2 {a b c : .} (f : a -> b) (g : a -> c) : paf (id2 f) (id2 g) -> id2 (pa f g) :=
-co3 (pa2-cong
-        (co3 (unitr2 _) (co3 (inv3 (unitl2 _)) (co2-cong (id-co1l _ _) (id3 _))))
-        (co3 (unitr2 _) (co3 (inv3 (unitl2 _)) (co2-cong (id-co1l _ _) (id3 _)))))
-     (inv3 (pa2-eta (id2 _)))
+  trans
+    (pa2-cong
+      (trans3
+        (unitr2 _)
+        (inv3 (unitl2 _))
+        (co2-cong (id-co1l _ _) (id3 _))
+      )
+      (trans3
+        (unitr2 _)
+        (inv3 (unitl2 _))
+        (co2-cong (id-co1l _ _) (id3 _))
+      )
+    )
+    (inv3 (pa2-eta (id2 _)))
 
 coh paf-co2 {a b c : .} {f f' f'' : a -> b} {g g' g'' : a -> c} (α : f -> f') (α' : f' -> f'') (β : g -> g') (β' : g' -> g'') : paf (co2 α α') (co2 β β') = co2 (paf α β) (paf α' β')
 let paf-co2 {a b c : .} {f f' f'' : a -> b} {g g' g'' : a -> c} (α : f -> f') (α' : f' -> f'') (β : g -> g') (β' : g' -> g'') : paf (co2 α α') (co2 β β') = co2 (paf α β) (paf α' β') :=
