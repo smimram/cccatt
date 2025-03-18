@@ -7,7 +7,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     - name: Install packages
-      run: sudo apt-get -y install ocaml ocaml-dune ocaml-odoc js-of-ocaml libppx-optcomp-ocaml-dev
+      run: sudo apt-get -y install ocaml ocaml-dune ocaml-odoc menhir js-of-ocaml libppx-optcomp-ocaml-dev
     - name: Install ppx_blob
       run: |
         cd /tmp
