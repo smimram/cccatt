@@ -76,7 +76,7 @@ sexpr:
 args:
   | LPAR idents COL expr RPAR args { (List.map (fun x -> `Explicit, x, $4) $2)@$6 }
   | LACC idents COL expr RACC args { (List.map (fun x -> `Implicit, x, $4) $2)@$6 }
-  /* | LPAR expr RPAR args { (`Explicit, "?", $2)::$4 } */
+  /* | LPAR expr RPAR args { (`Explicit, "_", $2)::$4 } */
   | { [] }
 
 eqtype:

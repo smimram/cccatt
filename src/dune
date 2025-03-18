@@ -5,7 +5,7 @@
 )
 
 (ocamllex (modules lexer))
-(ocamlyacc (modules parser))
+(menhir (modules parser))
 
 (library
  (public_name cccatt)
