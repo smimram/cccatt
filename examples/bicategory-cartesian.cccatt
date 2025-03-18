@@ -47,20 +47,20 @@ coh pa2-cong {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} {α α' : co
 coh paf {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : pa f g -> pa f' g'
 let paf {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : pa f g -> pa f' g' := pa2 {a} {b} {c} {f'} {g'} (pa f g) (co2 (pa-fst f g) α) (co2 (pa-snd f g) β)
 
+# Lemmas to be moved
+coh co21-cong {a b c : .} {f g : a -> b} {α β : f -> g} (_ : α -> β) (h  : b -> c) : co21 α h -> co21 β h
+coh co2-cong {a b : .} {f g h : a -> b} {α α' : f -> g} {β β': g -> h} (_ : α -> α') (_ : β -> β') : co2 α β -> co2 α' β'
+coh id3 {a b : .} {f g : a -> b} (α : f -> g) : α -> α
+coh id-co1l {a b c : .} (f : a -> b) (g : b -> c) : id2 (co1 f g) -> co21 (id2 f) g
+
 # TODO: show that other are also derivable
-
 coh paf-id2 {a b c : .} (f : a -> b) (g : a -> c) : paf (id2 f) (id2 g) -> id2 (pa f g)
-# let paf-id2 {a b c : .} (f : a -> b) (g : a -> c) : paf (id2 f) (id2 g) -> id2 (pa f g) := co3 (pa2-cong (inv3 (pa2-fst _ _ _)) _) (inv3 (pa2-eta (id2 _)))
+let paf-id2 {a b c : .} (f : a -> b) (g : a -> c) : paf (id2 f) (id2 g) -> id2 (pa f g) :=
+co3 (pa2-cong
+        (co3 (unitr2 _) (co3 (inv3 (unitl2 _)) (co2-cong (id-co1l _ _) (id3 _))))
+        (co3 (unitr2 _) (co3 (inv3 (unitl2 _)) (co2-cong (id-co1l _ _) (id3 _)))))
+     (inv3 (pa2-eta (id2 _)))
 
-# pa2[pa[?2080,?2114],co2[co21[id2[pa[?2080,?2114]],fst[]],pa-fst[?2080,?2114]],co2[co21[id2[pa[?2080,?2114]],snd[]],pa-snd[?2080,?2114]]] = id2[pa[?2080,?2114]]
-# pa2[pa[?2080,?2114],co2[co21[pa2[pa[?2080,?2114],?2086,?126],fst[]],pa-fst[?2080,?2114]],?2092] = ?2072
-
-# co2[pa-fst[f,g],id2[f]] = co2[co21[id2[pa[f,g]],fst[]],pa-fst[f,g]]
-
-# pa2[pa[f,g],co2[pa-fst[f,g],id2[f]],co2[pa-snd[f,g],id2[g]]] = pa2[pa[f,g],co2[co21[id2[pa[f,g]],fst[]],pa-fst[f,g]],co2[co21[id2[pa[f,g]],snd[]],pa-snd[f,g]]]
-
-# pa2[pa[f,g],co2[co21[id2[pa[f,g]],fst[]],pa-fst[f,g]],co2[co21[id2[pa[f,g]],snd[]],pa-snd[f,g]]] = id2[pa[f,g]]
-# pa2[pa[f,g],co2[pa-fst[f,g],id2[f]],co2[pa-snd[f,g],id2[g]]] = id2[pa[f,g]] expected
 
 coh paf-co2 {a b c : .} {f f' f'' : a -> b} {g g' g'' : a -> c} (α : f -> f') (α' : f' -> f'') (β : g -> g') (β' : g' -> g'') : co2 (paf α β) (paf α' β') = paf (co2 α α') (co2 β β')
 
