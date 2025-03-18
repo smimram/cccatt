@@ -20,19 +20,22 @@ coh pa-fst {a b c : .} (f : a -> b) (g : a -> c) : co1 (pa f g) fst -> f
 
 coh pa-snd {a b c : .} (f : a -> b) (g : a -> c) : co1 (pa f g) snd -> g
 
+# NOTE: changing from here on...
+
 # p†
 coh pa2 {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : pa f g -> pa f' g'
 
-# # ς
-# let pa-eta {a b c : .} (f : a -> b * c) : f -> pa (co1 f fst) (co1 f snd) := pa2 f (id2 (co1 f fst)) (id2 (co1 f snd))
+# ς
+# NOTE: this is not derivable here!
+coh pa-eta {a b c : .} (f : a -> b * c) : f -> pa (co1 f fst) (co1 f snd)
 
-# # U1
-# coh pa2-fst {a b c : .} {f : a -> b} {g : a -> c} (h : a -> b * c) (α : co1 h fst -> f) (β : co1 h snd -> g) : co2 (co21 (pa2 h α β) fst) (pa-fst f g) = α
+# U1
+coh pa2-fst {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : co2 (co21 (pa2 α β) fst) (pa-fst f' g') = co2 (pa-fst f g) α
 
-# coh pa2-snd {a b c : .} {f : a -> b} {g : a -> c} (h : a -> b * c) (α : co1 h fst -> f) (β : co1 h snd -> g) : co2 (co21 (pa2 h α β) snd) (pa-snd f g) = β
+coh pa2-fst {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : co2 (co21 (pa2 α β) snd) (pa-snd f' g') = co2 (pa-snd f g) β
 
-# # U2
-# coh pa2-eta {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} (α : h -> pa f g) : α = pa2 h (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g))
+# U2
+# coh pa2-eta {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : pa f g -> pa f' g') : α = pa2 (co2 (co2 _ (co21 α fst)) (pa-fst f' g')) _
 
-# # cong
-# coh pa2-cong {a b c : .} {f : a -> b} {g : a -> c} {h : a -> b * c} {α α' : co1 h fst -> f} {β β' : co1 h snd -> g} (_ : α -> α') (_ : β -> β') : pa2 h α β = pa2 h α' β'
+# cong
+coh pa2-cong {a b c : .} {f f' : a -> b} {g g' : a -> c} {α α' : f -> f'} {β β' : g -> g'} (_ : α = α') (_ : β = β') : pa2 α β = pa2 α' β'
