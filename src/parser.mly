@@ -20,7 +20,7 @@ let pis ?pos l a =
 
 %token LET NCOH FUN TO HOLE
 %token COH ARR HOM EQ IEQ EQDEF OBJ TIMES ONE OP
-%token LPAR RPAR LACC RACC COL
+%token LPAR RPAR LACC RACC COL MARR
 %token <string> IDENT
 %token <string> INCLUDE
 %token EOF
@@ -76,8 +76,8 @@ sexpr:
 args:
   | LPAR idents COL expr RPAR args { (List.map (fun x -> `Explicit, x, $4) $2)@$6 }
   | LACC idents COL expr RACC args { (List.map (fun x -> `Implicit, x, $4) $2)@$6 }
-  /* | LPAR expr RPAR args { (`Explicit, "_", $2)::$4 } */
-  /* | LACC expr RACC args { (`Implicit, "_", $2)::$4 } */
+  | MARR LPAR expr RPAR args { (`Explicit, "_", $3)::$5 }
+  | MARR LACC expr RACC args { (`Implicit, "_", $3)::$5 }
   | { [] }
 
 eqtype:
