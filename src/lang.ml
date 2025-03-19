@@ -293,10 +293,10 @@ let rec exec_command (tenv, env) p =
     (* print_endline "checking"; *)
     let v = eval env e in
     print_metavariables_elaboration m;
-    print_unelaborated_metavariables m;
     let tenv = (x,a)::tenv in
     let env = (x,v)::env in
     message "defined %s : %s" x (to_string a);
+    print_unelaborated_metavariables m;
     (* printf "      %s\n%!" (to_string v); *)
     tenv, env
   | NCoh (x, l, a) ->
