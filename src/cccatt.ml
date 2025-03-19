@@ -4,7 +4,11 @@ let () =
   Printexc.record_backtrace true;
   let files = ref [] in
   Arg.parse
-    []
+    (Arg.align
+       [
+         "--disable-pasting", Arg.Set Setting.disable_pasting_check, " Disable checking of pasting schemes.";
+       ]
+    )
     (fun s -> files := s::!files)
     usage;
   if !files = [] then (print_endline usage; exit 0);

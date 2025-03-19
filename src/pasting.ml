@@ -490,3 +490,6 @@ let check ~pos l a =
       ) l
 
   (* | _ -> failwith "unhandled mode" *)
+
+let check ~pos l a =
+  if not !Setting.disable_pasting_check then check ~pos l a

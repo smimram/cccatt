@@ -3,6 +3,9 @@
 open Extlib
 open Common
 
+(** Whether checking for pasting types is disabled. *)
+let disable_pasting_check = ref false
+
 (** Mode for checking pasting schemes. *)
 type mode = [
   | `Plain
