@@ -5,12 +5,7 @@ open Common
 open Term
 
 (** A set of variables. *)
-module VarSet = struct
-  include Set.Make(struct type nonrec t = t let compare = compare_var end)
-
-  (* Backward compatibility. *)
-  let to_list s = List.of_seq @@ to_seq s
-end
+module VarSet = Set.Make(struct type nonrec t = t let compare = compare_var end)
 module VS = VarSet
 
 (** Check whether a 1-dimensional type in a context is a pasting scheme. *)
@@ -338,7 +333,7 @@ let check1 ~pos l a =
     (* Make sure that every positive variable is matched with exactly one corresponding negative variable, and conversely. *)
     if not (VS.equal v v') then failure pos "non-matched variables: %s" (String.concat ", " @@ List.map to_string @@ VS.elements @@ VS.union (VS.diff v v') (VS.diff v' v));
     (* Make sure that we do not have cycles by constructing connected components. *)
-    let cc = ref @@ List.map VS.singleton (VS.to_list v) in
+    let cc = ref @@ List.map VS.singleton (VS.elements v) in
     List.iter
       (fun (_,a) ->
          let (a,a') = get_tens a in
@@ -447,12 +442,13 @@ let check ~pos l a =
 (* Here, we cleanup the variable declarations and call the above. *)
 let check ~pos l a =
   (* printf "* check_ps: %s\n%!" (to_string (pis_explicit l a)); *)
+  let module S = Set.Make(String) in
 
   (* Remove variable declarations from the context. *)
   let vars, l =
     let split_vars l =
       let is_obj a = a.desc = Obj in
-      let vars = List.filter_map (fun (x,a) -> if is_obj a then Some x else None) l in
+      let vars = List.fold_left (fun vars (x,a) -> if is_obj a then S.add x vars else vars) S.empty l in
       let l = List.filter (fun (_,a) -> not (is_obj a)) l in
       vars, l
     in
@@ -466,7 +462,7 @@ let check ~pos l a =
     let fv a =
       let rec aux a fv =
         match (unmeta a).desc with
-        | Var x -> if not (List.mem x fv) then x::fv else fv
+        | Var x -> S.add x fv
         | Obj -> fv
         | Arr (a, t, u) -> fv |> aux a |> aux t |> aux u
         | Hom (a, b) -> fv |> aux a |> aux b
@@ -478,10 +474,10 @@ let check ~pos l a =
         | Coh (_,_,_,s) -> List.fold_left (fun fv (_,t) -> aux t fv) fv s
         | _ -> failure a.pos "TODO: fv handle %s" (to_string a)
       in
-      aux a []
+      aux a S.empty
     in
-    let d = List.diff vars (fv a) in
-    if d <> [] then failure a.pos "unused variables: %s" (String.concat ", " d)
+    let d = S.diff vars (fv a) in
+    if not (S.is_empty d) then failure a.pos "unused variables: %s" (String.concat ", " @@ S.elements d)
   in
 
   check ~pos l a
