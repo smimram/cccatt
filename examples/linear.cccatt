@@ -46,3 +46,7 @@ coh ax-C3 {a b c d : .} :
   ap2 B (ap B B) C
   ⇔{(a ⇒ b ⇒ c) ⇒ b ⇒ (d ⇒ a) ⇒ d ⇒ c}
   ap2 B C (ap2 B (ap B C) B)
+
+# Tests
+
+ncoh diag {a b : .} (f : a => a => b) : a => b
