@@ -13,6 +13,7 @@ type mode = [
   | `Monoidal
   | `Symmetric_monoidal
   | `Symmetric_monoidal_closed
+  | `Linear_closed
   | `Cartesian
   | `Cartesian_closed
   | `Compact_closed
@@ -21,9 +22,9 @@ type mode = [
 let mode = ref (`Cartesian_closed : mode)
 
 (** Whether types have elements. *)
-let has_elements () = List.mem !mode [`Symmetric_monoidal_closed; `Cartesian_closed]
+let has_elements () = List.mem !mode [`Linear_closed; `Symmetric_monoidal_closed; `Cartesian_closed]
 
-let has_hom () = List.mem !mode [`Symmetric_monoidal_closed; `Cartesian_closed]
+let has_hom () = List.mem !mode [`Linear_closed; `Symmetric_monoidal_closed; `Cartesian_closed]
 
 let has_prod () = List.mem !mode [`Monoidal; `Symmetric_monoidal; `Symmetric_monoidal_closed; `Cartesian; `Cartesian_closed; `Compact_closed]
 
@@ -85,6 +86,7 @@ let parse s =
         | "symmetric monoidal closed category" | "smcc" -> `Symmetric_monoidal_closed
         | "monoidal category" -> `Monoidal
         | "compact closed" -> `Compact_closed
+        | "linear closed" -> `Linear_closed
         | m -> error "unknown mode: %s" m
       );
     !mode_callback !mode;
