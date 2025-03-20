@@ -11,7 +11,6 @@ module VS = VarSet
 (** Check whether a 1-dimensional type in a context is a pasting scheme. *)
 let check1 ~pos l a =
   (* Printf.printf "check1 : %s ⊢ %s\n%!" (string_of_context l) (to_string a); *)
-
   match !Setting.mode with
 
   | `Cartesian_closed ->
@@ -320,7 +319,7 @@ let check1 ~pos l a =
     in
     let neg (a,a') = a',a in
     let rec get_tens a =
-      match a.desc with
+      match (unmeta a).desc with
       | Var _ -> VS.singleton a, VS.empty
       | One -> VS.empty, VS.empty
       | Prod (a, b) -> union (get_tens a) (get_tens b)
