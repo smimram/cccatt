@@ -10,6 +10,8 @@ module VS = VarSet
 
 (** Check whether a 1-dimensional type in a context is a pasting scheme. *)
 let check1 ~pos l a =
+  Printf.printf "check1 : %s ⊢ %s\n%!" (String.concat ", " @@ List.map (fun (x,a) -> x^" : "^to_string a) l) (to_string a);
+
   match !Setting.mode with
 
   | `Cartesian_closed ->
@@ -360,6 +362,13 @@ let check1 ~pos l a =
 (** Check whether a type in a context is a pasting scheme. We suppose that there are no variable declarations. *)
 (* Here, we remove identities and call the above. *)
 let check ~pos l a =
+
+  if !Setting.orientation = `Directed && Setting.has_elements () then
+    (
+      warning "orientation not supported yet for closed categories, falling back to reversible";
+      Setting.orientation := `Reversible
+    );
+
   match !Setting.orientation with
 
   | `Reversible ->
@@ -479,7 +488,6 @@ let check ~pos l a =
         aux (n-1) src (fst @@ arr a);
         aux (n-1) tgt (snd @@ arr a)
     in
-    let dim a = try dim a with _ when Setting.has_elements () -> 0 in
     let n = dim a in
     List.iter (fun (_,a) -> if dim a > n then failure a.pos "type %s has dimension %d but trying to construct a term of dimension %d" (to_string a) (dim a) n) l;
     aux n l a
