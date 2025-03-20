@@ -4,6 +4,15 @@ open Extlib
 open Common
 open Term
 
+(** A set of variables. *)
+module VarSet = struct
+  include Set.Make(struct type nonrec t = t let compare = compare_var end)
+
+  (* Backward compatibility. *)
+  let to_list s = List.of_seq @@ to_seq s
+end
+module VS = VarSet
+
 (** Check whether a 1-dimensional type in a context is a pasting scheme. *)
 let check1 ~pos l a =
   match !Setting.mode with
@@ -185,17 +194,16 @@ let check1 ~pos l a =
   | `Cartesian ->
 
     (* printf "cartesian pasing scheme : %s ⊢ %s\n" (string_of_context l) (to_string a); *)
-    let module S = Set.Make(struct type nonrec t = t let compare = compare_var end) in
     let rec get_prod ?(distinct=false) a =
       let a0 = a in
       match (unmeta a).desc with
       | Prod (a, b) ->
         let a = get_prod a in
         let b = get_prod b in
-        if distinct && not (S.disjoint a b) then failure a0.pos "repeated variables";
-        S.union a b
-      | One -> S.empty
-      | Var _ -> S.singleton a
+        if distinct && not (VS.disjoint a b) then failure a0.pos "repeated variables";
+        VS.union a b
+      | One -> VS.empty
+      | Var _ -> VS.singleton a
       | _ -> failure a.pos "product of variables expected"
     in
     let get_arr a =
@@ -213,18 +221,17 @@ let check1 ~pos l a =
     (* From the source to the targets. *)
     let rec check available l =
       if l = [] then available else
-        match List.find_and_remove_opt (fun (a,_) -> S.subset a available) l with
+        match List.find_and_remove_opt (fun (a,_) -> VS.subset a available) l with
         | Some ((_,b),l) ->
-          if not (S.disjoint b available) then failure pos "variable produced multiple times: %s" (S.to_seq b |> List.of_seq |> List.map to_string |> String.concat ", ");
-          check (S.union b available) l
+          if not (VS.disjoint b available) then failure pos "variable produced multiple times: %s" (VS.to_seq b |> List.of_seq |> List.map to_string |> String.concat ", ");
+          check (VS.union b available) l
         | None -> failure pos "some hypothesis could not be produced"
     in
     let available = check a l in
-    if not (S.subset b available) then failure pos "some variables cannot be produced: %s" (S.diff b available |> S.to_seq |> List.of_seq |> List.map to_string |> String.concat ", ")
+    if not (VS.subset b available) then failure pos "some variables cannot be produced: %s" (VS.diff b available |> VS.to_seq |> List.of_seq |> List.map to_string |> String.concat ", ")
 
   | `Symmetric_monoidal ->
 
-    let module S = Set.Make(struct type nonrec t = t let compare = compare_var end) in
     (* Make sure that the types are arrows between tensor expressions. *)
     let rec get_tens a =
       let pos = a.pos in
@@ -232,10 +239,10 @@ let check1 ~pos l a =
       | Prod (a, b) ->
         let a = get_tens a in
         let b = get_tens b in
-        if not (S.disjoint a b) then failure pos "repeated variables";
-        S.union a b
-      | One -> S.empty
-      | Var _ -> S.singleton a
+        if not (VS.disjoint a b) then failure pos "repeated variables";
+        VS.union a b
+      | One -> VS.empty
+      | Var _ -> VS.singleton a
       | _ -> failure a.pos "tensor product of variables expected"
     in
     let get_arr a =
@@ -243,8 +250,8 @@ let check1 ~pos l a =
       | Arr (o, a, b) when is_obj o ->
         let a' = get_tens a in
         let b' = get_tens b in
-        if S.is_empty a' then failure a.pos "type cannot be empty";
-        if S.is_empty b' then failure b.pos "type cannot be empty";
+        if VS.is_empty a' then failure a.pos "type cannot be empty";
+        if VS.is_empty b' then failure b.pos "type cannot be empty";
         (* if not (S.disjoint a' b') then failure pos "looping type"; *)
         a', b'
       | _ -> failure a.pos "arrow expected"
@@ -256,36 +263,35 @@ let check1 ~pos l a =
     (* NOTE: we could also check that the formula is balanced *)
     List.iter_unordered_pairs
       (fun (a,b) (a',b') ->
-         if not (S.disjoint a a') then failure pos "sources not disjoint";
-         if not (S.disjoint b b') then failure pos "targets not disjoint"
+         if not (VS.disjoint a a') then failure pos "sources not disjoint";
+         if not (VS.disjoint b b') then failure pos "targets not disjoint"
       ) l;
     (* Make sure that we have a 2-path from b to a. *)
     let rec check seen b =
       (* Printf.printf "check : %s\n%!" (to_string (prods b)); *)
-      let rule = List.find_opt (fun (_,b') -> S.subset b' b) l in
+      let rule = List.find_opt (fun (_,b') -> VS.subset b' b) l in
       match rule with
       | Some (a',b') ->
-        if not (S.disjoint a' seen) then failure pos "cyclic dependency";
-        check (S.union a' seen) (S.union (S.diff b b') a')
+        if not (VS.disjoint a' seen) then failure pos "cyclic dependency";
+        check (VS.union a' seen) (VS.union (VS.diff b b') a')
       | None ->
-        if not (S.equal a b) then failure pos "no producer for %s" (to_string (prods (S.elements b)))
+        if not (VS.equal a b) then failure pos "no producer for %s" (to_string @@ prods @@ VS.elements b)
     in
-    check S.empty b
+    check VS.empty b
 
   | `Symmetric_monoidal_closed ->
 
-    let module S = Set.Make(struct type nonrec t = t let compare = compare_var end) in
     let a = homs ~pos (List.map snd l) a in
     (* Check that the formula is balanced (every variable occurs at most once positively and at most once negatively. *)
     let rec balanced neg pos a =
       match a.desc with
-      | Var _ -> if S.mem a pos then failure a.pos "variable occurs twice with the same polarity"
+      | Var _ -> if VS.mem a pos then failure a.pos "variable occurs twice with the same polarity"
       | One -> ()
       | Prod (a, b) -> balanced neg pos a; balanced neg pos b
       | Hom (a, b) -> balanced pos neg a; balanced neg pos b
       | _ -> assert false
     in
-    balanced S.empty S.empty a;
+    balanced VS.empty VS.empty a;
     let eq = eq_var in
     (* Prove a. *) 
     let rec prove env a =
@@ -309,56 +315,50 @@ let check1 ~pos l a =
 
   | `Compact_closed ->
 
-    let module S = struct
-      include Set.Make(struct type nonrec t = t let compare = compare_var end)
-      (* Backward compatibility. *)
-      let to_list s = List.of_seq @@ to_seq s
-    end
-    in
     (* We consider pairs of sets of variables: the positive ones and the negative ones. *)
     let union (a,a') (b,b') =
-      if not (S.disjoint a b) then failure pos "repeated variables: %s" (String.concat ", " @@ List.map to_string @@ S.elements @@ S.inter a b);
-      if not (S.disjoint a' b') then failure pos "repeated variables: %s" (String.concat ", " @@ List.map to_string @@ S.elements @@ S.inter a' b');
-      S.union a b, S.union a' b'
+      if not (VS.disjoint a b) then failure pos "repeated variables: %s" (String.concat ", " @@ List.map to_string @@ VS.elements @@ VS.inter a b);
+      if not (VS.disjoint a' b') then failure pos "repeated variables: %s" (String.concat ", " @@ List.map to_string @@ VS.elements @@ VS.inter a' b');
+      VS.union a b, VS.union a' b'
     in
     let neg (a,a') = a',a in
     let rec get_tens a =
       match a.desc with
-      | Var _ -> S.singleton a, S.empty
-      | One -> S.empty, S.empty
+      | Var _ -> VS.singleton a, VS.empty
+      | One -> VS.empty, VS.empty
       | Prod (a, b) -> union (get_tens a) (get_tens b)
       | Op a -> neg @@ get_tens a
       | Arr (o, a, b) when is_obj o -> union (neg @@ get_tens a) (get_tens b)
       | _ -> failure a.pos "unhandled type: %s" @@ to_string a
     in
     let v, v' =
-      let l = List.fold_left union (S.empty,S.empty) @@ List.map get_tens @@ List.map snd l in
+      let l = List.fold_left union (VS.empty,VS.empty) @@ List.map get_tens @@ List.map snd l in
       union (neg l) (get_tens a)
     in
     (* Make sure that every positive variable is matched with exactly one corresponding negative variable, and conversely. *)
-    if not (S.equal v v') then failure pos "non-matched variables: %s" (String.concat ", " @@ List.map to_string @@ S.elements @@ S.union (S.diff v v') (S.diff v' v));
+    if not (VS.equal v v') then failure pos "non-matched variables: %s" (String.concat ", " @@ List.map to_string @@ VS.elements @@ VS.union (VS.diff v v') (VS.diff v' v));
     (* Make sure that we do not have cycles by constructing connected components. *)
-    let cc = ref @@ List.map S.singleton (S.to_list v) in
+    let cc = ref @@ List.map VS.singleton (VS.to_list v) in
     List.iter
       (fun (_,a) ->
          let (a,a') = get_tens a in
-         if not (S.disjoint a a') then
+         if not (VS.disjoint a a') then
            (
-             let x = S.choose @@ S.inter a a' in
+             let x = VS.choose @@ VS.inter a a' in
              failure x.pos "loop on %s" @@ to_string x
            );
-         let v = S.union a a' in
-         let l,l' = List.partition (S.disjoint v) !cc in
-         if List.length l' <> S.cardinal v then
+         let v = VS.union a a' in
+         let l,l' = List.partition (VS.disjoint v) !cc in
+         if List.length l' <> VS.cardinal v then
            (
              ignore @@ failure pos "wrong cardinal";
-             S.iter
+             VS.iter
                (fun x ->
-                  if List.count (S.mem x) !cc > 1 then
+                  if List.count (VS.mem x) !cc > 1 then
                     failure x.pos "loop on %s" @@ to_string x
                ) v
            );
-         let l' = List.fold_left S.union S.empty l' in
+         let l' = List.fold_left VS.union VS.empty l' in
          cc := l' :: l
       ) l
 
@@ -444,7 +444,7 @@ let check ~pos l a =
   check1 ~pos l a
 
 (** Check whether a type in a context is a pasting scheme. *)
-(* Here, we cleanup the variable declaration and call the above. *)
+(* Here, we cleanup the variable declarations and call the above. *)
 let check ~pos l a =
   (* printf "* check_ps: %s\n%!" (to_string (pis_explicit l a)); *)
 
