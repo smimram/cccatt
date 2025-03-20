@@ -74,13 +74,20 @@ let parse s =
         | "symmetric monoidal closed category" | "smcc" -> `Symmetric_monoidal_closed
         | "monoidal category" -> `Monoidal
         | "compact closed" -> `Compact_closed
-        | m -> error "Unknown mode: %s" m
+        | m -> error "unknown mode: %s" m
       );
     !mode_callback !mode
   | "dim" | "dimension" ->
     let n = if v = "oo" || v = "∞" then max_int else int_of_string v in
     set_dim n
-  | k -> error "Unknown setting: %s" k
+  | "reversible" ->
+    (
+      match v with
+      | "true" -> directed := `Reversible
+      | "false" -> directed := `Directed
+      | v -> error "unexpected value for %s: %s" k v
+    )
+  | k -> error "unknown setting: %s" k
 
 let save, restore =
   let l = ref [] in

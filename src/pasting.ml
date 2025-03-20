@@ -444,7 +444,44 @@ let check ~pos l a =
 
   | `Directed ->
 
-    failwith "TODO: directed"
+    let rec aux n l a =
+      if n <= 1 then check1 ~pos l a
+      else
+        let arr a =
+          match (unmeta a).desc with
+          | Arr (_, src, tgt) -> src, tgt
+          | _ -> assert false
+        in
+        let var x =
+          match (unmeta x).desc with
+          | Var x -> x
+          | _ -> error ~pos:x.pos "variable expected, have %s" (to_string a)
+        in
+        (* Equations *)
+        let eq =
+          List.filter_map
+            (fun (_,a) ->
+               let x, y = arr a in
+               let x = var x in
+               let y = var y in
+               if dim a = n then Some (x,y) else None
+            ) l
+        in
+        let l = List.filter (fun (_,a) -> dim a < n) l in
+        let src =
+          let tgts = List.map snd eq in
+          List.filter (fun (x,_) -> not (List.mem x tgts)) l
+        in
+        let tgt =
+          let srcs = List.map snd eq in
+          List.filter (fun (x,_) -> not (List.mem x srcs)) l
+        in
+        aux (n-1) src (fst @@ arr a);
+        aux (n-1) tgt (snd @@ arr a)
+    in
+    let n = try dim a with _ when Setting.has_elements () -> 0 in
+    List.iter (fun (_,a) -> if dim a > n then failure a.pos "type %s has dimension %d but trying to construct a term of dimension %d" (to_string a) (dim a) n) l;
+    aux n l a
 
 (** Check whether a type in a context is a pasting scheme. *)
 (* Here, we cleanup the variable declarations and call the above. *)
