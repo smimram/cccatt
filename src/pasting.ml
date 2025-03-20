@@ -360,7 +360,7 @@ let check1 ~pos l a =
 (** Check whether a type in a context is a pasting scheme. We suppose that there are no variable declarations. *)
 (* Here, we remove identities and call the above. *)
 let check ~pos l a =
-  match !Setting.directed with
+  match !Setting.orientation with
 
   | `Reversible ->
 
@@ -479,7 +479,8 @@ let check ~pos l a =
         aux (n-1) src (fst @@ arr a);
         aux (n-1) tgt (snd @@ arr a)
     in
-    let n = try dim a with _ when Setting.has_elements () -> 0 in
+    let dim a = try dim a with _ when Setting.has_elements () -> 0 in
+    let n = dim a in
     List.iter (fun (_,a) -> if dim a > n then failure a.pos "type %s has dimension %d but trying to construct a term of dimension %d" (to_string a) (dim a) n) l;
     aux n l a
 

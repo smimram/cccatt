@@ -21,10 +21,10 @@ type mode = [
 let mode = ref (`Cartesian_closed : mode)
 
 (** Whether all maps are reversible starting from dimension 1. *)
-let directed = ref (`Reversible : [`Directed | `Reversible])
+let orientation = ref (`Directed : [`Directed | `Reversible])
 
 (** Whether types have elements. *)
-let has_elements () = List.mem !mode [`Cartesian_closed]
+let has_elements () = List.mem !mode [`Symmetric_monoidal_closed; `Cartesian_closed]
 
 let has_hom () = List.mem !mode [`Symmetric_monoidal_closed; `Cartesian_closed]
 
@@ -83,8 +83,8 @@ let parse s =
   | "reversible" ->
     (
       match v with
-      | "true" -> directed := `Reversible
-      | "false" -> directed := `Directed
+      | "true" -> orientation := `Reversible
+      | "false" -> orientation := `Directed
       | v -> error "unexpected value for %s: %s" k v
     )
   | k -> error "unknown setting: %s" k
