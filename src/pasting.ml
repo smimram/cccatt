@@ -490,24 +490,20 @@ let check ~pos l a =
         in
         let l = List.filter (fun (_,a) -> dim a < n) l in
         (* TODO: check for acyclicity... *)
-        let src =
-          let tgts = List.map snd eq in
-          List.filter (fun (x,_) -> not (List.mem x tgts)) l
-        in
-        let tgt =
-          let srcs = List.map snd eq in
-          List.filter (fun (x,_) -> not (List.mem x srcs)) l
-        in
-        let a = pred a in
+        let srcs = List.map fst eq in
+        let tgts = List.map snd eq in
+        let src = List.filter (fun (x,_) -> not (List.mem x tgts)) l in
+        let tgt = List.filter (fun (x,_) -> not (List.mem x srcs)) l in
         (* Make sure that the source and target types are pasting. *)
-        aux (n-1) src a;
-        aux (n-1) tgt a;
-        (* Make sure that the source target are typable in the source and target. *)
+        aux (n-1) src (pred a);
+        aux (n-1) tgt (pred a);
+        (* Make sure that the source target don't use removed variables (ideally, we should make sure that we can type in the source/target environment, but we cannot do that here). *)
         let vars =
           SS.union
-            (SS.diff (fv @@ fst @@ arr a) (SS.of_list @@ List.map fst src))
-            (SS.diff (fv @@ snd @@ arr a) (SS.of_list @@ List.map fst tgt))
+            (SS.inter (fv @@ fst @@ arr a) (SS.of_list tgts))
+            (SS.inter (fv @@ snd @@ arr a) (SS.of_list srcs))
         in
+        (* Printf.printf "aux with %d : %s ⊢ %s\n%!" n (string_of_context l) (to_string a); *)
         if not (SS.is_empty vars) then failure pos "not allowed to use those variables in source / target: %s" (String.concat ", " @@ SS.elements vars)
     in
     let n = dim a in
