@@ -272,7 +272,7 @@ let parse_file f =
   in
   parse ~filename:f (Bytes.to_string sin)
 
-let rec exec_command (tenv, env) p =
+let rec exec_command ?(settings=true) (tenv, env) p =
   match p with
   | Let (x, a, e) ->
     (* printf "*** let %s : %s := %s\n%!" x (Option.value ~default:"?" @@ Option.map to_string a) (to_string e); *)
@@ -327,15 +327,14 @@ let rec exec_command (tenv, env) p =
       else if Sys.file_exists (fname^".cccatt") then fname^".cccatt"
       else fname
     in
-    Setting.save ();
-    let env = exec (tenv,env) (parse_file fname) in
-    Setting.restore ();
+    (* Inhibit settings when including. *)
+    let env = exec ~settings:false (tenv,env) (parse_file fname) in
     env
   | Setting s ->
-    Setting.parse s;
+    if settings then Setting.parse s;
     tenv, env
 
 (** Execute a program. *)
-and exec env cmd =
-  try List.fold_left exec_command env cmd
+and exec ?(settings=true) env cmd =
+  try List.fold_left (exec_command ~settings) env cmd
   with Type_error (pos, a, b) -> failure pos "got %s but %s expected" (to_string a) (to_string b)
