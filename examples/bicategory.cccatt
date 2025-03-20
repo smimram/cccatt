@@ -78,7 +78,7 @@ coh pentagon {a b c d e : .} (f : a -> b) (g : b -> c) (h : c -> d) (i : d -> e)
 
 # We don't have inverses
 # ncoh inv2 {a b : .} {f g : a -> b} (α : f -> g) : g -> f
-# ncoh inv3 {a b : .} {f g : a -> b} {α : f -> g} {β : f -> g} (p : α -> β) : (β -> α)
+coh sym {a b : .} {f g : a -> b} {α : f -> g} {β : f -> g} (p : α -> β) : (β -> α)
 coh co3 {a b : .} {f g : a -> b} {α β γ : f -> g} (_ : α -> β) (_ : β -> γ) : (α -> γ)
 # TODO: bracketing on the right is incredibly much slower than bracketing on the left...
 let trans := co3
