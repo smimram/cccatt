@@ -10,7 +10,7 @@ module VS = VarSet
 
 (** Check whether a 1-dimensional type in a context is a pasting scheme. *)
 let check1 ~pos l a =
-  Printf.printf "check1 : %s ⊢ %s\n%!" (String.concat ", " @@ List.map (fun (x,a) -> x^" : "^to_string a) l) (to_string a);
+  (* Printf.printf "check1 : %s ⊢ %s\n%!" (string_of_context l) (to_string a); *)
 
   match !Setting.mode with
 
@@ -454,11 +454,17 @@ let check ~pos l a =
   | `Directed ->
 
     let rec aux n l a =
+      (* Printf.printf "aux %d : %s ⊢ %s\n%!" n (string_of_context l) (to_string a); *)
       if n <= 1 then check1 ~pos l a
       else
         let arr a =
           match (unmeta a).desc with
           | Arr (_, src, tgt) -> src, tgt
+          | _ -> assert false
+        in
+        let pred a =
+          match (unmeta a).desc with
+          | Arr (a, _, _) -> a
           | _ -> assert false
         in
         let var x =
@@ -470,13 +476,16 @@ let check ~pos l a =
         let eq =
           List.filter_map
             (fun (_,a) ->
-               let x, y = arr a in
-               let x = var x in
-               let y = var y in
-               if dim a = n then Some (x,y) else None
+               if dim a = n then
+                 let x, y = arr a in
+                 let x = var x in
+                 let y = var y in
+                 Some (x,y)
+               else None
             ) l
         in
         let l = List.filter (fun (_,a) -> dim a < n) l in
+        (* TODO: check for acyclicity... *)
         let src =
           let tgts = List.map snd eq in
           List.filter (fun (x,_) -> not (List.mem x tgts)) l
@@ -485,8 +494,8 @@ let check ~pos l a =
           let srcs = List.map snd eq in
           List.filter (fun (x,_) -> not (List.mem x srcs)) l
         in
-        aux (n-1) src (fst @@ arr a);
-        aux (n-1) tgt (snd @@ arr a)
+        aux (n-1) src (pred a);
+        aux (n-1) tgt (pred a)
     in
     let n = dim a in
     List.iter (fun (_,a) -> if dim a > n then failure a.pos "type %s has dimension %d but trying to construct a term of dimension %d" (to_string a) (dim a) n) l;

@@ -97,7 +97,7 @@ let string_of_icit = function
   | `Implicit -> "implicit"
   | `Explicit -> "explicit"
 
-let string_of_context env = List.map (fun (x,v) -> x ^ " = " ^ to_string v) env |> String.concat ","
+let string_of_context env = List.map (fun (x,v) -> x ^ " : " ^ to_string v) env |> String.concat ","
 
 (** Create an expression from its contents. *)
 let mk ?pos desc : t =
