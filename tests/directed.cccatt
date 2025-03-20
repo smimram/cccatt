@@ -1,4 +1,5 @@
-#-# mode: ccc
+#-# mode: category
 #-# reversible: false
 
-ncoh inv {a b : .} {f g : a -> b} (α : f -> g) : g -> f
+ncoh inv2 {a b : .} {f g : a -> b} (α : f -> g) : g -> f
+coh inv3 {a b : .} {f g : a -> b} {α : f -> g} {β : f -> g} (p : α -> β) : (β -> α)
