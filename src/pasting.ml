@@ -4,54 +4,6 @@ open Extlib
 open Common
 open Term
 
-(** Check whether a type is a pasting scheme in the theory of ccc, for an implicational formula. *)
-let check_ccc a =
-  (* printf "* check ccc: %s\n%!" (to_string a); *)
-  let rec target a =
-    match a.desc with
-    | Var x -> x
-    | Hom (_, b) -> target b
-    | Id _ -> failure a.pos "identities are not handled here yet"
-    | _ -> assert false
-  in
-  let rec arguments a =
-    match a.desc with
-    | Var _ -> []
-    | Hom (a, b) -> a::(arguments b)
-    | _ -> assert false
-  in
-  let has_target x a =
-    target a = x
-  in
-  (* Find the unique proof of a type. vars is the list of head variables and env is the list of known arguments. *)
-  let rec prove vars env c =
-    match c.desc with
-    | Var x ->
-      (
-        match List.find_and_remove_opt (has_target x) env with
-        | Some (a, env) -> List.iter (prove vars env) (arguments a)
-        | None -> failure c.pos "no producer for %s" x
-      )
-    | Hom (a, b) ->
-      let x = target a in
-      if List.mem x vars then failure c.pos "multiple producers for %s" x;
-      prove (x::vars) (a::env) b
-    | Id _ -> assert false
-    | Obj -> failure c.pos "cannot prove identities between objects"
-    | _ -> assert false
-  in
-  let () =
-    let rec depth a =
-      match a.desc with
-      | Var _ -> 0
-      | Hom _ -> 0
-      | Arr (_, a, b) -> max (1 + depth a) (depth b)
-      | _ -> assert false
-    in
-    if depth a > !Setting.dimension then failure a.pos "pasting has depth %d but we are limited to %d" (depth a) !Setting.dimension
-  in
-  prove [] [] a
-
 (** Whether a type in a context is a pasting scheme. *)
 let check ~pos l a =
   (* printf "* check_ps: %s\n%!" (to_string (pis_explicit l a)); *)
@@ -194,9 +146,44 @@ let check ~pos l a =
       let l = List.map deproduct l |> List.flatten in
       List.map (homs ~pos l) (deproduct a)
     in
-    List.iter check_ccc aa
+    (* printf "* check ccc: %s\n%!" (to_string a); *)
+    let rec target a =
+      match a.desc with
+      | Var x -> x
+      | Hom (_, b) -> target b
+      | Id _ -> failure a.pos "identities are not handled here yet"
+      | _ -> assert false
+    in
+    let rec arguments a =
+      match a.desc with
+      | Var _ -> []
+      | Hom (a, b) -> a::(arguments b)
+      | _ -> assert false
+    in
+    let has_target x a =
+      target a = x
+    in
+    (* Find the unique proof of a type. vars is the list of head variables and env is the list of known arguments. *)
+    let rec prove vars env c =
+      match c.desc with
+      | Var x ->
+        (
+          match List.find_and_remove_opt (has_target x) env with
+          | Some (a, env) -> List.iter (prove vars env) (arguments a)
+          | None -> failure c.pos "no producer for %s" x
+        )
+      | Hom (a, b) ->
+        let x = target a in
+        if List.mem x vars then failure c.pos "multiple producers for %s" x;
+        prove (x::vars) (a::env) b
+      | Id _ -> assert false
+      | Obj -> failure c.pos "cannot prove identities between objects"
+      | _ -> assert false
+    in
+    List.iter (prove [] []) aa
 
   | `Plain ->
+
     let l = List.map snd l in
     if not (List.mem a l) then failure pos "cannot produce %s" (to_string a)
 
