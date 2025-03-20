@@ -4,24 +4,11 @@ open Extlib
 open Common
 open Term
 
-(** Whether a type in a context is a pasting scheme. *)
+(** Whether a type in a context is a pasting scheme (here, we suppose that there are no variable declarations). *)
 let check ~pos l a =
-  (* printf "* check_ps: %s\n%!" (to_string (pis_explicit l a)); *)
-
-  (* Remove variable declarations from the context. *)
-  let vars, l =
-    let split_vars l =
-      let is_obj a = a.desc = Obj in
-      let vars = List.filter_map (fun (x,a) -> if is_obj a then Some x else None) l in
-      let l = List.filter (fun (_,a) -> not (is_obj a)) l in
-      vars, l
-    in
-    split_vars l
-  in
-  (* printf "**** without variables: %s\n%!" (to_string (pis_explicit l a)); *)
 
   (* Remove identities/higher arrows in the context. *)
-  let vars, l, a =
+  let l, a =
     (* Apply rewriting rules. *)
     let rec rewrite rw (e:Term.t) =
       let rewrite = rewrite rw in
@@ -81,34 +68,9 @@ let check ~pos l a =
       | None -> rw, l
     in
     let rw, l = simplify [] l in
-    let vars = List.diff vars (List.map fst rw) in
-    vars, l, rewrite rw a
+    l, rewrite rw a
   in
   (* printf "**** after simplification: %s\n%!" (to_string (pis_explicit l a)); *)
-
-  (* Ensure that the declared variables are exactly the free variables. *)
-  let () =
-    let a = homs ~pos (List.map snd l) a in
-    let fv a =
-      let rec aux a fv =
-        match (unmeta a).desc with
-        | Var x -> if not (List.mem x fv) then x::fv else fv
-        | Obj -> fv
-        | Arr (a, t, u) -> fv |> aux a |> aux t |> aux u
-        | Hom (a, b) -> fv |> aux a |> aux b
-        | Prod (a, b) -> fv |> aux a |> aux b
-        | One -> fv
-        | Op a -> fv |> aux a
-        | Id (a, t, u) -> fv |> aux a |> aux t |> aux u
-        | App (_, t, u) -> fv |> aux t |> aux u
-        | Coh (_,_,_,s) -> List.fold_left (fun fv (_,t) -> aux t fv) fv s
-        | _ -> failure a.pos "TODO: fv handle %s" (to_string a)
-      in
-      aux a []
-    in
-    let d = List.diff vars (fv a) in
-    if d <> [] then failure a.pos "unused variables: %s" (String.concat ", " d)
-  in
 
   (* An identity is provable when its type is contractible. *)
   let a =
@@ -475,6 +437,49 @@ let check ~pos l a =
          let l' = List.fold_left S.union S.empty l' in
          cc := l' :: l
       ) l
+
+(** Check whether a type in a context is a pasting scheme. *)
+(* Here, we cleanup the variable declaration and call the above. *)
+let check ~pos l a =
+  (* printf "* check_ps: %s\n%!" (to_string (pis_explicit l a)); *)
+
+  (* Remove variable declarations from the context. *)
+  let vars, l =
+    let split_vars l =
+      let is_obj a = a.desc = Obj in
+      let vars = List.filter_map (fun (x,a) -> if is_obj a then Some x else None) l in
+      let l = List.filter (fun (_,a) -> not (is_obj a)) l in
+      vars, l
+    in
+    split_vars l
+  in
+  (* printf "**** without variables: %s\n%!" (to_string (pis_explicit l a)); *)
+
+  (* Ensure that the declared variables are exactly the free variables. *)
+  let () =
+    let a = homs ~pos (List.map snd l) a in
+    let fv a =
+      let rec aux a fv =
+        match (unmeta a).desc with
+        | Var x -> if not (List.mem x fv) then x::fv else fv
+        | Obj -> fv
+        | Arr (a, t, u) -> fv |> aux a |> aux t |> aux u
+        | Hom (a, b) -> fv |> aux a |> aux b
+        | Prod (a, b) -> fv |> aux a |> aux b
+        | One -> fv
+        | Op a -> fv |> aux a
+        | Id (a, t, u) -> fv |> aux a |> aux t |> aux u
+        | App (_, t, u) -> fv |> aux t |> aux u
+        | Coh (_,_,_,s) -> List.fold_left (fun fv (_,t) -> aux t fv) fv s
+        | _ -> failure a.pos "TODO: fv handle %s" (to_string a)
+      in
+      aux a []
+    in
+    let d = List.diff vars (fv a) in
+    if d <> [] then failure a.pos "unused variables: %s" (String.concat ", " d)
+  in
+
+  check ~pos l a
 
 let check ~pos l a =
   (* In case we explicitely disable checking everything is accepted as a pasting scheme. *)

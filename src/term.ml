@@ -121,9 +121,9 @@ let hole ?pos ?(real=false) () =
   meta ?pos ~real (meta ?pos (mk ?pos Type))
 
 (** Replace metavariables at toplevel by their content. *)
-let unmeta e =
+let rec unmeta e =
   match e.desc with
-  | Meta { value = Some e; _ } -> e
+  | Meta { value = Some e; _ } -> unmeta e
   | _ -> e
 
 (** Create coherence with abstracted arguments. *)
