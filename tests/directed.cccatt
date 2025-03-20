@@ -1,3 +1,4 @@
+#-# mode: ccc
 #-# reversible: false
 
-coh inv {a b : .} {f g : a -> b} (α : f -> g) : g -> f
+ncoh inv {a b : .} {f g : a -> b} (α : f -> g) : g -> f
