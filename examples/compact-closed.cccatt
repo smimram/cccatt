@@ -31,7 +31,7 @@ ncoh bla {a : .} : a -> !a
 
 coh op {a b : .} (f : a -> b) : !b -> !a
 
-# TODO: The loop should be non-trivial..........
+# IMPORTANT NOTE: we don't axiomatize exactly compact closed categories, but those which satsify the equation below, ie trace(id) = id. There is almost no hope to be able to axiomatize general compact closed categories.
 coh loop {a : .} : co (eta {a}) (seps {a}) = id
 
 # We don't expect this to be well-defined as a coherence, but this is derivable
