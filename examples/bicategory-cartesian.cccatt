@@ -130,11 +130,29 @@ let pa-eta-nat {a b c : .} {f f' : a -> b * c} (α : f -> f') : co2 α (pa-eta f
 
 # ϖ-nat
 coh pa-fst-nat {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : co2 (co21 (paf α β) fst) (pa-fst f' g') = co2 (pa-fst f g) α
+let pa-fst-nat {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : co2 (co21 (paf α β) fst) (pa-fst f' g') = co2 (pa-fst f g) α := pa2-fst _ _ _
 
 coh pa-snd-nat {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : co2 (co21 (paf α β) snd) (pa-snd f' g') = co2 (pa-snd f g) β
+let pa-snd-nat {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : co2 (co21 (paf α β) snd) (pa-snd f' g') = co2 (pa-snd f g) β := pa2-snd _ _ _
+
 
 # triangle-law-1
 coh tl1 {a b c : .} (f : a -> b) (g : a -> c) : co2 (pa-eta (pa f g)) (paf (pa-fst f g) (pa-snd f g)) = id2 _
+let tl1 {a b c : .} (f : a -> b) (g : a -> c) : co2 (pa-eta (pa f g)) (paf (pa-fst f g) (pa-snd f g)) = id2 _ := trans3 (pa2-eta _)
+        (pa2-cong
+          (trans5
+            (co2-cong (co2-co21 _ _ _) (id3 _))
+            (assoc2 _ _ _)
+            (co2-cong (id3 _) (pa2-fst  _ _ _))
+            (inv3 (assoc2 _ _ _))
+            (co2-cong (co3 (pa2-fst _ _ _) (id-co1l _ _)) (id3 _)))
+          (trans5
+            (co2-cong (co2-co21 _ _ _) (id3 _))
+            (assoc2 _ _ _)
+            (co2-cong (id3 _) (pa2-snd  _ _ _))
+            (inv3 (assoc2 _ _ _))
+            (co2-cong (co3 (pa2-snd _ _ _) (id-co1l _ _)) (id3 _))))
+        (inv3 (pa2-eta _))
 
 # triangle-law-2
 coh tl2-fst {a b c : .} (f : a -> b * c) : co2 (co21 (pa-eta f) fst) (pa-fst _ _) = id2 (co1 f fst)
