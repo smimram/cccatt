@@ -476,7 +476,6 @@ let check ~pos l a =
          cc := l' :: l
       ) l
 
-  (* | _ -> failwith "unhandled mode" *)
-
 let check ~pos l a =
+  (* In case we explicitely disable checking everything is accepted as a pasting scheme. *)
   if not !Setting.disable_pasting_check then check ~pos l a
