@@ -20,6 +20,9 @@ type mode = [
 
 let mode = ref (`Cartesian_closed : mode)
 
+(** Whether all maps are reversible starting from dimension 1. *)
+let reversible = ref true
+
 (** Whether types have elements. *)
 let has_elements () = List.mem !mode [`Cartesian_closed]
 
