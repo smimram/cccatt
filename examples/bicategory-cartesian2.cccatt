@@ -41,7 +41,6 @@ coh pa2-fst {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -
 coh pa2-fst {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : co2 (co21 (pa2 α β) snd) (pa-snd f' g') = co2 (pa-snd f g) β
 
 # U2
-# coh pa2-eta {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : pa f g -> pa f' g') : α = pa2 (co2 (co2 _ (co21 α fst)) (pa-fst f' g')) _
 coh pa2-eta {a b c : .} {h h' : a -> b * c} (α : h -> h') : co2 (pa-eta h) α = co2 (pa2 (co21 α fst) (co21 α snd)) (pa-eta h')
 
 # cong
