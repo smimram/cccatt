@@ -307,14 +307,13 @@ let check1 ~pos l a =
       | _ -> assert false
     in
     balanced VS.empty VS.empty a;
-    let eq = eq_var in
     (* Prove a. *) 
     let rec prove env a =
       (* Printf.printf "prove: %s\n%!" (to_string a); *)
       match a.desc with
       | Var _ ->
-        if not (List.exists (eq a) env) then failure a.pos "cannot produce %s" (to_string a);
-        List.filter (fun b -> not (eq a b)) env
+        if not (List.exists (eq_var a) env) then failure a.pos "cannot produce %s" (to_string a);
+        List.filter (fun b -> not (eq_var a b)) env
       | Prod (a, b) -> prove (prove env a) b
       | Hom (a, b) -> coprove a env b
       | _ -> failwith "TODO: smcc pasting, handle %s" (to_string a)
@@ -325,8 +324,40 @@ let check1 ~pos l a =
       | Hom (a, a') -> coprove a' (prove env a) b
       | _ -> failure a.pos "TODO: smcc pasting (coprove), handle %s" (to_string a)
     in
-    let env = prove [] a in
+    let env = prove (List.map snd l) a in
     if env <> [] then failure pos "unused hypothesis: %s" (env |> List.map to_string |> String.concat ", ")
+
+  | `Linear_closed ->
+
+    let rec target a =
+      match a.desc with
+      | Var _ -> a
+      | Hom (_, b) -> target b
+      | _ -> assert false
+    in
+    let rec prove env a =
+      let pos = a.pos in
+      match a.desc with
+      | Var x ->
+        (
+          match List.find_and_remove_opt (fun b -> eq_var a (target b)) env with
+          | Some (a, env) ->
+            if List.exists (fun b -> eq_var a (target b)) env then failure pos "multiple producers for %s" x;
+            coprove env a
+          | None -> failure pos "could not produce %s" x
+        )
+      | Hom (a, b) -> prove (a::env) b
+      | _ -> assert false
+
+    (* Prove all the hypothesis of the target of a. *)
+    and coprove env a =
+      match a.desc with
+      | Var _ -> env
+      | Hom (a, b) -> coprove (prove env a) b
+      | _ -> assert false
+    in
+    let env = prove (List.map snd l) a in
+    if env <> [] then failure pos "unused hypothesis: %s" (String.concat ", " @@ List.map to_string @@ env)
 
   | `Compact_closed ->
 
