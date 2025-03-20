@@ -10,6 +10,7 @@ let mk ~pos e = mk ~pos e
 %token LPAR RPAR LACC RACC COL MARR
 %token <string> IDENT
 %token <string> INCLUDE
+%token <string> SETTING
 %token EOF
 
 %right ARR
@@ -32,6 +33,7 @@ cmd:
   | NCOH ident args COL expr { NCoh ($2, List.map (fun (_,x,a) -> x,a) $3, $5) }
   | LET IDENT args type_opt EQDEF expr { Let ($2, Option.map (pis $3) $4, abss $3 $6) }
   | INCLUDE { Include $1 }
+  | SETTING { Setting $1 }
 
 type_opt:
   | COL expr { Some $2 }
