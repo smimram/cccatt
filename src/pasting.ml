@@ -4,84 +4,8 @@ open Extlib
 open Common
 open Term
 
-(** Whether a type in a context is a pasting scheme (here, we suppose that there are no variable declarations). *)
-let check ~pos l a =
-
-  (* Remove identities/higher arrows in the context. *)
-  let l, a =
-    (* Apply rewriting rules. *)
-    let rec rewrite rw (e:Term.t) =
-      let rewrite = rewrite rw in
-      let mk = mk ~pos:e.pos in
-      match e.desc with
-      | Var x ->
-        (
-          match List.assoc_opt x rw with
-          | Some e' -> mk e'.desc
-          | None -> e
-        )
-      | Arr (a, t, u) -> mk (Arr (rewrite a, rewrite t, rewrite u))
-      | Hom (a, b) -> mk (Hom (rewrite a, rewrite b))
-      | Prod (a, b) -> mk (Prod (rewrite a, rewrite b))
-      | One -> mk One
-      | Id (a, t, u) -> mk (Id (rewrite a, rewrite t, rewrite u))
-      | Obj -> e
-      | Op a -> mk (Op (rewrite a))
-      | App (i, t, u) -> mk (App (i, rewrite t, rewrite u))
-      | Coh (n, l, a, s) ->
-        let s = List.map (fun (x,t) -> x, rewrite t) s in
-        mk (Coh (n, l, a, s))
-      | Meta { value = Some t; _ } -> rewrite t
-      | Meta { value = None; _ } -> error ~pos:e.pos "unresolved metvariable %s when checking pasting conditions" (to_string e)
-      | _ -> error ~pos:e.pos "TODO: in rewrite handle %s" (to_string e)
-    in
-
-    (* Orient identities on variables as rewriting rules and normalize l. *)
-    (* TODO: we implicitly assume that all variable names are distinct in pasting schemes *)
-    (* TODO: check that we are not a coboundary *)
-    (* TODO: this makes us construct (∞,1)-categories, we should also investigate (∞,∞)-... *)
-    let rec simplify rw l =
-      let check (r, a) =
-        let valid (x,t) =
-          (* occurs check *)
-          not (has_fv x t) &&
-          (* the rule is not a boundary *)
-          not (List.exists (fun (_,a) -> has_fv r a) l) &&
-          (* there is no rewrite rule on this already *)
-          not (List.exists (fun (y,_) -> x = y) rw)
-        in
-        match a.desc with
-        | Id (_, {desc = Var x; _}, t) -> Some (x,t)
-        | Id (_, t, {desc = Var x; _}) -> Some (x,t)
-        | Arr (o, {desc = Var x; _}, t) when valid (x,t) && dim o >= 1 -> Some (x,t)
-        | Arr (o, t, {desc = Var x; _}) when valid (x,t) && dim o >= 1 -> Some (x,t)
-        | _ -> None
-      in
-      match List.find_map_and_remove_opt check l with
-      | Some ((x,t),l) ->
-        (* printf "add rule %s -> %s\n" x (to_string t); *)
-        let l = List.filter (fun (x',_) -> x <> x') l in
-        let t = rewrite rw t in
-        let rw = List.map (fun (y,u) -> y, rewrite [x,t] u) rw in
-        let rw = (x,t)::rw in
-        simplify rw l
-      | None -> rw, l
-    in
-    let rw, l = simplify [] l in
-    l, rewrite rw a
-  in
-  (* printf "**** after simplification: %s\n%!" (to_string (pis_explicit l a)); *)
-
-  (* An identity is provable when its type is contractible. *)
-  let a =
-    let rec aux a =
-      match a.desc with
-      | Arr(a, _, _) when not (is_obj a) -> aux a
-      | Id (a, _, _) -> aux a
-      | _ -> a
-    in
-    aux a
-  in
+(** Check whether a 1-dimensional type in a context is a pasting scheme. *)
+let check1 ~pos l a =
   match !Setting.mode with
 
   | `Cartesian_closed ->
@@ -437,6 +361,87 @@ let check ~pos l a =
          let l' = List.fold_left S.union S.empty l' in
          cc := l' :: l
       ) l
+
+(** Check whether a type in a context is a pasting scheme. We suppose that there are no variable declarations. *)
+(* Here, we remove identities and call the above. *)
+let check ~pos l a =
+  (* Remove identities/higher arrows in the context. *)
+  let l, a =
+    (* Apply rewriting rules. *)
+    let rec rewrite rw (e:Term.t) =
+      let rewrite = rewrite rw in
+      let mk = mk ~pos:e.pos in
+      match e.desc with
+      | Var x ->
+        (
+          match List.assoc_opt x rw with
+          | Some e' -> mk e'.desc
+          | None -> e
+        )
+      | Arr (a, t, u) -> mk (Arr (rewrite a, rewrite t, rewrite u))
+      | Hom (a, b) -> mk (Hom (rewrite a, rewrite b))
+      | Prod (a, b) -> mk (Prod (rewrite a, rewrite b))
+      | One -> mk One
+      | Id (a, t, u) -> mk (Id (rewrite a, rewrite t, rewrite u))
+      | Obj -> e
+      | Op a -> mk (Op (rewrite a))
+      | App (i, t, u) -> mk (App (i, rewrite t, rewrite u))
+      | Coh (n, l, a, s) ->
+        let s = List.map (fun (x,t) -> x, rewrite t) s in
+        mk (Coh (n, l, a, s))
+      | Meta { value = Some t; _ } -> rewrite t
+      | Meta { value = None; _ } -> error ~pos:e.pos "unresolved metvariable %s when checking pasting conditions" (to_string e)
+      | _ -> error ~pos:e.pos "TODO: in rewrite handle %s" (to_string e)
+    in
+
+    (* Orient identities on variables as rewriting rules and normalize l. *)
+    (* TODO: we implicitly assume that all variable names are distinct in pasting schemes *)
+    (* TODO: check that we are not a coboundary *)
+    (* TODO: this makes us construct (∞,1)-categories, we should also investigate (∞,∞)-... *)
+    let rec simplify rw l =
+      let check (r, a) =
+        let valid (x,t) =
+          (* occurs check *)
+          not (has_fv x t) &&
+          (* the rule is not a boundary *)
+          not (List.exists (fun (_,a) -> has_fv r a) l) &&
+          (* there is no rewrite rule on this already *)
+          not (List.exists (fun (y,_) -> x = y) rw)
+        in
+        match a.desc with
+        | Id (_, {desc = Var x; _}, t) -> Some (x,t)
+        | Id (_, t, {desc = Var x; _}) -> Some (x,t)
+        | Arr (o, {desc = Var x; _}, t) when valid (x,t) && dim o >= 1 -> Some (x,t)
+        | Arr (o, t, {desc = Var x; _}) when valid (x,t) && dim o >= 1 -> Some (x,t)
+        | _ -> None
+      in
+      match List.find_map_and_remove_opt check l with
+      | Some ((x,t),l) ->
+        (* printf "add rule %s -> %s\n" x (to_string t); *)
+        let l = List.filter (fun (x',_) -> x <> x') l in
+        let t = rewrite rw t in
+        let rw = List.map (fun (y,u) -> y, rewrite [x,t] u) rw in
+        let rw = (x,t)::rw in
+        simplify rw l
+      | None -> rw, l
+    in
+    let rw, l = simplify [] l in
+    l, rewrite rw a
+  in
+  (* printf "**** after simplification: %s\n%!" (to_string (pis_explicit l a)); *)
+
+  (* An identity is provable when its type is contractible. *)
+  let a =
+    let rec aux a =
+      match a.desc with
+      | Arr(a, _, _) when not (is_obj a) -> aux a
+      | Id (a, _, _) -> aux a
+      | _ -> a
+    in
+    aux a
+  in
+
+  check1 ~pos l a
 
 (** Check whether a type in a context is a pasting scheme. *)
 (* Here, we cleanup the variable declaration and call the above. *)
