@@ -18,6 +18,47 @@ let check1 ~pos l a =
   (* Printf.printf "check1 : %s ⊢ %s\n%!" (string_of_context l) (to_string a); *)
   match !Setting.mode with
 
+  | `Plain ->
+
+    let l = List.map snd l in
+    if not (List.mem a l) then failure pos "cannot produce %s" (to_string a)
+
+  | `Category ->
+
+    let get_arr a =
+      match (unmeta a).desc with
+      | Arr (a, t, u) ->
+        if not (is_obj a) then failure a.pos "1-dimensional arrow expected, got %s" (to_string a);
+        if not (is_var t) then failure t.pos "variable expected";
+        if not (is_var u) then failure u.pos "variable expected";
+        t, u
+      | _ ->
+        failure a.pos "arrow expected"
+    in
+    let l = List.map snd l in
+    let l = List.map get_arr l in
+    let a, b = get_arr a in
+    let eq = eq_var in
+    (* Check that we have a unique path from b to a. *)
+    let rec check seen l b =
+      if l = [] then
+        begin
+          if not (eq a b) then failure b.pos "no producer for %s" (to_string b)
+        end
+      else
+      if eq a b
+      then failure pos "useless hypothesis: %s" (String.concat ", " @@ List.map (fun (a, b) -> to_string @@ mk (Arr (mk Obj, a, b))) l)
+      else
+        match List.find_and_remove_opt (fun (_,b') -> eq b b') l with
+        | Some ((a, _), l) ->
+          List.iter (fun (_,b') -> if eq b b' then failure b'.pos "multiple producers for %s" (to_string b)) l;
+          List.iter (fun a' -> if eq a a' then failure a'.pos "cyclic dependencies %s already produced" (to_string a)) seen;
+          check (a::seen) l a
+        | None ->
+          failure b.pos "no producer for %s" (to_string b)
+    in
+    check [] l b
+
   | `Cartesian_closed ->
 
     (* Turn products into arrows (the result is a formal product of types containing only arrows). *)
@@ -78,120 +119,6 @@ let check1 ~pos l a =
     in
     List.iter (prove [] []) aa
 
-  | `Plain ->
-
-    let l = List.map snd l in
-    if not (List.mem a l) then failure pos "cannot produce %s" (to_string a)
-
-  | `Category ->
-
-    let get_arr a =
-      match (unmeta a).desc with
-      | Arr (a, t, u) ->
-        if not (is_obj a) then failure a.pos "1-dimensional arrow expected, got %s" (to_string a);
-        if not (is_var t) then failure t.pos "variable expected";
-        if not (is_var u) then failure u.pos "variable expected";
-        t, u
-      | _ ->
-        failure a.pos "arrow expected"
-    in
-    let l = List.map snd l in
-    let l = List.map get_arr l in
-    let a, b = get_arr a in
-    let eq = eq_var in
-    (* Check that we have a unique path from b to a. *)
-    let rec check seen l b =
-      if l = [] then
-        begin
-          if not (eq a b) then failure b.pos "no producer for %s" (to_string b)
-        end
-      else
-      if eq a b
-      then failure pos "useless hypothesis: %s" (String.concat ", " @@ List.map (fun (a, b) -> to_string @@ mk (Arr (mk Obj, a, b))) l)
-      else
-        match List.find_and_remove_opt (fun (_,b') -> eq b b') l with
-        | Some ((a, _), l) ->
-          List.iter (fun (_,b') -> if eq b b' then failure b'.pos "multiple producers for %s" (to_string b)) l;
-          List.iter (fun a' -> if eq a a' then failure a'.pos "cyclic dependencies %s already produced" (to_string a)) seen;
-          check (a::seen) l a
-        | None ->
-          failure b.pos "no producer for %s" (to_string b)
-    in
-    check [] l b
-
-  | `Monoidal ->
-
-    (* Make sure that the types are arrows between tensor expressions. *)
-    let rec get_tens a =
-      match (unmeta a).desc with
-      | Prod (a, b) -> (get_tens a)@(get_tens b)
-      | One -> []
-      | Var _ -> [a]
-      | _ -> failure a.pos "tensor product of variables expected"
-    in
-    let get_arr a =
-      match (unmeta a).desc with
-      | Arr (o, a, b) when is_obj o ->
-        let a' = get_tens a in
-        let b' = get_tens b in
-        if a' = [] then failure a.pos "type cannot be empty";
-        if b' = [] then failure b.pos "type cannot be empty";
-        a', b'
-      | _ -> failure a.pos "arrow expected"
-    in
-    let l = List.map snd l in
-    let l = List.map get_arr l in
-    let a, b = get_arr a in
-    let eq = eq_var in
-    (* NOTE: we could also check that the formula is balanced *)
-    (* Make sure that sources and targets have distinct variables and are disjoint. *)
-    List.iter (fun (a,b) ->
-        let distinct a = List.iter_unordered_pairs (fun x y -> if eq x y then failure y.pos "repeated variable") a in
-        distinct a;
-        distinct b;
-        (* NOTE: should already be handled by seen below *)
-        (* List.iter (fun x -> List.iter (fun y -> if eq x y then failure y.pos "looping variable") b) a *)
-      ) l;
-    (* Make sure that sources and targets are pairwise disjoint. *)
-    List.iter_unordered_pairs
-      (fun (a,b) (a',b') ->
-         let disjoint st a b = List.iter (fun x -> List.iter (fun y -> if eq x y then failure y.pos "variable already used in %s: %s" st (to_string y)) b) a in
-         disjoint "source" a a';
-         disjoint "target" b b'
-      ) l;
-    (* Make sure that we have a 2-path from b to a. *)
-    let rec check seen b =
-      (* Printf.printf "check : %s\n%!" (to_string (prods b)); *)
-      (* What remains of a after b *)
-      let rec residual a b =
-        match a, b with
-        | x::a, y::b -> if eq x y then residual a b else None
-        | _, [] -> Some a
-        | [], _ -> None
-      in
-      (* Find a possible rewrite of b' to a' in b. *)
-      let rewrite (a',b') =
-        let rec aux pre b =
-          match residual b b' with
-          | Some c ->
-            (* Printf.printf "%s (%s -> %s) %s\n%!" (to_string (prods (List.rev pre))) (to_string (prods a')) (to_string (prods b)) (to_string (prods c)); *)
-            Some (List.rev pre, a', c)
-          | None ->
-            match b with
-            | x::b -> aux (x::pre) b
-            | [] -> None
-        in
-        aux [] b
-      in
-      let rw = List.find_map rewrite l in
-      match rw with
-      | Some (u, a, c) ->
-        List.iter (fun x -> if List.exists (eq x) seen then failure pos "cyclic dependency on %s" (to_string x)) a;
-        check (a@seen) (u@a@c)
-      | None -> if not (List.length a = List.length b && List.for_all2 eq a b) then failure pos "no producer for %s" (to_string (prods b))
-    in
-    check [] b
-
   | `Cartesian ->
 
     (* printf "cartesian pasing scheme : %s ⊢ %s\n" (string_of_context l) (to_string a); *)
@@ -231,6 +158,86 @@ let check1 ~pos l a =
     let available = check a l in
     if not (VS.subset b available) then failure pos "some variables cannot be produced: %s" (VS.diff b available |> VS.to_seq |> List.of_seq |> List.map to_string |> String.concat ", ")
 
+  | `Monoidal ->
+
+    (* Make sure that the types are arrows between tensor expressions. *)
+    let rec get_tens a =
+      match (unmeta a).desc with
+      | Prod (a, b) -> (get_tens a)@(get_tens b)
+      | One -> []
+      | Var _ -> [a]
+      | _ -> failure a.pos "tensor product of variables expected"
+    in
+    let get_arr a =
+      match (unmeta a).desc with
+      | Arr (o, a, b) when is_obj o ->
+        let a' = get_tens a in
+        let b' = get_tens b in
+        if a' = [] then failure a.pos "type cannot be empty";
+        if b' = [] then failure b.pos "type cannot be empty";
+        a', b'
+      | _ -> failure a.pos "arrow expected"
+    in
+    let l = List.map snd l in
+    let l = List.map get_arr l in
+    let a, b = get_arr a in
+    (* NOTE: we could also check that the formula is balanced *)
+    (* Make sure that sources and targets have distinct variables and are disjoint. *)
+    List.iter (fun (a,b) ->
+        let distinct a = List.iter_unordered_pairs (fun x y -> if eq_var x y then failure y.pos "repeated variable") a in
+        distinct a;
+        distinct b;
+        (* NOTE: should already be handled by seen below *)
+        (* List.iter (fun x -> List.iter (fun y -> if eq x y then failure y.pos "looping variable") b) a *)
+      ) l;
+    (* Make sure that sources and targets are pairwise disjoint. *)
+    List.iter_unordered_pairs
+      (fun (a,b) (a',b') ->
+         let disjoint st a b = List.iter (fun x -> List.iter (fun y -> if eq_var x y then failure y.pos "variable already used in %s: %s" st (to_string y)) b) a in
+         disjoint "source" a a';
+         disjoint "target" b b'
+      ) l;
+    (* Make sure that we have a 2-path from b to a. *)
+    let rec check seen l b =
+      (* Printf.printf "check : %s\n%!" (to_string (prods b)); *)
+      (* What remains of a after b *)
+      let rec residual a b =
+        match a, b with
+        | x::a, y::b -> if eq_var x y then residual a b else None
+        | _, [] -> Some a
+        | [], _ -> None
+      in
+      (* Find a possible rewrite of b' to a' in b. *)
+      let rewrite (a',b') =
+        let rec aux pre b =
+          match residual b b' with
+          | Some c ->
+            (* Printf.printf "%s (%s -> %s) %s\n%!" (to_string (prods (List.rev pre))) (to_string (prods a')) (to_string (prods b)) (to_string (prods c)); *)
+            Some (List.rev pre, a', c)
+          | None ->
+            match b with
+            | x::b -> aux (x::pre) b
+            | [] -> None
+        in
+        aux [] b
+      in
+      let rw = List.find_map_and_remove_opt rewrite l in
+      match rw with
+      | Some ((u, a, c), l) ->
+        List.iter (fun x -> if List.exists (eq_var x) seen then failure pos "cyclic dependency on %s" (to_string x)) a;
+        check (a@seen) l (u@a@c)
+      | None ->
+        if l <> [] then
+          (
+            let a, b = List.hd l in
+            let a = String.concat " * " @@ List.map to_string a in
+            let b = String.concat " * " @@ List.map to_string b in
+            failure pos "unused rule %s -> %s" a b
+          );
+        if not (List.length a = List.length b && List.for_all2 eq_var a b) then failure pos "no producer for %s" (to_string (prods b))
+    in
+    check [] l b
+
   | `Symmetric_monoidal ->
 
     (* Make sure that the types are arrows between tensor expressions. *)
@@ -268,17 +275,24 @@ let check1 ~pos l a =
          if not (VS.disjoint b b') then failure pos "targets not disjoint"
       ) l;
     (* Make sure that we have a 2-path from b to a. *)
-    let rec check seen b =
+    let rec check seen l b =
       (* Printf.printf "check : %s\n%!" (to_string (prods b)); *)
-      let rule = List.find_opt (fun (_,b') -> VS.subset b' b) l in
+      let rule = List.find_and_remove_opt (fun (_,b') -> VS.subset b' b) l in
       match rule with
-      | Some (a',b') ->
+      | Some ((a',b'),l) ->
         if not (VS.disjoint a' seen) then failure pos "cyclic dependency";
-        check (VS.union a' seen) (VS.union (VS.diff b b') a')
+        check (VS.union a' seen) l (VS.union (VS.diff b b') a')
       | None ->
+        if l <> [] then
+          (
+            let a, b = List.hd l in
+            let a = String.concat " * " @@ List.map to_string @@ VS.elements a in
+            let b = String.concat " * " @@ List.map to_string @@ VS.elements b in
+            failure pos "unused rule %s -> %s" a b
+          );
         if not (VS.equal a b) then failure pos "no producer for %s" (to_string @@ prods @@ VS.elements b)
     in
-    check VS.empty b
+    check VS.empty l b
 
   | `Symmetric_monoidal_closed ->
 
