@@ -69,7 +69,7 @@ textarea {
   justify-content: space-between;
 }
 
-.dropdown {
+#dropdowns div {
   display: block;
 }
 

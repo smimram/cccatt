@@ -76,13 +76,12 @@ coh invl-invr {a b c : .} (f : a -> b) (g : b -> c) : co2 (assoc f id1 g) (co12 
 
 coh pentagon {a b c d e : .} (f : a -> b) (g : b -> c) (h : c -> d) (i : d -> e) : co2 (assoc (co1 f g) h i) (assoc f g (co1 h i)) = co2 (co21 (assoc f g h) i) (co2 (assoc f (co1 g h) i) (co12 f (assoc g h i)))
 
-# We actually have (2,1)-categories for now
-
-coh inv2 {a b : .} {f g : a -> b} (α : f -> g) : g -> f
-coh inv3 {a b : .} {f g : a -> b} {α : f -> g} {β : f -> g} (p : α -> β) : (β -> α)
+# We don't have inverses
+ncoh inv2 {a b : .} {f g : a -> b} (α : f -> g) : g -> f
+ncoh inv3 {a b : .} {f g : a -> b} {α : f -> g} {β : f -> g} (p : α -> β) : (β -> α)
 coh co3 {a b : .} {f g : a -> b} {α β γ : f -> g} (_ : α -> β) (_ : β -> γ) : (α -> γ)
 
 # Tests
 
-## TODO: the following should not be accepted for (2,0)-bicategories (we actually have (2,1)-bicategories)
-coh inv2 {a b : .} {f g : a -> b} (α : f -> g) : g -> f
+## The following should not be accepted for (2,0)-bicategories (we actually have (2,1)-bicategories)
+ncoh inv2 {a b : .} {f g : a -> b} (α : f -> g) : g -> f

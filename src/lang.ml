@@ -331,6 +331,9 @@ let rec exec_command (tenv, env) p =
     let env = exec (tenv,env) (parse_file fname) in
     Setting.restore ();
     env
+  | Setting s ->
+    Setting.parse s;
+    tenv, env
 
 (** Execute a program. *)
 and exec env cmd =

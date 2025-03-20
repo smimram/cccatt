@@ -97,7 +97,7 @@ let string_of_icit = function
   | `Implicit -> "implicit"
   | `Explicit -> "explicit"
 
-let string_of_context env = List.map (fun (x,v) -> x ^ " = " ^ to_string v) env |> String.concat ","
+let string_of_context env = List.map (fun (x,v) -> x ^ " : " ^ to_string v) env |> String.concat ","
 
 (** Create an expression from its contents. *)
 let mk ?pos desc : t =
@@ -142,6 +142,7 @@ type command =
   | Let of string * t option * t (** declare a value *)
   | NCoh of string * context * t (** ensure that we are *not* coherent *)
   | Include of string (** include another file *)
+  | Setting of string (** change a setting *)
 
 (** A program. *)
 type prog = command list
@@ -269,3 +270,20 @@ let rec dim e =
   | Obj -> 0
   | Arr (a, _, _) -> 1 + dim a
   | _ -> assert false
+
+let free_variable_names a =
+  let rec aux a fv =
+    match (unmeta a).desc with
+    | Var x -> x::fv
+    | Obj -> fv
+    | Arr (a, t, u) -> fv |> aux a |> aux t |> aux u
+    | Hom (a, b) -> fv |> aux a |> aux b
+    | Prod (a, b) -> fv |> aux a |> aux b
+    | One -> fv
+    | Op a -> fv |> aux a
+    | Id (a, t, u) -> fv |> aux a |> aux t |> aux u
+    | App (_, t, u) -> fv |> aux t |> aux u
+    | Coh (_,_,_,s) -> List.fold_left (fun fv (_,t) -> aux t fv) fv s
+    | _ -> failure a.pos "TODO: fv handle %s" (to_string a)
+  in
+  aux a []

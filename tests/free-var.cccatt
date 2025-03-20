@@ -1,7 +1,8 @@
 # This example is inspired from cartesian bicategories. It shows that we need to be able to evaluate free variables as themselves. Namely, for Π-types we replace variables by fresh ones and we need to evaluate those. In particular, in coherences, we have substitutions which consist of values but we need to re-evaluate them to perform substitution.
 #
-# mode: cartesian
-# dimension: 2
+#-# mode: cartesian
+#-# dimension: 2
+#-# reversible: true
 
 # coh co1 (a b c : .) (f : a -> b) (g : b -> c) : a -> c
 

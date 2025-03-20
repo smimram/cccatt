@@ -53,7 +53,7 @@ rule token = parse
   | "include \""([^'"']* as filename)"\"" { INCLUDE filename }
   | (first_letter letter* as s) { utf8 s lexbuf; IDENT s }
   | space+ { token lexbuf }
-  | "#-#"([^'\n']* as s) { Setting.parse s; token lexbuf }
+  | "#-#"([^'\n']* as s) { SETTING s }
   | "#"[^'\n']* { token lexbuf }
   | "--"[^'\n']* { token lexbuf }
   | "\n" { Lexing.new_line lexbuf; token lexbuf }

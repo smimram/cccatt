@@ -4,6 +4,9 @@
 #
 #-# mode: cartesian
 #-# dimension: 2
+#
+# Note that this formalization cannot go through with our directed criterion, see bicategory-cartesian2 for an alternative axiomatization
+#-# reversible: true
 
 include "bicategory"
 
