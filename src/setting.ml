@@ -103,5 +103,5 @@ let parse s =
 
 let save, restore =
   let l = ref [] in
-  (fun () -> l := (!mode,!dimension) :: !l),
-  (fun () -> let m,d = List.hd !l in l := List.tl !l; mode := m; set_dim d)
+  (fun () -> l := (!mode,!dimension,!orientation) :: !l),
+  (fun () -> let m,d,o = List.hd !l in l := List.tl !l; mode := m; set_dim d; set_orientation o)
