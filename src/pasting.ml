@@ -365,7 +365,7 @@ let check ~pos l a =
   if !Setting.orientation = `Directed && Setting.has_elements () then
     (
       warning "orientation not supported yet for closed categories, falling back to reversible";
-      Setting.orientation := `Reversible
+      Setting.set_orientation `Reversible
     );
 
   match !Setting.orientation with

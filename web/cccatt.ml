@@ -33,6 +33,7 @@ let run _ =
   let example = get_element_by_id "example" |> Html.CoerceTo.select |> jsget in
   let mode = get_element_by_id "mode" |> Html.CoerceTo.select |> jsget in
   let dim = get_element_by_id "dim" |> Html.CoerceTo.input |> jsget in
+  let rev = get_element_by_id "reversible" |> Html.CoerceTo.input |> jsget in
 
   let print s =
     let s = Js.to_string output##.value ^ s in
@@ -78,6 +79,7 @@ let run _ =
        mode##.value := Js.string m
     );
   Setting.on_dim (fun d -> dim##.value := Js.string (if d = max_int then "∞" else string_of_int d));
+  Setting.on_orientation (fun o -> rev##.checked := Js.bool (o = `Reversible));
 
   send##.onclick :=
     Html.handler
@@ -108,6 +110,12 @@ let run _ =
     Html.handler
       (fun _ ->
          Setting.set_dim @@ int_of_string @@ Js.to_string dim##.value;
+         Js.bool true
+      );
+  rev##.onchange :=
+    Html.handler
+      (fun _ ->
+         Setting.set_orientation (if Js.to_bool rev##.checked then `Reversible else `Directed);
          Js.bool true
       );
 

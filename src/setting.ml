@@ -20,9 +20,6 @@ type mode = [
 
 let mode = ref (`Cartesian_closed : mode)
 
-(** Whether all maps are reversible starting from dimension 1. *)
-let orientation = ref (`Directed : [`Directed | `Reversible])
-
 (** Whether types have elements. *)
 let has_elements () = List.mem !mode [`Symmetric_monoidal_closed; `Cartesian_closed]
 
@@ -35,14 +32,14 @@ let has_one () = has_prod ()
 let has_op () = List.mem !mode [`Compact_closed]
 
 (** Callback when the mode is changed. *)
-let mode_callback = ref (fun _ -> ())
+let mode_callback = ref ignore
 
 let on_mode f =
   let g = !mode_callback in
   mode_callback := fun s -> g s; f s
 
 (** Callback when the dimension is changed. *)
-let dim_callback = ref (fun _ -> ())
+let dim_callback = ref ignore
 
 (** Maximal depth for pasting schemes. *)
 let dimension = ref max_int
@@ -55,6 +52,19 @@ let set_dim n =
   message "setting dimension to %s" (if n = max_int then "∞" else string_of_int n);
   dimension := n;
   !dim_callback n
+
+(** Whether all maps are reversible starting from dimension 1. *)
+let orientation = ref (`Directed : [`Directed | `Reversible])
+
+let orientation_callback = ref ignore
+
+let on_orientation f =
+  let g = !orientation_callback in
+  orientation_callback := fun d -> g d; f d
+
+let set_orientation d =
+  !orientation_callback d;
+  orientation := d
 
 let parse s =
   let k, v = String.split_on_first_char ':' s in
@@ -76,15 +86,16 @@ let parse s =
         | "compact closed" -> `Compact_closed
         | m -> error "unknown mode: %s" m
       );
-    !mode_callback !mode
+    !mode_callback !mode;
+    set_orientation `Directed
   | "dim" | "dimension" ->
     let n = if v = "oo" || v = "∞" then max_int else int_of_string v in
     set_dim n
   | "reversible" ->
     (
       match v with
-      | "true" -> orientation := `Reversible
-      | "false" -> orientation := `Directed
+      | "true" -> set_orientation `Reversible
+      | "false" -> set_orientation `Directed
       | v -> error "unexpected value for %s: %s" k v
     )
   | k -> error "unknown setting: %s" k
