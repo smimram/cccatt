@@ -341,9 +341,9 @@ let check1 ~pos l a =
       | Var x ->
         (
           match List.find_and_remove_opt (fun b -> eq_var a (target b)) env with
-          | Some (a, env) ->
+          | Some (a', env) ->
             if List.exists (fun b -> eq_var a (target b)) env then failure pos "multiple producers for %s" x;
-            coprove env a
+            coprove env a'
           | None -> failure pos "could not produce %s" x
         )
       | Hom (a, b) -> prove (a::env) b

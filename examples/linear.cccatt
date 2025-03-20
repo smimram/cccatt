@@ -1,4 +1,7 @@
 # Axioms for linear λ-terms, also known as BCI-calculus
+#
+#-# mode: linear closed
+#-# dimension: 1
 
 coh ap {a b : .} (f : a ⇒ b) (x : a) : b
 
