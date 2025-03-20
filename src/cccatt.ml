@@ -6,7 +6,7 @@ let () =
   Arg.parse
     (Arg.align
        [
-         "--disable-pasting", Arg.Set Setting.disable_pasting_check, " Disable checking of pasting schemes.";
+         "--disable-pasting", Arg.Set Settings.disable_pasting_check, " Disable checking of pasting schemes.";
        ]
     )
     (fun s -> files := s::!files)

@@ -78,7 +78,7 @@ let rec to_string ?(pa=false) e =
       Printf.sprintf "(%s : %s)%s %s" x (to_string a) arr (to_string t) |> pa
   | Obj -> "."
     
-  | Arr (a, t, u) -> Printf.sprintf "%s %s %s" (to_string ~pa:true t) (if dim a = !Setting.dimension then "=" else "→") (to_string u) |> pa
+  | Arr (a, t, u) -> Printf.sprintf "%s %s %s" (to_string ~pa:true t) (if dim a = !Settings.dimension then "=" else "→") (to_string u) |> pa
   | Hom (a, b) -> Printf.sprintf "%s ⇒ %s" (to_string ~pa:true a) (to_string b) |> pa
   | Prod (a, b) -> Printf.sprintf "%s × %s" (to_string ~pa:true a) (to_string b) |> pa
   | One -> "1"

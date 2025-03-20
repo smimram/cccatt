@@ -45,7 +45,7 @@ let run _ =
   in
   let set_mode () =
     let mode = Js.to_string mode##.value in
-    Setting.parse ("mode : " ^ mode)
+    Settings.parse ("mode : " ^ mode)
   in
   let read () =
     Js.to_string input##.value
@@ -64,7 +64,7 @@ let run _ =
     do_send ();
   in
   Common.print_fun := print;
-  Setting.on_mode
+  Settings.on_mode
     (fun s ->
        let m =
          match s with
@@ -78,8 +78,8 @@ let run _ =
        in
        mode##.value := Js.string m
     );
-  Setting.on_dim (fun d -> dim##.value := Js.string (if d = max_int then "∞" else string_of_int d));
-  Setting.on_orientation (fun o -> rev##.checked := Js.bool (o = `Reversible));
+  Settings.on_dim (fun d -> dim##.value := Js.string (if d = max_int then "∞" else string_of_int d));
+  Settings.on_orientation (fun o -> rev##.checked := Js.bool (o = `Reversible));
 
   send##.onclick :=
     Html.handler
@@ -109,13 +109,13 @@ let run _ =
   dim##.onchange :=
     Html.handler
       (fun _ ->
-         Setting.set_dim @@ int_of_string @@ Js.to_string dim##.value;
+         Settings.set_dim @@ int_of_string @@ Js.to_string dim##.value;
          Js.bool true
       );
   rev##.onchange :=
     Html.handler
       (fun _ ->
-         Setting.set_orientation (if Js.to_bool rev##.checked then `Reversible else `Directed);
+         Settings.set_orientation (if Js.to_bool rev##.checked then `Reversible else `Directed);
          Js.bool true
       );
 

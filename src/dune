@@ -9,7 +9,7 @@
 
 (library
  (public_name cccatt)
- (modules extlib common setting term pasting lang parser lexer)
+ (modules extlib common settings term pasting lang parser lexer)
  (wrapped false)
 )
 

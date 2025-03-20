@@ -16,7 +16,7 @@ let fv a = SS.of_list @@ free_variable_names a
 (** Check whether a 1-dimensional type in a context is a pasting scheme. *)
 let check1 ~pos l a =
   (* Printf.printf "check1 : %s ⊢ %s\n%!" (string_of_context l) (to_string a); *)
-  match !Setting.mode with
+  match !Settings.mode with
 
   | `Plain ->
 
@@ -418,13 +418,13 @@ let check ~pos l a =
     (x,t)::rw
   in
 
-  if !Setting.orientation = `Directed && Setting.has_elements () then
+  if !Settings.orientation = `Directed && Settings.has_elements () then
     (
       warning "orientation not supported yet for closed categories, falling back to reversible";
-      Setting.set_orientation `Reversible
+      Settings.set_orientation `Reversible
     );
 
-  match !Setting.orientation with
+  match !Settings.orientation with
 
   | `Reversible ->
 
@@ -495,7 +495,7 @@ let check ~pos l a =
     in
     (* Contract all rules above the maximal dimension, so that we are reversible. *)
     let l, a =
-      let rw, l = List.partition (fun (_,a) -> dim a > !Setting.dimension) l in
+      let rw, l = List.partition (fun (_,a) -> dim a > !Settings.dimension) l in
       let rw = List.map (fun (_,a) -> let x, b = arr a in let x = var x in x, b) rw in
       let rw = List.fold_left add_rule [] rw in
       let l =
@@ -507,7 +507,7 @@ let check ~pos l a =
       l, a
     in
     let a =
-      let rec aux a = if dim a > !Setting.dimension then aux (pred a) else a in
+      let rec aux a = if dim a > !Settings.dimension then aux (pred a) else a in
       aux a
     in
     (* printf "after contraction: %s\n%!" (to_string (pis_explicit l a)); *)
@@ -577,4 +577,4 @@ let check ~pos l a =
 
 let check ~pos l a =
   (* In case we explicitely disable checking everything is accepted as a pasting scheme. *)
-  if not !Setting.disable_pasting_check then check ~pos l a
+  if not !Settings.disable_pasting_check then check ~pos l a

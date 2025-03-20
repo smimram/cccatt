@@ -179,20 +179,20 @@ and infer tenv env (e:Term.t) =
     let u = check tenv env u a' in
     mk ~pos (Arr (a, t, u)), mk ~pos Type
   | Hom (a, b) ->
-    if not (Setting.has_hom ()) then failure e.pos "internal hom not allowed in this mode";
+    if not (Settings.has_hom ()) then failure e.pos "internal hom not allowed in this mode";
     let a = check tenv env a (mk ~pos:a.pos Obj) in
     let b = check tenv env b (mk ~pos:b.pos Obj) in
     mk ~pos (Hom (a, b)), mk ~pos Obj
   | Prod (a, b) ->
-    if not (Setting.has_prod ()) then failure e.pos "products not allowed in this mode";
+    if not (Settings.has_prod ()) then failure e.pos "products not allowed in this mode";
     let a = check tenv env a (mk ~pos:a.pos Obj) in
     let b = check tenv env b (mk ~pos:b.pos Obj) in
     mk ~pos (Prod (a, b)), mk ~pos Obj
   | One ->
-    if not (Setting.has_one ()) then failure e.pos "unit not allowed in this mode";
+    if not (Settings.has_one ()) then failure e.pos "unit not allowed in this mode";
     mk ~pos One, mk ~pos Obj
   | Op a ->
-    if not (Setting.has_op ()) then failure e.pos "duals not allowed in this mode";
+    if not (Settings.has_op ()) then failure e.pos "duals not allowed in this mode";
     let a = check tenv env a (mk ~pos:a.pos Obj) in
     mk ~pos (Op a), mk ~pos Obj
   | Type ->
@@ -212,7 +212,7 @@ and check tenv env e a =
   | _ ->
     let e, b = infer tenv env e in
     let e, b = insert tenv env e b in
-    if not (Setting.has_elements ()) || not (b.desc = Obj && a.desc = Type) then
+    if not (Settings.has_elements ()) || not (b.desc = Obj && a.desc = Type) then
       (
         try unify tenv env b a
         with Unification -> raise (Type_error (e.pos, b, a))
@@ -331,7 +331,7 @@ let rec exec_command ?(settings=true) (tenv, env) p =
     let env = exec ~settings:false (tenv,env) (parse_file fname) in
     env
   | Setting s ->
-    if settings then Setting.parse s;
+    if settings then Settings.parse s;
     tenv, env
 
 (** Execute a program. *)
