@@ -124,7 +124,7 @@ let check ~pos l a =
 
   | `Cartesian_closed ->
 
-    (* Turn products into arrows. *)
+    (* Turn products into arrows (the result is a formal product of types containing only arrows). *)
     let rec deproduct e =
       match e.desc with
       | Arr (o, a, b) when is_obj o ->
@@ -139,8 +139,9 @@ let check ~pos l a =
       | One -> []
       | Var _
       | Obj -> [e]
-      | _ -> failure e.pos "TODO: deproduct handle %s" (to_string e)
+      | _ -> failure e.pos "unhandled construction in deproduct: %s" (to_string e)
     in
+    (* Given Γ⊢A, compute the deproduct of Γ⇒A. *)
     let aa =
       let l = List.map snd l in
       let l = List.map deproduct l |> List.flatten in
@@ -151,7 +152,6 @@ let check ~pos l a =
       match a.desc with
       | Var x -> x
       | Hom (_, b) -> target b
-      | Id _ -> failure a.pos "identities are not handled here yet"
       | _ -> assert false
     in
     let rec arguments a =
@@ -163,7 +163,7 @@ let check ~pos l a =
     let has_target x a =
       target a = x
     in
-    (* Find the unique proof of a type. vars is the list of head variables and env is the list of known arguments. *)
+    (* Find the unique proof of a type c. vars is the list of head variables and env is the list of known arguments. *)
     let rec prove vars env c =
       match c.desc with
       | Var x ->
