@@ -156,5 +156,7 @@ let tl1 {a b c : .} (f : a -> b) (g : a -> c) : co2 (pa-eta (pa f g)) (paf (pa-f
 
 # triangle-law-2
 coh tl2-fst {a b c : .} (f : a -> b * c) : co2 (co21 (pa-eta f) fst) (pa-fst _ _) = id2 (co1 f fst)
+let tl2-fst {a b c : .} (f : a -> b * c) : co2 (co21 (pa-eta f) fst) (pa-fst _ _) = id2 (co1 f fst) := pa2-fst _ _ _
 
 coh tl2-snd {a b c : .} (f : a -> b * c) : co2 (co21 (pa-eta f) snd) (pa-snd _ _) = id2 (co1 f snd)
+let tl2-snd {a b c : .} (f : a -> b * c) : co2 (co21 (pa-eta f) snd) (pa-snd _ _) = id2 (co1 f snd) := pa2-snd _ _ _
