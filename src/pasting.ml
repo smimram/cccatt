@@ -7,6 +7,8 @@ open Term
 (** A set of variables. *)
 module VarSet = Set.Make(struct type nonrec t = t let compare = compare_var end)
 module VS = VarSet
+module StringSet = Set.Make(String)
+module SS = StringSet
 
 (** Check whether a 1-dimensional type in a context is a pasting scheme. *)
 let check1 ~pos l a =
@@ -453,7 +455,7 @@ let check ~pos l a =
   | `Directed ->
 
     let rec aux n l a =
-      (* Printf.printf "aux %d : %s ⊢ %s\n%!" n (string_of_context l) (to_string a); *)
+      Printf.printf "aux %d : %s ⊢ %s\n%!" n (string_of_context l) (to_string a);
       if n <= 1 then check1 ~pos l a
       else
         let arr a =
@@ -493,8 +495,12 @@ let check ~pos l a =
           let srcs = List.map snd eq in
           List.filter (fun (x,_) -> not (List.mem x srcs)) l
         in
-        aux (n-1) src (pred a);
-        aux (n-1) tgt (pred a)
+        let a = pred a in
+        (* Make sure that the source and target types are pasting. *)
+        aux (n-1) src a;
+        aux (n-1) tgt a;
+        (* Make sure that the source target are typable in the source and target. *)
+        (* let v = *)
     in
     let n = dim a in
     List.iter (fun (_,a) -> if dim a > n then failure a.pos "type %s has dimension %d but trying to construct a term of dimension %d" (to_string a) (dim a) n) l;
@@ -504,13 +510,12 @@ let check ~pos l a =
 (* Here, we cleanup the variable declarations and call the above. *)
 let check ~pos l a =
   (* printf "* check_ps: %s\n%!" (to_string (pis_explicit l a)); *)
-  let module S = Set.Make(String) in
 
   (* Remove variable declarations from the context. *)
   let vars, l =
     let split_vars l =
       let is_obj a = a.desc = Obj in
-      let vars = List.fold_left (fun vars (x,a) -> if is_obj a then S.add x vars else vars) S.empty l in
+      let vars = List.fold_left (fun vars (x,a) -> if is_obj a then SS.add x vars else vars) SS.empty l in
       let l = List.filter (fun (_,a) -> not (is_obj a)) l in
       vars, l
     in
@@ -521,25 +526,8 @@ let check ~pos l a =
   (* Ensure that the declared variables are exactly the free variables. *)
   let () =
     let a = homs ~pos (List.map snd l) a in
-    let fv a =
-      let rec aux a fv =
-        match (unmeta a).desc with
-        | Var x -> S.add x fv
-        | Obj -> fv
-        | Arr (a, t, u) -> fv |> aux a |> aux t |> aux u
-        | Hom (a, b) -> fv |> aux a |> aux b
-        | Prod (a, b) -> fv |> aux a |> aux b
-        | One -> fv
-        | Op a -> fv |> aux a
-        | Id (a, t, u) -> fv |> aux a |> aux t |> aux u
-        | App (_, t, u) -> fv |> aux t |> aux u
-        | Coh (_,_,_,s) -> List.fold_left (fun fv (_,t) -> aux t fv) fv s
-        | _ -> failure a.pos "TODO: fv handle %s" (to_string a)
-      in
-      aux a S.empty
-    in
-    let d = S.diff vars (fv a) in
-    if not (S.is_empty d) then failure a.pos "unused variables: %s" (String.concat ", " @@ S.elements d)
+    let d = SS.diff vars (SS.of_list @@ free_variable_names a) in
+    if not (SS.is_empty d) then failure a.pos "unused variables: %s" (String.concat ", " @@ SS.elements d)
   in
 
   check ~pos l a

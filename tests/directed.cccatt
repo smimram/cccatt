@@ -2,4 +2,4 @@
 #-# reversible: false
 
 ncoh inv2 {a b : .} {f g : a -> b} (α : f -> g) : g -> f
-coh inv3 {a b : .} {f g : a -> b} {α : f -> g} {β : f -> g} (p : α -> β) : (β -> α)
+ncoh inv3 {a b : .} {f g : a -> b} {α : f -> g} {β : f -> g} (p : α -> β) : (β -> α)
