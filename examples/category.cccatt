@@ -28,6 +28,14 @@ ncoh co1 {a b : .} (f : a -> b) (g : b -> a) : a -> b
 
 ncoh co1 {a b c : .} (f : a -> b) (g : b -> c) : a -> b
 
+# Equality
+
+coh refl {a b : .} (f : a -> b) : f = f
+
+coh sym {a b : .} {f g : a -> b} (_ : f = g) : g = f
+
+coh trans {a b : .} {f g h : a -> b} (_ : f = g) (_ : g = h) : f = h
+
 # Multiple compositions
 
 let co3 {a b c d : .} (f : a -> b) (g : b -> c) (h : c -> d) := co f (co g h)

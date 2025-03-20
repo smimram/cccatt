@@ -381,6 +381,43 @@ let check1 ~pos l a =
 (* Here, we remove identities and call the above. *)
 let check ~pos l a =
 
+  (* Apply rewriting rules. *)
+  let rec rewrite rw (e:Term.t) =
+    let rewrite = rewrite rw in
+    let mk = mk ~pos:e.pos in
+    match e.desc with
+    | Var x ->
+      (
+        match List.assoc_opt x rw with
+        | Some e' -> mk e'.desc
+        | None -> e
+      )
+    | Arr (a, t, u) -> mk (Arr (rewrite a, rewrite t, rewrite u))
+    | Hom (a, b) -> mk (Hom (rewrite a, rewrite b))
+    | Prod (a, b) -> mk (Prod (rewrite a, rewrite b))
+    | One -> mk One
+    | Id (a, t, u) -> mk (Id (rewrite a, rewrite t, rewrite u))
+    | Obj -> e
+    | Op a -> mk (Op (rewrite a))
+    | App (i, t, u) -> mk (App (i, rewrite t, rewrite u))
+    | Coh (n, l, a, s) ->
+      let s = List.map (fun (x,t) -> x, rewrite t) s in
+      mk (Coh (n, l, a, s))
+    | Meta { value = Some t; _ } -> rewrite t
+    | Meta { value = None; _ } -> error ~pos:e.pos "unresolved metvariable %s when checking pasting conditions" (to_string e)
+    | _ -> error ~pos:e.pos "TODO: in rewrite handle %s" (to_string e)
+  in
+  (* Add a rule to a rewriting system. *)
+  let add_rule rw (x,t) =
+    if has_fv x t then failure pos "trying to add rule %s -> %s but source occurs in target" x (to_string t);
+    assert (not (List.exists (fun (y,_) -> x = y) rw));
+
+    (* printf "add rule %s -> %s\n" x (to_string t); *)
+    let t = rewrite rw t in
+    let rw = List.map (fun (y,u) -> y, rewrite [x,t] u) rw in
+    (x,t)::rw
+  in
+
   if !Setting.orientation = `Directed && Setting.has_elements () then
     (
       warning "orientation not supported yet for closed categories, falling back to reversible";
@@ -393,33 +430,6 @@ let check ~pos l a =
 
     (* Remove identities/higher arrows in the context. *)
     let l, a =
-      (* Apply rewriting rules. *)
-      let rec rewrite rw (e:Term.t) =
-        let rewrite = rewrite rw in
-        let mk = mk ~pos:e.pos in
-        match e.desc with
-        | Var x ->
-          (
-            match List.assoc_opt x rw with
-            | Some e' -> mk e'.desc
-            | None -> e
-          )
-        | Arr (a, t, u) -> mk (Arr (rewrite a, rewrite t, rewrite u))
-        | Hom (a, b) -> mk (Hom (rewrite a, rewrite b))
-        | Prod (a, b) -> mk (Prod (rewrite a, rewrite b))
-        | One -> mk One
-        | Id (a, t, u) -> mk (Id (rewrite a, rewrite t, rewrite u))
-        | Obj -> e
-        | Op a -> mk (Op (rewrite a))
-        | App (i, t, u) -> mk (App (i, rewrite t, rewrite u))
-        | Coh (n, l, a, s) ->
-          let s = List.map (fun (x,t) -> x, rewrite t) s in
-          mk (Coh (n, l, a, s))
-        | Meta { value = Some t; _ } -> rewrite t
-        | Meta { value = None; _ } -> error ~pos:e.pos "unresolved metvariable %s when checking pasting conditions" (to_string e)
-        | _ -> error ~pos:e.pos "TODO: in rewrite handle %s" (to_string e)
-      in
-
       (* Orient identities on variables as rewriting rules and normalize l. *)
       (* TODO: we implicitly assume that all variable names are distinct in pasting schemes *)
       (* TODO: check that we are not a coboundary *)
@@ -443,11 +453,8 @@ let check ~pos l a =
         in
         match List.find_map_and_remove_opt check l with
         | Some ((x,t),l) ->
-          (* printf "add rule %s -> %s\n" x (to_string t); *)
           let l = List.filter (fun (x',_) -> x <> x') l in
-          let t = rewrite rw t in
-          let rw = List.map (fun (y,u) -> y, rewrite [x,t] u) rw in
-          let rw = (x,t)::rw in
+          let rw = add_rule rw (x,t) in
           simplify rw l
         | None -> rw, l
       in
@@ -471,25 +478,43 @@ let check ~pos l a =
 
   | `Directed ->
 
+    let arr a =
+      match (unmeta a).desc with
+      | Arr (_, src, tgt) -> src, tgt
+      | _ -> assert false
+    in
+    let pred a =
+      match (unmeta a).desc with
+      | Arr (a, _, _) -> a
+      | _ -> assert false
+    in
+    let var x =
+      match (unmeta x).desc with
+      | Var x -> x
+      | _ -> error ~pos:x.pos "variable expected, have %s" (to_string a)
+    in
+    (* Contract all rules above the maximal dimension, so that we are reversible. *)
+    let l, a =
+      let rw, l = List.partition (fun (_,a) -> dim a > !Setting.dimension) l in
+      let rw = List.map (fun (_,a) -> let x, b = arr a in let x = var x in x, b) rw in
+      let rw = List.fold_left add_rule [] rw in
+      let l =
+        let rw = List.map fst rw in
+        List.filter (fun (x,_) -> not (List.mem x rw)) l
+      in
+      let l = List.map (fun (x,a) -> x, rewrite rw a) l in
+      let a = rewrite rw a in
+      l, a
+    in
+    let a =
+      let rec aux a = if dim a > !Setting.dimension then aux (pred a) else a in
+      aux a
+    in
+    (* printf "after contraction: %s\n%!" (to_string (pis_explicit l a)); *)
     let rec aux n l a =
       (* Printf.printf "aux %d : %s ⊢ %s\n%!" n (string_of_context l) (to_string a); *)
       if n <= 1 then check1 ~pos l a
       else
-        let arr a =
-          match (unmeta a).desc with
-          | Arr (_, src, tgt) -> src, tgt
-          | _ -> assert false
-        in
-        let pred a =
-          match (unmeta a).desc with
-          | Arr (a, _, _) -> a
-          | _ -> assert false
-        in
-        let var x =
-          match (unmeta x).desc with
-          | Var x -> x
-          | _ -> error ~pos:x.pos "variable expected, have %s" (to_string a)
-        in
         (* Equations *)
         let eq =
           List.filter_map
