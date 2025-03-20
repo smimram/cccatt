@@ -10,6 +10,9 @@ module VS = VarSet
 module StringSet = Set.Make(String)
 module SS = StringSet
 
+(* TODO: directly a set instead of constructing the list *)
+let fv a = SS.of_list @@ free_variable_names a
+
 (** Check whether a 1-dimensional type in a context is a pasting scheme. *)
 let check1 ~pos l a =
   (* Printf.printf "check1 : %s ⊢ %s\n%!" (string_of_context l) (to_string a); *)
@@ -455,7 +458,7 @@ let check ~pos l a =
   | `Directed ->
 
     let rec aux n l a =
-      Printf.printf "aux %d : %s ⊢ %s\n%!" n (string_of_context l) (to_string a);
+      (* Printf.printf "aux %d : %s ⊢ %s\n%!" n (string_of_context l) (to_string a); *)
       if n <= 1 then check1 ~pos l a
       else
         let arr a =
@@ -500,7 +503,12 @@ let check ~pos l a =
         aux (n-1) src a;
         aux (n-1) tgt a;
         (* Make sure that the source target are typable in the source and target. *)
-        (* let v = *)
+        let vars =
+          SS.union
+            (SS.diff (fv @@ fst @@ arr a) (SS.of_list @@ List.map fst src))
+            (SS.diff (fv @@ snd @@ arr a) (SS.of_list @@ List.map fst tgt))
+        in
+        if not (SS.is_empty vars) then failure pos "not allowed to use those variables in source / target: %s" (String.concat ", " @@ SS.elements vars)
     in
     let n = dim a in
     List.iter (fun (_,a) -> if dim a > n then failure a.pos "type %s has dimension %d but trying to construct a term of dimension %d" (to_string a) (dim a) n) l;
@@ -526,7 +534,7 @@ let check ~pos l a =
   (* Ensure that the declared variables are exactly the free variables. *)
   let () =
     let a = homs ~pos (List.map snd l) a in
-    let d = SS.diff vars (SS.of_list @@ free_variable_names a) in
+    let d = SS.diff vars (fv a) in
     if not (SS.is_empty d) then failure a.pos "unused variables: %s" (String.concat ", " @@ SS.elements d)
   in
 
