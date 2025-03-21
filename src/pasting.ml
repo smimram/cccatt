@@ -443,7 +443,7 @@ let check ~pos l a =
     if List.exists (fun (y,_) -> x = y) rw then failure pos "we already have a rule on %s" x;
     (* printf "add rule %s -> %s\n" x (to_string t); *)
     let t = rewrite rw t in
-    if has_fv x t then failure pos "trying to add rule %s -> %s but source occurs in target" x (to_string t);
+    if has_fv x t then failure pos "cycle on %s" x;
     let rw = List.map (fun (y,u) -> y, rewrite [x,t] u) rw in
     (x,t)::rw
   in
@@ -548,7 +548,7 @@ let check ~pos l a =
         (* Consider top dimensional cells as equations. *)
         let l, eq = List.partition (fun (_,a) -> dim a < n) l in
         let eq = List.map (fun (_,a) -> let x, y = arr a in var x, var y) eq in
-        (* TODO: check for acyclicity... *)
+        (* Note the set of equations should be acyclic, which is taken checked by add_rule *)
         let srcs = List.map fst eq in
         let tgts = List.map snd eq in
         let src = List.filter (fun (x,_) -> not (List.mem x tgts)) l in

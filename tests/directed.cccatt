@@ -12,3 +12,6 @@ coh inv4 {a b : .} {f g : a -> b} {α β : f -> g} {p q : α -> β} (_ : p -> q)
 # We cannot eliminate looping identities since we preserve homotopy types
 coh id4 {a b : .} {f g : a -> b} {α β : f -> g} (p : α -> β) : α -> β
 ncoh id4' {a b : .} {f g : a -> b} {α β : f -> g} (p : α -> β) (_ : p -> p) : α -> β
+
+# We cannot eliminate loops by transitivity either
+ncoh id4'' {a b : .} {f g : a -> b} {α β : f -> g} (p q : α -> β) (_ : p -> q) (_ : q -> p) : α -> β
