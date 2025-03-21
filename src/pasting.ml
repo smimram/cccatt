@@ -545,19 +545,9 @@ let check ~pos l a =
       (* Printf.printf "aux %d : %s ⊢ %s\n%!" n (string_of_context l) (to_string a); *)
       if n <= 1 then check1 ~pos l a
       else
-        (* Equations *)
-        let eq =
-          List.filter_map
-            (fun (_,a) ->
-               if dim a = n then
-                 let x, y = arr a in
-                 let x = var x in
-                 let y = var y in
-                 Some (x,y)
-               else None
-            ) l
-        in
-        let l = List.filter (fun (_,a) -> dim a < n) l in
+        (* Consider top dimensional cells as equations. *)
+        let l, eq = List.partition (fun (_,a) -> dim a < n) l in
+        let eq = List.map (fun (_,a) -> let x, y = arr a in var x, var y) eq in
         (* TODO: check for acyclicity... *)
         let srcs = List.map fst eq in
         let tgts = List.map snd eq in
