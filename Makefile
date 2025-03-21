@@ -8,5 +8,6 @@ clean:
 	@dune clean
 
 test:
-	@dune runtest
 	$(MAKE) -C tests $@
+	$(MAKE) -C examples $@
+	@dune runtest

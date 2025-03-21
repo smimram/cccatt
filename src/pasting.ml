@@ -440,11 +440,10 @@ let check ~pos l a =
   in
   (* Add a rule to a rewriting system. *)
   let add_rule rw (x,t) =
-    if has_fv x t then failure pos "trying to add rule %s -> %s but source occurs in target" x (to_string t);
-    assert (not (List.exists (fun (y,_) -> x = y) rw));
-
+    if List.exists (fun (y,_) -> x = y) rw then failure pos "we already have a rule on %s" x;
     (* printf "add rule %s -> %s\n" x (to_string t); *)
     let t = rewrite rw t in
+    if has_fv x t then failure pos "trying to add rule %s -> %s but source occurs in target" x (to_string t);
     let rw = List.map (fun (y,u) -> y, rewrite [x,t] u) rw in
     (x,t)::rw
   in
