@@ -21,7 +21,7 @@ let () =
          message "checking %s" f;
          Lang.exec envs (Lang.parse_file f)
       ) ([], []) !files |> ignore;
-    info "used %d metavariables" !Term.meta_counter
+    (* info "used %d metavariables" !Term.meta_counter *)
   with
   | e ->
     let bt = Printexc.get_raw_backtrace () |> Printexc.raw_backtrace_to_string in
