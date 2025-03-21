@@ -49,3 +49,8 @@ coh tassoc-nat {a a' b b' c c' : .} (f : a -> a') (g : b -> b') (h : c -> c') : 
 coh triangle {a b : .} : co tassoc (te id tunitl) ={ (a * 1) * b -> a * b } te tunitr id
 
 coh pentagon {a b c d : .} : co3 (te tassoc id) tassoc (te id tassoc) ={ ((a * b) * c) * d -> a * (b * (c * d)) } co tassoc tassoc
+
+# Tests
+
+# TODO: this should *not* be accepted...
+# coh bad {a : .} (f : a -> a) : a -> ab

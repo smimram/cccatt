@@ -84,7 +84,7 @@ let parse s =
         | "cartesian closed" | "cartesian closed category" | "ccc" -> `Cartesian_closed
         | "symmetric monoidal category" | "smc" -> `Symmetric_monoidal
         | "symmetric monoidal closed category" | "smcc" -> `Symmetric_monoidal_closed
-        | "monoidal category" -> `Monoidal
+        | "monoidal" | "monoidal category" -> `Monoidal
         | "compact closed" -> `Compact_closed
         | "linear closed" -> `Linear_closed
         | m -> error "unknown mode: %s" m
