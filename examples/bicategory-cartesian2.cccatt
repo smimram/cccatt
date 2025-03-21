@@ -1,0 +1,47 @@
+# Cartesian bicategories
+#
+# Alternative functorial axiomatization.
+#
+#-# mode: cartesian
+#-# dimension: 2
+
+include "bicategory"
+
+# tup
+coh pa {a b c : .} (f : a -> b) (g : a -> c) : a -> b * c
+
+# π
+coh fst {a b : .} : a * b -> a
+
+coh snd {a b : .} : a * b -> b
+
+# ϖ
+coh pa-fst {a b c : .} (f : a -> b) (g : a -> c) : co1 (pa f g) fst -> f
+
+# coh pa-fst' {a b c : .} (f : a -> b) (g : a -> c) : f -> co1 (pa f g) fst
+
+coh pa-snd {a b c : .} (f : a -> b) (g : a -> c) : co1 (pa f g) snd -> g
+
+# coh pa-snd' {a b c : .} (f : a -> b) (g : a -> c) : g -> co1 (pa f g) snd
+
+# NOTE: changing from here on...
+
+# p†
+coh pa2 {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : pa f g -> pa f' g'
+
+# ς
+# NOTE: this is not derivable here!
+coh pa-eta {a b c : .} (f : a -> b * c) : pa (co1 f fst) (co1 f snd) -> f
+
+# coh pa-eta' {a b c : .} (f : a -> b * c) : f -> pa (co1 f fst) (co1 f snd)
+
+# U1
+coh pa2-fst {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : co2 (co21 (pa2 α β) fst) (pa-fst f' g') = co2 (pa-fst f g) α
+
+coh pa2-fst {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : co2 (co21 (pa2 α β) snd) (pa-snd f' g') = co2 (pa-snd f g) β
+
+# U2
+coh pa2-eta {a b c : .} {h h' : a -> b * c} (α : h -> h') : co2 (pa-eta h) α = co2 (pa2 (co21 α fst) (co21 α snd)) (pa-eta h')
+
+# cong
+coh pa2-cong {a b c : .} {f f' : a -> b} {g g' : a -> c} {α α' : f -> f'} {β β' : g -> g'} (_ : α = α') (_ : β = β') : pa2 α β = pa2 α' β'
