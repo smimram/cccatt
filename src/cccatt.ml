@@ -1,3 +1,5 @@
+open Common
+
 let usage = "cccatt [options] [file]"
 
 let () =
@@ -15,9 +17,11 @@ let () =
   try
     List.fold_left
       (fun envs f ->
-         Printf.printf "=^.^= checking %s\n" f;
+         print_newline ();
+         message "checking %s" f;
          Lang.exec envs (Lang.parse_file f)
-      ) ([], []) !files |> ignore
+      ) ([], []) !files |> ignore;
+    info "used %d metavariables" !Term.meta_counter
   with
   | e ->
     let bt = Printexc.get_raw_backtrace () |> Printexc.raw_backtrace_to_string in
