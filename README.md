@@ -2,7 +2,7 @@
 
 A type theory for **unbiased cartesian closed categories** and variants with other structures (monoidal, cartesian, etc.) and with higher dimensions. We provide a small proof assistant which you can also [try online](https://smimram.github.io/cccatt/).
 
-## Introduction
+## Presentation
 
 The general idea here is that this proof assistant allows you to define _coherences_ which are simply terms with given type. If those are accepted, you can be sure that the corresponding morphisms can be defined in any cartesian closed category (this is the correctness of our theory). Conversely, there is a way to obtain any morphism which is part of the structure of cartesian closed categories as a composite of coherences (this is the completeness part).
 
