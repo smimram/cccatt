@@ -548,7 +548,7 @@ let check ~pos l a =
         (* Consider top dimensional cells as equations. *)
         let l, eq = List.partition (fun (_,a) -> dim a < n) l in
         let eq = List.map (fun (_,a) -> let x, y = arr a in var x, var y) eq in
-        (* Note the set of equations should be acyclic, which is taken checked by add_rule *)
+        (* TODO: check that eq is acyclic *)
         let srcs = List.map fst eq in
         let tgts = List.map snd eq in
         let src = List.filter (fun (x,_) -> not (List.mem x tgts)) l in
