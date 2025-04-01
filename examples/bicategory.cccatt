@@ -93,4 +93,4 @@ let trans12 {a b : .} {f g : a -> b} {α0 α1 α2 α3 α4 α5 α6 α7 α8 α9 α
 # Tests
 
 ## The following should not be accepted for (2,0)-bicategories (we actually have (2,1)-bicategories)
-# ncoh inv2 {a b : .} {f g : a -> b} (α : f -> g) : g -> f
+#ncoh inv2 {a b : .} {f g : a -> b} (α : f -> g) : g -> f

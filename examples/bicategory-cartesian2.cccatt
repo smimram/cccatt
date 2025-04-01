@@ -38,7 +38,7 @@ coh pa-eta {a b c : .} (f : a -> b * c) : pa (co1 f fst) (co1 f snd) -> f
 # U1
 coh pa2-fst {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : co2 (co21 (pa2 α β) fst) (pa-fst f' g') = co2 (pa-fst f g) α
 
-coh pa2-fst {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : co2 (co21 (pa2 α β) snd) (pa-snd f' g') = co2 (pa-snd f g) β
+coh pa2-snd {a b c : .} {f f' : a -> b} {g g' : a -> c} (α : f -> f') (β : g -> g') : co2 (co21 (pa2 α β) snd) (pa-snd f' g') = co2 (pa-snd f g) β
 
 # U2
 coh pa2-eta {a b c : .} {h h' : a -> b * c} (α : h -> h') : co2 (pa-eta h) α = co2 (pa2 (co21 α fst) (co21 α snd)) (pa-eta h')
