@@ -110,7 +110,13 @@ The theory is available in [this paper](http://www.lix.polytechnique.fr/Labo/Sam
 The Emacs mode can be loaded by adding
 
 ```
+(use-package cccatt-mode :commands cccatt-mode :vc (:url "https://github.com/smimram/cccatt.git" :rev :last-release))
+```
+
+to you `.emacs` file, or
+
+```
 (require 'cccatt-mode "~/path/to/cccatt-mode.el")
 ```
 
-to you `.emacs` file.
+if you have cloned the repository locally.
