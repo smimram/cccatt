@@ -123,6 +123,7 @@ let check1 ~pos l a =
 
     (* printf "cartesian pasing scheme : %s ⊢ %s\n" (string_of_context l) (to_string a); *)
     let rec get_prod ?(distinct=false) a =
+      let get_prod ?(distinct=distinct) = get_prod ~distinct in
       let a0 = a in
       match (unmeta a).desc with
       | Prod (a, b) ->
