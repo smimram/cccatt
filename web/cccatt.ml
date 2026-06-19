@@ -6,22 +6,14 @@ module Html = Dom_html
 
 let doc = Html.document
 
-[%%if ocaml_version = (4,14,1)]
-let _debug s = Firebug.console##debug (Js.string s)
-[%%else]
 let _debug s = Console.console##debug (Js.string s)
-[%%endif]
 
 let env = ref ([],[])
 
 let loop s =
   env := Lang.exec !env (Lang.parse s)
 
-[%%if ocaml_version = (4,14,1)]
-let number_of_int n = n
-[%%else]
 let number_of_int n = Js.number_of_float (float n)
-[%%endif]
 
 let run _ =
   let jsget x = Js.Opt.get x (fun () -> assert false) in
