@@ -78,10 +78,19 @@ coh pentagon {a b c d e : .} (f : a -> b) (g : b -> c) (h : c -> d) (i : d -> e)
 
 # We don't have inverses
 # ncoh inv2 {a b : .} {f g : a -> b} (α : f -> g) : g -> f
-# ncoh inv3 {a b : .} {f g : a -> b} {α : f -> g} {β : f -> g} (p : α -> β) : (β -> α)
+coh sym {a b : .} {f g : a -> b} {α : f -> g} {β : f -> g} (p : α -> β) : (β -> α)
 coh co3 {a b : .} {f g : a -> b} {α β γ : f -> g} (_ : α -> β) (_ : β -> γ) : (α -> γ)
+# TODO: bracketing on the right is incredibly much slower than bracketing on the left...
+let trans := co3
+# let trans3 {a b : .} {f g : a -> b} {α0 α1 α2 α3 : f -> g} (A1 : α0 -> α1) (A2 : α1 -> α2) (A3 : α2 -> α3) := trans A1 (trans A2 A3)
+let trans3 {a b : .} {f g : a -> b} {α0 α1 α2 α3 : f -> g} (A1 : α0 -> α1) (A2 : α1 -> α2) (A3 : α2 -> α3) := trans (trans A1 A2) A3
+let trans5 {a b : .} {f g : a -> b} {α0 α1 α2 α3 α4 α5 : f -> g} (A1 : α0 -> α1) (A2 : α1 -> α2) (A3 : α2 -> α3) (A4 : α3 -> α4) (A5 : α4 -> α5) := trans (trans (trans (trans A1 A2) A3) A4) A5
+let trans6 {a b : .} {f g : a -> b} {α0 α1 α2 α3 α4 α5 α6 : f -> g} (A1 : α0 -> α1) (A2 : α1 -> α2) (A3 : α2 -> α3) (A4 : α3 -> α4) (A5 : α4 -> α5) (A6 : α5 -> α6) := trans (trans (trans (trans (trans A1 A2) A3) A4) A5) A6
+# let trans10 {a b : .} {f g : a -> b} {α0 α1 α2 α3 α4 α5 α6 α7 α8 α9 α10 : f -> g} (A1 : α0 -> α1) (A2 : α1 -> α2) (A3 : α2 -> α3) (A4 : α3 -> α4) (A5 : α4 -> α5) (A6 : α5 -> α6) (A7 : α6 -> α7) (A8 : α7 -> α8) (A9 : α8 -> α9) (A10 : α9 -> α10) := trans A1 (trans A2 (trans A3 (trans A4 (trans A5 (trans A6 (trans A7 (trans A8 (trans A9 A10))))))))
+let trans10 {a b : .} {f g : a -> b} {α0 α1 α2 α3 α4 α5 α6 α7 α8 α9 α10 : f -> g} (A1 : α0 -> α1) (A2 : α1 -> α2) (A3 : α2 -> α3) (A4 : α3 -> α4) (A5 : α4 -> α5) (A6 : α5 -> α6) (A7 : α6 -> α7) (A8 : α7 -> α8) (A9 : α8 -> α9) (A10 : α9 -> α10) := trans (trans (trans (trans (trans (trans (trans (trans (trans A1 A2) A3) A4) A5) A6) A7) A8) A9) A10
+let trans12 {a b : .} {f g : a -> b} {α0 α1 α2 α3 α4 α5 α6 α7 α8 α9 α10 α11 α12 : f -> g} (A1 : α0 -> α1) (A2 : α1 -> α2) (A3 : α2 -> α3) (A4 : α3 -> α4) (A5 : α4 -> α5) (A6 : α5 -> α6) (A7 : α6 -> α7) (A8 : α7 -> α8) (A9 : α8 -> α9) (A10 : α9 -> α10) (A11 : α10 -> α11) (A12 : α11 -> α12) := trans (trans (trans (trans (trans (trans (trans (trans (trans (trans (trans A1 A2) A3) A4) A5) A6) A7) A8) A9) A10) A11) A12
 
 # Tests
 
 ## The following should not be accepted for (2,0)-bicategories (we actually have (2,1)-bicategories)
-# ncoh inv2 {a b : .} {f g : a -> b} (α : f -> g) : g -> f
+#ncoh inv2 {a b : .} {f g : a -> b} (α : f -> g) : g -> f
