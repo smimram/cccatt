@@ -18,6 +18,7 @@
   (file ../examples/compact-closed.cccatt)
   (file ../examples/bicategory.cccatt)
   (file ../examples/bicategory-cartesian.cccatt)
+  (file ../examples/bicategory-cartesian-closed.cccatt)
  )
  (libraries js_of_ocaml cccatt)
 )

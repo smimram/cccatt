@@ -13,12 +13,14 @@ let cartesian = [%blob "../examples/cartesian.cccatt"]
 let compact_closed = [%blob "../examples/compact-closed.cccatt"]
 let bicategory = [%blob "../examples/bicategory.cccatt"]
 let cartesian_bicategory = [%blob "../examples/bicategory-cartesian.cccatt"]
+let cartesian_closed_bicategory = [%blob "../examples/bicategory-cartesian-closed.cccatt"]
 
 let () =
   Js_of_ocaml.Sys_js.create_file ~name:"category.cccatt" ~content:category;
   Js_of_ocaml.Sys_js.create_file ~name:"monoidal.cccatt" ~content:monoidal;
   Js_of_ocaml.Sys_js.create_file ~name:"symmetric.cccatt" ~content:symmetric;
-  Js_of_ocaml.Sys_js.create_file ~name:"bicategory.cccatt" ~content:bicategory
+  Js_of_ocaml.Sys_js.create_file ~name:"bicategory.cccatt" ~content:bicategory;
+  Js_of_ocaml.Sys_js.create_file ~name:"bicategory-cartesian.cccatt" ~content:cartesian_bicategory
 
 let get = function
   | "none" -> ""
@@ -37,4 +39,5 @@ let get = function
   | "compact-closed" -> compact_closed
   | "bicategory" -> bicategory
   | "cartesian-bicategory" -> cartesian_bicategory
+  | "cartesian-closed-bicategory" -> cartesian_closed_bicategory
   | _ -> ""
