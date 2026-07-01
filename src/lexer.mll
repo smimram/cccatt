@@ -58,3 +58,7 @@ rule token = parse
   | "--"[^'\n']* { token lexbuf }
   | "\n" { Lexing.new_line lexbuf; token lexbuf }
   | eof { EOF }
+
+(* Local Variables: *)
+(* mode: tuareg *)
+(* End: *)
