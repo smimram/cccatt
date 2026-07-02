@@ -15,5 +15,5 @@
  (name cccatt)
  (synopsis "A typechecker for unbiased cartesian closed categories")
  (description "A typechecker for unbiased cartesian closed categories, based on the CCCaTT type theory. Variants are also supported: categories, cartesian categories, monoidal categories, symmetric monoidal categories, etc.")
- (depends ocaml dune)
+ (depends ocaml dune sedlex)
 )
