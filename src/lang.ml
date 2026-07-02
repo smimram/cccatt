@@ -251,14 +251,14 @@ let print_unelaborated_metavariables m =
 
 (** Parse a string. *)
 let parse ?filename s =
-  let lexbuf = Lexing.from_string s in
-  lexbuf.lex_curr_p <- { lexbuf.lex_curr_p with pos_fname = Option.value ~default:"" filename };
-  try Parser.prog Lexer.token lexbuf
-  with
-  | Failure s when s = "lexing: empty token" ->
-    Common.error "lexing error %s" (Pos.to_string @@ Pos.lexeme lexbuf)
+  let lexbuf = Sedlexing.Utf8.from_string s in
+  Option.iter (Sedlexing.set_filename lexbuf) filename;
+  let parse = MenhirLib.Convert.Simplified.traditional2revised Parser.prog in
+  try parse @@ Sedlexing.with_tokenizer Lexer.token lexbuf with
+  | Failure _ ->
+    Common.error "lexing error %s" (Pos.to_string @@ Sedlexing.lexing_positions lexbuf)
   | Parser.Error ->
-    Common.error "parsing error at word \"%s\", %s" (Lexing.lexeme lexbuf) (Pos.to_string @@ Pos.lexeme lexbuf)
+    Common.error "parsing error at word \"%s\", %s" (Sedlexing.Utf8.lexeme lexbuf) (Pos.to_string @@ Sedlexing.lexing_positions lexbuf)
 
 (** Parse a file. *)
 let parse_file f =

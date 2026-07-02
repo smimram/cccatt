@@ -4,12 +4,13 @@
   )
 )
 
-(ocamllex (modules lexer))
 (menhir (modules parser))
 
 (library
  (public_name cccatt)
  (modules extlib common settings term pasting lang parser lexer)
+ (libraries sedlex menhirLib)
+ (preprocess (per_module ((pps sedlex.ppx) lexer)))
  (wrapped false)
 )
 
