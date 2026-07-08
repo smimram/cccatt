@@ -4,6 +4,7 @@
 # https://www.angelfire.com/tx4/cus/combinator/birds.html
 #
 #-# mode: ccc
+#-# elements: true
 
 # - "crossed X" (or "converse X") means that we exchange the two arguments of X, i.e. we take CX
 # - "X once removed" means that the first argument now takes an argument, i.e. we take B x

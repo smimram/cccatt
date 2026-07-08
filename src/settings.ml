@@ -21,14 +21,27 @@ type mode = [
 
 let mode = ref (`Cartesian_closed : mode)
 
-(** Whether types have elements. *)
-let has_elements () = List.mem !mode [`Linear_closed; `Symmetric_monoidal_closed; `Cartesian_closed]
-
 let has_hom () = List.mem !mode [`Linear_closed; `Symmetric_monoidal_closed; `Cartesian_closed]
 
 let has_prod () = List.mem !mode [`Monoidal; `Symmetric_monoidal; `Symmetric_monoidal_closed; `Cartesian; `Cartesian_closed; `Compact_closed]
 
 let has_one () = has_prod ()
+
+let elements = ref false
+
+let set_elements e =
+  let e =
+    if e && not (List.mem !mode [`Linear_closed; `Symmetric_monoidal_closed; `Cartesian_closed]) then
+      (
+        warning "cannot have elements";
+        false
+      )
+    else e
+  in
+  elements := e
+
+(** Whether types have elements, ie we consider x : a as implicitly meaning x : 1 → a. *)
+let has_elements () = !elements
 
 let has_op () = List.mem !mode [`Compact_closed]
 
@@ -94,6 +107,8 @@ let parse s =
   | "dim" | "dimension" ->
     let n = if v = "oo" || v = "∞" then max_int else int_of_string v in
     set_dim n
+  | "elements" ->
+    set_elements @@ bool_of_string v
   | "reversible" ->
     (
       match v with

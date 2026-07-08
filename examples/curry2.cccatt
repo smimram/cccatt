@@ -2,6 +2,7 @@
 # https://en.wikipedia.org/wiki/B,_C,_K,_W_system
 #
 #-# mode: ccc
+#-# elements: true
 
 coh ap {a b : .} (f : a ⇒ b) (x : a) : b
 

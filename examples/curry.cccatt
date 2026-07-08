@@ -1,6 +1,7 @@
 # λ-calculus with SKI combinators
 #
 #-# mode: ccc
+#-# elements: true
 #-# dimension: 1
 
 ## Combinators
