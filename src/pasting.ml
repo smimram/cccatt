@@ -451,7 +451,7 @@ let check ~pos l a =
 
   if !Settings.orientation = `Directed && Settings.has_elements () then
     (
-      warning "orientation not supported yet for closed categories, falling back to reversible";
+      warning "orientation not supported yet for elements, falling back to reversible";
       Settings.set_orientation `Reversible
     );
 
