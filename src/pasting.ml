@@ -544,6 +544,7 @@ let check ~pos l a =
     (* printf "after contraction: %s\n%!" (to_string (pis_explicit l a)); *)
     let rec aux n l a =
       (* Printf.printf "aux %d : %s ⊢ %s\n%!" n (string_of_context l) (to_string a); *)
+      (* For 1-dimensional context use traditional pasting scheme verification. *)
       if n <= 1 then check1 ~pos l a
       else
         (* Consider top dimensional cells as equations. *)
@@ -552,6 +553,7 @@ let check ~pos l a =
         (* TODO: check that eq is acyclic *)
         let srcs = List.map fst eq in
         let tgts = List.map snd eq in
+        (* Compute the source and the target. *)
         let src = List.filter (fun (x,_) -> not (List.mem x tgts)) l in
         let tgt = List.filter (fun (x,_) -> not (List.mem x srcs)) l in
         (* Make sure that the source and target types are pasting. *)
