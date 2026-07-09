@@ -144,6 +144,14 @@ type command =
   | Include of string (** include another file *)
   | Setting of string (** change a setting *)
 
+let string_of_command = function
+  | Let (x, a, t) ->
+    let a = match a with Some a -> " : " ^ to_string a | None -> "" in
+    Printf.sprintf "let %s%s = %s" x a (to_string t)
+  | NCoh (x, _, _) -> Printf.sprintf "ncoh %s" x
+  | Include x -> Printf.sprintf "include \"%s\"" x
+  | Setting x -> Printf.sprintf "set %s" x
+
 (** A program. *)
 type prog = command list
 
