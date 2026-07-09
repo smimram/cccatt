@@ -1,0 +1,81 @@
+# Cartesian bicategories
+#
+# See for instance _A type theory for cartesian closed bicategories_ by Fiore and Saville
+#
+#-# mode: cartesian
+#-# dimension: 2
+#
+# Note that this formalization cannot go through with our directed criterion, see bicategory-cartesian for an alternative axiomatization.
+#-# reversible: true
+
+include "bicategory"
+
+# tup
+coh pa {a b c : .} (f : a → b) (g : a → c) : a → b × c
+
+# π
+coh fst {a b : .} : a × b → a
+
+coh snd {a b : .} : a × b → b
+
+# ϖ
+coh pa-fst {a b c : .} (f : a → b) (g : a → c) : co1 (pa f g) fst → f
+
+coh pa-snd {a b c : .} (f : a → b) (g : a → c) : co1 (pa f g) snd → g
+
+# p†
+coh pa2 {a b c : .} {f : a → b} {g : a → c} (h : a → b × c) (α : co1 h fst → f) (β : co1 h snd → g) : h → pa f g
+
+## Note that eta-expansion is derivable
+# coh pa-eta {a b c : .} (f : a → b × c) : f → pa (co1 f fst) (co1 f snd)
+# ς
+let pa-eta {a b c : .} (f : a → b × c) : f → pa (co1 f fst) (co1 f snd) := pa2 f (id2 (co1 f fst)) (id2 (co1 f snd))
+
+# U1
+coh pa2-fst {a b c : .} {f : a → b} {g : a → c} (h : a → b × c) (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2 h α β) fst) (pa-fst f g) = α
+
+coh pa2-snd {a b c : .} {f : a → b} {g : a → c} (h : a → b × c) (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2 h α β) snd) (pa-snd f g) = β
+
+# U2
+coh pa2-eta {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : h → pa f g) : α = pa2 h (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g))
+
+# cong
+coh pa2-cong {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} {α α' : co1 h fst → f} {β β' : co1 h snd → g} (_ : α → α') (_ : β → β') : pa2 h α β = pa2 h α' β'
+
+# Admissible rules
+
+coh paf {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g'
+let paf {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g' := pa2 {a} {b} {c} {f'} {g'} (pa f g) (co2 (pa-fst f g) α) (co2 (pa-snd f g) β)
+
+# TODO: show that other are also derivable
+
+coh paf-id2 {a b c : .} (f : a → b) (g : a → c) : paf (id2 f) (id2 g) → id2 (pa f g)
+# let paf-id2 {a b c : .} (f : a → b) (g : a → c) : paf (id2 f) (id2 g) → id2 (pa f g) := co3 (pa2-cong (inv3 (pa2-fst _ _ _)) _) (inv3 (pa2-eta (id2 _)))
+
+# pa2[pa[?2080,?2114],co2[co21[id2[pa[?2080,?2114]],fst[]],pa-fst[?2080,?2114]],co2[co21[id2[pa[?2080,?2114]],snd[]],pa-snd[?2080,?2114]]] = id2[pa[?2080,?2114]]
+# pa2[pa[?2080,?2114],co2[co21[pa2[pa[?2080,?2114],?2086,?126],fst[]],pa-fst[?2080,?2114]],?2092] = ?2072
+
+# co2[pa-fst[f,g],id2[f]] = co2[co21[id2[pa[f,g]],fst[]],pa-fst[f,g]]
+
+# pa2[pa[f,g],co2[pa-fst[f,g],id2[f]],co2[pa-snd[f,g],id2[g]]] = pa2[pa[f,g],co2[co21[id2[pa[f,g]],fst[]],pa-fst[f,g]],co2[co21[id2[pa[f,g]],snd[]],pa-snd[f,g]]]
+
+# pa2[pa[f,g],co2[co21[id2[pa[f,g]],fst[]],pa-fst[f,g]],co2[co21[id2[pa[f,g]],snd[]],pa-snd[f,g]]] = id2[pa[f,g]]
+# pa2[pa[f,g],co2[pa-fst[f,g],id2[f]],co2[pa-snd[f,g],id2[g]]] = id2[pa[f,g]] expected
+
+coh paf-co2 {a b c : .} {f f' f'' : a → b} {g g' g'' : a → c} (α : f → f') (α' : f' → f'') (β : g → g') (β' : g' → g'') : co2 (paf α β) (paf α' β') = paf (co2 α α') (co2 β β')
+
+# ς-nat
+coh pa-eta-nat {a b c : .} {f f' : a → b × c} (α : f → f') : co2 α (pa-eta f') = co2 (pa-eta f) (paf (co21 α fst) (co21 α snd))
+
+# ϖ-nat
+coh pa-fst-nat {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2 (co21 (paf α β) fst) (pa-fst f' g') = co2 (pa-fst f g) α
+
+coh pa-snd-nat {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2 (co21 (paf α β) snd) (pa-snd f' g') = co2 (pa-snd f g) β
+
+# triangle-law-1
+coh tl1 {a b c : .} (f : a → b) (g : a → c) : co2 (pa-eta (pa f g)) (paf (pa-fst f g) (pa-snd f g)) = id2 _
+
+# triangle-law-2
+coh tl2-fst {a b c : .} (f : a → b × c) : co2 (co21 (pa-eta f) fst) (pa-fst _ _) = id2 (co1 f fst)
+
+coh tl2-snd {a b c : .} (f : a → b × c) : co2 (co21 (pa-eta f) snd) (pa-snd _ _) = id2 (co1 f snd)
