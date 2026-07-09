@@ -4,6 +4,7 @@
 #
 #-# mode: cartesian closed
 #-# dimension: 2
+#-# reversible: true
 
 include "bicategory-cartesian"
 
