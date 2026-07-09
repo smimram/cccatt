@@ -490,6 +490,7 @@ let check ~pos l a =
         | None -> rw, l
       in
       let rw, l = simplify [] l in
+      (* TODO: the rewriting on a is not necessary I think since we are going to keep its 1-dimensional source only anyway *)
       l, rewrite rw a
     in
     (* printf "**** after simplification: %s\n%!" (to_string (pis_explicit l a)); *)
@@ -522,7 +523,7 @@ let check ~pos l a =
     let var x =
       match (unmeta x).desc with
       | Var x -> x
-      | _ -> error ~pos:x.pos "variable expected, have %s" (to_string a)
+      | _ -> error ~pos:x.pos "variable expected but we have %s" (to_string a)
     in
     (* Contract all rules above the maximal dimension, so that we are reversible. *)
     let l, a =
