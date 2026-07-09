@@ -10,7 +10,7 @@ exception Type_error of Pos.t * t * t (* at pos got type a instead of b *)
 (** Make sure that two values are equal (and raise [Unification] if this cannot be the case). *)
 (* The first argument is the alpha-conversion to apply to t *)
 let rec unify tenv env ?(alpha=[]) t t' =
-  (* Printf.printf "UNIFY: %s vs %s\n%!" (to_string t) (to_string t'); *)
+  (* debug "UNIFY" "%s vs %s" (to_string t) (to_string t'); *)
   let unify tenv env ?(alpha=alpha) = unify tenv env ~alpha in
   match t.desc, t'.desc with
   | Var x, Var y ->
@@ -140,8 +140,9 @@ and infer tenv env (e:Term.t) =
     )
   | Abs (i,x,a,t) ->
     let a = check tenv env a (mk ~pos:a.pos Type) in
-    let t, b = infer ((x,eval env a)::tenv) ((x, var ~pos:a.pos x)::env) t in
-    mk ~pos (Abs (i,x,a,t)), mk ~pos (Pi (i, x, a, b))
+    let a' = eval env a in
+    let t, b = infer ((x,a')::tenv) ((x, var ~pos:a.pos x)::env) t in
+    mk ~pos (Abs (i,x,a,t)), mk ~pos (Pi (i, x, a', b))
   | App (i, t, u) ->
     let t, a =
       match i with
@@ -273,6 +274,7 @@ let parse_file f =
   parse ~filename:f (Bytes.to_string sin)
 
 let rec exec_command ?(settings=true) (tenv, env) p =
+  (* debug "EXEC" "%s" (string_of_command p); *)
   match p with
   | Let (x, a, e) ->
     (* printf "*** let %s : %s := %s\n%!" x (Option.value ~default:"?" @@ Option.map to_string a) (to_string e); *)

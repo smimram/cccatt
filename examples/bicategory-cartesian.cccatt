@@ -36,7 +36,7 @@ coh pa-eta {a b c : .} (f : a → b × c) : f → pa (co1 f fst) (co1 f snd)
 
 # coh pa-eta-inv {a b c : .} (f : a → b × c) : pa (co1 f fst) (co1 f snd) → f
 
-# let pa2' {a b c : .} {f : a → b} {g : a → c} (h : a → b × c) (α : co1 h fst → f) (β : co1 h snd → g) : h → pa f g := co2 (pa-eta h) (pa2 α β)
+let pa2' {a b c : .} {f : a → b} {g : a → c} (h : a → b × c) (α : co1 h fst → f) (β : co1 h snd → g) : h → pa f g := co2 (pa-eta h) (pa2 α β)
 
 coh pa2-id2 {a b c : .} (f : a → b) (g : a → c) : pa2 (id2 f) (id2 g) → id2 (pa f g)
 
