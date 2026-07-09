@@ -95,6 +95,14 @@ coh vcomp {a b : .} {f g h : a -> b} (α : f -> g) (β : g → h) : f -> h
 
 Have a look a the [examples](examples/) or the [online demo](https://smimram.github.io/cccatt/) for more illustrations.
 
+## Options
+
+The following options can be set
+
+- `mode`: set the underlying theory (`monoidal`, `cartesian closed`, etc.),
+- `dimension`: set the number of directed dimensions,
+- `elements`: set whether types have elements (i.e. whether `x:a` makes sense for `a:*`), disabled by default.
+
 ## Theory
 
 The theory is available in [this paper](http://www.lix.polytechnique.fr/Labo/Samuel.Mimram/docs/mimram_cccatt.pdf).
