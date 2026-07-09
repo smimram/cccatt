@@ -96,4 +96,4 @@ coh co3 {a b : .} {f g : a → b} {α β γ : f → g} (_ : α → β) (_ : β �
 # Tests
 
 ## The following should not be accepted for (2,0)-bicategories (we actually have (2,1)-bicategories)
-# ncoh inv2 {a b : .} {f g : a → b} (α : f → g) : g → f
+ncoh inv2 {a b : .} {f g : a → b} (α : f → g) : g → f
