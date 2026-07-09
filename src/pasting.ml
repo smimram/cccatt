@@ -575,7 +575,7 @@ let check ~pos l a =
 (** Check whether a type in a context is a pasting scheme. *)
 (* Here, we cleanup the variable declarations and call the above. *)
 let check ~pos l a =
-  (* printf "* check_ps: %s\n%!" (to_string (pis_explicit l a)); *)
+  (* debug "PS" "%s" (to_string (pis_explicit l a)); *)
 
   (* Remove variable declarations from the context. *)
   let vars, l =

@@ -10,7 +10,7 @@ exception Type_error of Pos.t * t * t (* at pos got type a instead of b *)
 (** Make sure that two values are equal (and raise [Unification] if this cannot be the case). *)
 (* The first argument is the alpha-conversion to apply to t *)
 let rec unify tenv env ?(alpha=[]) t t' =
-  (* Printf.printf "unify %s with %s\n%!" (to_string t) (to_string t'); *)
+  (* Printf.printf "UNIFY: %s vs %s\n%!" (to_string t) (to_string t'); *)
   let unify tenv env ?(alpha=alpha) = unify tenv env ~alpha in
   match t.desc, t'.desc with
   | Var x, Var y ->
@@ -202,7 +202,7 @@ and infer tenv env (e:Term.t) =
 
 (* NOTE: a is supposed to be a value *)
 and check tenv env e a =
-  (* printf "* check %s : %s\n%!" (to_string e) (to_string a); *)
+  (* debug "CHECK" "%s : %s" (to_string e) (to_string a); *)
   match e.desc, a.desc with
   (* Allow casting under implicit arrows. *)
   | Abs(`Implicit,x,a,t), Pi(`Implicit,x',a',b) when x = x' (* TODO: alpha? *) ->

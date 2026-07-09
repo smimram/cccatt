@@ -34,3 +34,6 @@ let message fmt =
 
 let info fmt =
   Printf.ksprintf (fun s -> printf "=?.?= %s\n" s) fmt
+
+let debug kind fmt =
+  Printf.ksprintf (fun s -> printf "=D.D= %s: %s\n" kind s) fmt
