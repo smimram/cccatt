@@ -8,11 +8,11 @@
 
 include "bicategory-cartesian-reversible"
 
-# # lam
-# coh abs {a b c : .} (f : a * b ⇒ c) : a ⇒ b ⇒ c
+# lam
+coh abs {a b c : .} (f : a * b -> c) : a -> b ⇒ c
 
-# # eval
-# coh app {a b : .} : (a ⇒ b) * a ⇒ b
+# eval
+coh app {a b : .} : (a ⇒ b) * a -> b
 
 # # ϵ-intro
 # # coh beta {a b c : .} (f : a * b => c) : app (abs f) = f
