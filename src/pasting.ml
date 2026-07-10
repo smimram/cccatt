@@ -549,7 +549,9 @@ let check ~pos l a =
       if n <= 1 then check1 ~pos l a
       else
         (* Consider top dimensional cells as equations. *)
+        (* NOTE: these checks are included in acyclicity below, but we get better positions in errors. *)
         let l, eq = List.partition (fun (_,a) -> dim a < n) l in
+        List.iter (fun (r,a) -> let x, y = arr a in if x = y then error ~pos:a.pos "%s is a loop" r) eq;
         List.iter_unordered_pairs
           (fun (r,a) (r',a') ->
              let x, y = arr a in
@@ -558,6 +560,24 @@ let check ~pos l a =
              if y = y' then error ~pos:a'.pos "%s has the same target as %s" r' r;
           ) eq;
         let eq = List.map (fun (_,a) -> let x, y = arr a in var x, var y) eq in
+        (* Check that equations are acyclic. *)
+        (
+          let trans eq =
+            let ans = ref eq in
+            let add r = if not (List.mem r !ans) then ans := r :: !ans in
+            List.iter_unordered_pairs (fun (x,y) (x',y') ->
+                if y = x' then add (x,y');
+                if y' = x then add (x',y)
+              ) eq;
+            !ans
+          in
+          let rec aux eq =
+            let eq' = trans eq in
+            if List.length eq' <> List.length eq then aux eq'
+            else eq
+          in
+          List.iter (fun (x,y) -> if x = y then error ~pos "cycle in equations") (aux eq)
+        );
         (* TODO: check that eq is acyclic *)
         let srcs = List.map fst eq in
         let tgts = List.map snd eq in
