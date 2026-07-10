@@ -16,7 +16,6 @@ and desc =
   | Abs  of icit * string * t * t (** abstraction *)
   | App  of icit * t * t (** application *)
   | Pi   of icit * string * t * t (** Π-type *)
-  | Id   of t * t * t (** identity type *)
   | Arr  of t * t * t (** arrow type *)
   | Hom  of t * t (** internal hom type *)
   | Prod of t * t (** product type *)
@@ -78,13 +77,11 @@ let rec to_string ?(pa=false) e =
       Printf.sprintf "(%s : %s)%s %s" x (to_string a) arr (to_string t) |> pa
   | Obj -> "."
     
-  | Arr (a, t, u) -> Printf.sprintf "%s %s %s" (to_string ~pa:true t) (if dim a = !Settings.dimension then "=" else "→") (to_string u) |> pa
+  | Arr (a, t, u) -> Printf.sprintf "%s %s %s" (to_string ~pa:true t) (if dim a >= !Settings.dimension then "=" else "→") (to_string u) |> pa
   | Hom (a, b) -> Printf.sprintf "%s ⇒ %s" (to_string ~pa:true a) (to_string b) |> pa
   | Prod (a, b) -> Printf.sprintf "%s × %s" (to_string ~pa:true a) (to_string b) |> pa
   | One -> "1"
   | Op a -> "! " ^ to_string ~pa:true a
-  | Id (a, t, u) ->
-    Printf.sprintf "(%s = %s : %s)" (to_string ~pa:true t) (to_string ~pa:true u) (to_string ~pa:true a) |> pa
   | Meta m ->
     (
       match m.value with
@@ -199,8 +196,7 @@ let rec has_fv x e =
   | Var y -> x = y
   | Hom (a, b)
   | Prod (a, b) -> has_fv x a || has_fv x b
-  | Arr (a, t, u)
-  | Id (a, t, u) -> has_fv x a || has_fv x t || has_fv x u
+  | Arr (a, t, u) -> has_fv x a || has_fv x t || has_fv x u
   | App (_, t, u) -> has_fv x t || has_fv x u
   | Meta { value = Some t; ty = ty; _ } -> has_fv x t || has_fv x ty
   | Meta { value = None; ty = ty; _ } -> has_fv x ty
@@ -243,8 +239,7 @@ let metavariables e =
     | Hom (a, b)
     | Prod (a, b) -> acc |> aux a |> aux b
     | One -> acc
-    | Arr (a, t, u)
-    | Id (a, t, u) -> acc |> aux a |> aux t |> aux u
+    | Arr (a, t, u) -> acc |> aux a |> aux t |> aux u
     | Op a -> acc |> aux a
     | Meta m ->
       (
@@ -289,7 +284,6 @@ let free_variable_names a =
     | Prod (a, b) -> fv |> aux a |> aux b
     | One -> fv
     | Op a -> fv |> aux a
-    | Id (a, t, u) -> fv |> aux a |> aux t |> aux u
     | App (_, t, u) -> fv |> aux t |> aux u
     | Coh (_,_,_,s) -> List.fold_left (fun fv (_,t) -> aux t fv) fv s
     | _ -> failure a.pos "TODO: fv handle %s" (to_string a)

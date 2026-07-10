@@ -113,7 +113,6 @@ let check1 ~pos l a =
         let x = target a in
         if List.mem x vars then failure c.pos "multiple producers for %s" x;
         prove (x::vars) (a::env) b
-      | Id _ -> assert false
       | Obj -> failure c.pos "cannot prove identities between objects"
       | _ -> assert false
     in
@@ -428,7 +427,6 @@ let check ~pos l a =
     | Hom (a, b) -> mk (Hom (rewrite a, rewrite b))
     | Prod (a, b) -> mk (Prod (rewrite a, rewrite b))
     | One -> mk One
-    | Id (a, t, u) -> mk (Id (rewrite a, rewrite t, rewrite u))
     | Obj -> e
     | Op a -> mk (Op (rewrite a))
     | App (i, t, u) -> mk (App (i, rewrite t, rewrite u))
@@ -476,8 +474,6 @@ let check ~pos l a =
             not (List.exists (fun (y,_) -> x = y) rw)
           in
           match a.desc with
-          | Id (_, {desc = Var x; _}, t) -> Some (x,t)
-          | Id (_, t, {desc = Var x; _}) -> Some (x,t)
           | Arr (o, {desc = Var x; _}, t) when valid (x,t) && dim o >= 1 -> Some (x,t)
           | Arr (o, t, {desc = Var x; _}) when valid (x,t) && dim o >= 1 -> Some (x,t)
           | _ -> None
@@ -500,7 +496,6 @@ let check ~pos l a =
       let rec aux a =
         match a.desc with
         | Arr(a, _, _) when not (is_obj a) -> aux a
-        | Id (a, _, _) -> aux a
         | _ -> a
       in
       aux a

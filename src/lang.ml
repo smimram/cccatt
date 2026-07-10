@@ -96,7 +96,6 @@ and eval env e =
       | _ -> assert false
     )
   | Obj -> mk Obj
-  | Id (a, t, u) -> mk (Id (eval env a, eval env t, eval env u))
   | Arr (a, t, u) -> mk (Arr (eval env a, eval env t, eval env u))
   | Hom (a, b) -> mk (Hom (eval env a, eval env b))
   | Prod (a, b) -> mk (Prod (eval env a, eval env b))
@@ -165,13 +164,6 @@ and infer tenv env (e:Term.t) =
     mk ~pos (Pi (i, x, a, b)), mk ~pos Type
   | Obj ->
     mk ~pos Obj, mk ~pos Type
-  | Id (a, t, u) ->
-    (* TODO: this should be merged as a higher-dimensional Hom *)
-    let a = check tenv env a (mk ~pos:a.pos Obj) in
-    let a' = eval env a in
-    let t = check tenv env t a' in
-    let u = check tenv env u a' in
-    mk ~pos (Id (a, t, u)), mk ~pos Type
   | Arr (a, t, u) ->
     (* TODO: change this! *)
     let a = check tenv env a (mk ~pos:a.pos Type) in

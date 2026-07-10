@@ -44,7 +44,7 @@ expr:
   | expr ARR expr { mk ~pos:$loc (Arr (hole ~pos:$loc (), $1, $3)) }
   | expr HOM expr { mk ~pos:$loc (Hom ($1, $3)) }
   | expr EQ eqtype expr { mk ~pos:$loc (Arr ($3, $1, $4)) }
-  | expr IEQ eqtype expr { mk ~pos:$loc (Id ($3, $1, $4)) }
+  | expr IEQ eqtype expr { mk ~pos:$loc (Arr ($3, $1, $4)) }
   | expr TIMES expr { mk ~pos:$loc (Prod ($1, $3)) }
   | OP expr { mk ~pos:$loc (Op $2) }
   | aexpr { $1 }
