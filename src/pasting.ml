@@ -549,8 +549,8 @@ let check ~pos l a =
       if n <= 1 then check1 ~pos l a
       else
         (* Consider top dimensional cells as equations. *)
-        (* NOTE: these checks are included in acyclicity below, but we get better positions in errors. *)
         let l, eq = List.partition (fun (_,a) -> dim a < n) l in
+        (* NOTE: these checks are included in acyclicity below, but we get better positions in errors. *)
         List.iter (fun (r,a) -> let x, y = arr a in if x = y then error ~pos:a.pos "%s is a loop" r) eq;
         List.iter_unordered_pairs
           (fun (r,a) (r',a') ->
