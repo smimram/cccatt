@@ -5,13 +5,13 @@
 
 # Generators
 
-coh comp {a b c : .} (f : a -> b) (g : b -> c) : a -> c
+coh comp {a b c : .} (f : a → b) (g : b → c) : a → c
 
-coh id {a : .} : a -> a
+coh id {a : .} : a → a
 
-coh tens {a a' b b' : .} (f : a -> b) (f' : a' -> b') : a * a' -> b * b'
+coh tens {a a' b b' : .} (f : a → b) (f' : a' → b') : a × a' → b × b'
 
-coh dup {a : .} : a -> a * a
+coh dup {a : .} : a → a × a
 
 # coh
 
