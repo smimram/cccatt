@@ -550,6 +550,13 @@ let check ~pos l a =
       else
         (* Consider top dimensional cells as equations. *)
         let l, eq = List.partition (fun (_,a) -> dim a < n) l in
+        List.iter_unordered_pairs
+          (fun (r,a) (r',a') ->
+             let x, y = arr a in
+             let x', y' = arr a' in
+             if x = x' then error ~pos:a'.pos "%s has the same source as %s" r' r;
+             if y = y' then error ~pos:a'.pos "%s has the same target as %s" r' r;
+          ) eq;
         let eq = List.map (fun (_,a) -> let x, y = arr a in var x, var y) eq in
         (* TODO: check that eq is acyclic *)
         let srcs = List.map fst eq in
