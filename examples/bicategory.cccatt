@@ -92,3 +92,5 @@ coh pentagon {a b c d e : .} (f : a → b) (g : b → c) (h : c → d) (i : d �
 let co2-3 {a b : .} {f1 f2 f3 f4 : a → b} (α : f1 → f2) (β : f2 → f3) (γ : f3 → f4) := co2 α (co2 β γ)
 
 coh co3 {a b : .} {f g : a → b} {α β γ : f → g} (p : α = β) (q : β = γ) : α = γ
+
+coh inv3 {a b : .} {f g : a → b} {α β : f → g} (p : α = β) : β = α

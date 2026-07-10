@@ -25,11 +25,9 @@ coh term-can2 {a : .} {f g : a → 1} (α : f → g) : α = term2 f g
 # coh term-can2 {a : .} {f g : a → 1} (α : f → g) : α = co2 (term-can f) (term-can' g)
 # coh term-can2 {a : .} {f g : a → 1} (α : f → g) : co2 α (term-can g) = term-can f
 
-coh term-can2' {a : .} {f g : a → 1} (α : f → g) : term2 f g = α
-
 # This one is not a coherence, but derivable
 ncoh term3 {a : .} {f g : a → 1} (α β : f → g) : α → β
-let term3 {a : .} {f g : a → 1} (α β : f → g) : α → β := co3 (term-can2 α) (term-can2' β)
+let term3 {a : .} {f g : a → 1} (α β : f → g) : α → β := co3 (term-can2 α) (inv3 (term-can2 β))
 
 # Pairing (tup)
 coh pa {a b c : .} (f : a → b) (g : a → c) : a → b × c
