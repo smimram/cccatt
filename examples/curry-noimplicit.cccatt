@@ -1,6 +1,7 @@
 ## λ-calculus
 #
 #-# mode: ccc
+#-# dimension: 1
 #-# elements: true
 
 coh I (a : .) : a ⇒ a
