@@ -109,6 +109,7 @@ and eval env e =
 (** Infer the type of an expression, elaborates the term along the way. *)
 (* NOTE: in the following environments only contain values, and type inference produces values. *)
 and infer tenv env (e:Term.t) =
+  (* debug "INFER" "%s" (to_string e); *)
   let pos = e.pos in
   (* printf "* infer %s\n%!" (to_string e); *)
   (* printf "  tenv : %s\n%!" (string_of_context tenv); *)
@@ -213,7 +214,7 @@ and check tenv env e a =
   | _ ->
     let e, b = infer tenv env e in
     let e, b = insert tenv env e b in
-    if not (Settings.has_elements ()) || not (b.desc = Obj && a.desc = Type) then
+    if not (Settings.has_elements ()) || not ((unmeta b).desc = Obj && (unmeta a).desc = Type) then
       (
         try unify tenv env b a
         with Unification -> raise (Type_error (e.pos, b, a))
