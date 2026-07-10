@@ -24,23 +24,19 @@ coh pa-snd {a b c : .} (f : a → b) (g : a → c) : co1 (pa f g) snd → g
 # Pairing
 coh pa2 {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g'
 
-# # p†
-# coh pa2 {a b c : .} {f : a → b} {g : a → c} (h : a → b × c) (α : co1 h fst → f) (β : co1 h snd → g) : h → pa f g
-
-# ## Note that eta-expansion is derivable
-# # coh pa-eta {a b c : .} (f : a → b × c) : f → pa (co1 f fst) (co1 f snd)
-# # ς
-# let pa-eta {a b c : .} (f : a → b × c) : f → pa (co1 f fst) (co1 f snd) := pa2 f (id2 (co1 f fst)) (id2 (co1 f snd))
-
 coh pa-eta {a b c : .} (f : a → b × c) : f → pa (co1 f fst) (co1 f snd)
 
 # coh pa-eta-inv {a b c : .} (f : a → b × c) : pa (co1 f fst) (co1 f snd) → f
 
+# p†
 let pa2' {a b c : .} {f : a → b} {g : a → c} (h : a → b × c) (α : co1 h fst → f) (β : co1 h snd → g) : h → pa f g := co2 (pa-eta h) (pa2 α β)
 
 coh pa2-id2 {a b c : .} (f : a → b) (g : a → c) : pa2 (id2 f) (id2 g) → id2 (pa f g)
 
-# coh pa2-co12 {a' a b c : .} (h : a' → a) {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co12 h (pa2 α β) = co2-3 (pa2 (co12 h α) (co12 h β))
+# coh pa2-co12 {a' a b c : .} (h : a' → a) {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co12 h (pa2 α β) = pa2 (co12 h α) (co12 h β)
+
+
+
 
 # # U1
 # coh pa2-fst {a b c : .} {f : a → b} {g : a → c} (h : a → b × c) (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2 h α β) fst) (pa-fst f g) = α
