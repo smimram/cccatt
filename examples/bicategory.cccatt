@@ -87,6 +87,8 @@ coh invl-invr {a b c : .} (f : a → b) (g : b → c) : co2 (assoc f id1 g) (co1
 
 coh pentagon {a b c d e : .} (f : a → b) (g : b → c) (h : c → d) (i : d → e) : co2 (assoc (co1 f g) h i) (assoc f g (co1 h i)) = co2 (co21 (assoc f g h) i) (co2 (assoc f (co1 g h) i) (co12 f (assoc g h i)))
 
-## Helper function
+## Helper functions
 
 let co2-3 {a b : .} {f1 f2 f3 f4 : a → b} (α : f1 → f2) (β : f2 → f3) (γ : f3 → f4) := co2 α (co2 β γ)
+
+coh co3 {a b : .} {f g : a → b} {α β γ : f → g} (p : α = β) (q : β = γ) : α = γ

@@ -16,15 +16,20 @@ coh term-can' {a : .} (f : a → 1) : term → f
 coh term-can-invl {a : .} (f : a → 1) : co2 (term-can' f) (term-can f) = id2 term
 coh term-can-invr {a : .} (f : a → 1) : co2 (term-can f) (term-can' f) = id2 f
 
-coh term-can2 {a : .} {f g : a → 1} (α : f → g) : co2 α (term-can g) = term-can f
-
 # This one is a coherence or derivable
 coh term2 {a : .} (f g : a → 1) : f → g
 let term2 {a : .} (f g : a → 1) : f → g := co2 (term-can f) (term-can' g)
 
-# This one is not a coherence
+# Note both are inter-derivable by invertibility of term-can g
+coh term-can2 {a : .} {f g : a → 1} (α : f → g) : α = term2 f g
+# coh term-can2 {a : .} {f g : a → 1} (α : f → g) : α = co2 (term-can f) (term-can' g)
+# coh term-can2 {a : .} {f g : a → 1} (α : f → g) : co2 α (term-can g) = term-can f
+
+coh term-can2' {a : .} {f g : a → 1} (α : f → g) : term2 f g = α
+
+# This one is not a coherence, but derivable
 ncoh term3 {a : .} {f g : a → 1} (α β : f → g) : α → β
-# let term3 {a : .} {f g : a → 1} (α β : f → g) : α → β := 
+let term3 {a : .} {f g : a → 1} (α β : f → g) : α → β := co3 (term-can2 α) (term-can2' β)
 
 # Pairing (tup)
 coh pa {a b c : .} (f : a → b) (g : a → c) : a → b × c
