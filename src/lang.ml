@@ -167,14 +167,12 @@ and infer tenv env (e:Term.t) =
   | Obj ->
     mk ~pos Obj, mk ~pos Type
   | Id (a, t, u) ->
-    (* TODO: this should be merged as a higher-dimensional Hom *)
     let a = check tenv env a (mk ~pos:a.pos Obj) in
     let a' = eval env a in
     let t = check tenv env t a' in
     let u = check tenv env u a' in
     mk ~pos (Id (a, t, u)), mk ~pos Type
   | Arr (a, t, u) ->
-    (* TODO: change this! *)
     let a = check tenv env a (mk ~pos:a.pos Type) in
     let a' = eval env a in
     let t = check tenv env t a' in
