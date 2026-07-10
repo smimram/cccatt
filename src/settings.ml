@@ -38,6 +38,7 @@ let set_elements e =
       )
     else e
   in
+  message "setting elements to %b" e;
   elements := e
 
 (** Whether types have elements, ie we consider x : a as implicitly meaning x : 1 → a. *)
@@ -77,7 +78,7 @@ let on_orientation f =
   orientation_callback := fun d -> g d; f d
 
 let set_orientation d =
-  message "setting %s variant" (match !orientation with `Directed -> "directed" | `Reversible -> "reversible");
+  message "setting %s variant" (match d with `Directed -> "directed" | `Reversible -> "reversible");
   !orientation_callback d;
   orientation := d
 
