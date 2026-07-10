@@ -8,7 +8,8 @@
 
 include "bicategory"
 
-# Terminal object
+## Terminal object
+
 coh term {a : .} : a → 1
 
 coh term-can {a : .} (f : a → 1) : f → term
@@ -17,7 +18,7 @@ coh term-can-invl {a : .} (f : a → 1) : co2 (term-can' f) (term-can f) = id2 t
 coh term-can-invr {a : .} (f : a → 1) : co2 (term-can f) (term-can' f) = id2 f
 
 # This one is a coherence or derivable
-coh term2 {a : .} (f g : a → 1) : f → g
+# coh term2 {a : .} (f g : a → 1) : f → g
 let term2 {a : .} (f g : a → 1) : f → g := co2 (term-can f) (term-can' g)
 
 # Note both are inter-derivable by invertibility of term-can g
@@ -26,26 +27,46 @@ coh term-can2 {a : .} {f g : a → 1} (α : f → g) : α = term2 f g
 # coh term-can2 {a : .} {f g : a → 1} (α : f → g) : co2 α (term-can g) = term-can f
 
 # This one is not a coherence, but derivable
-ncoh term3 {a : .} {f g : a → 1} (α β : f → g) : α → β
-let term3 {a : .} {f g : a → 1} (α β : f → g) : α → β := co3 (term-can2 α) (inv3 (term-can2 β))
+ncoh term3 {a : .} {f g : a → 1} (α β : f → g) : α = β
+let term3 {a : .} {f g : a → 1} (α β : f → g) : α = β := co3 (term-can2 α) (inv3 (term-can2 β))
+
+# This one is not a coherence, but derivable
+ncoh term-can2' {a : .} {f : a → 1} (α : f → term) : α = term-can f
+let term-can2' {a : .} {f : a → 1} (α : f → term) : α = term-can f := term3 α (term-can f)
+
+## Products
+
+# Projections (π)
+coh fst {a b : .} : a × b → a
+coh snd {a b : .} : a × b → b
 
 # Pairing (tup)
 coh pa {a b c : .} (f : a → b) (g : a → c) : a → b × c
 
-# Projections (π)
-coh fst {a b : .} : a × b → a
-
-coh snd {a b : .} : a × b → b
-
 # Pairing reduction (ϖ)
 coh pa-fst {a b c : .} (f : a → b) (g : a → c) : co1 (pa f g) fst → f
+coh pa-fst' {a b c : .} (f : a → b) (g : a → c) : f → co1 (pa f g) fst
+coh pa-fst-invl {a b c : .} (f : a → b) (g : a → c) : co2 (pa-fst' f g) (pa-fst f g) = id2 f
+coh pa-fst-invr {a b c : .} (f : a → b) (g : a → c) : co2 (pa-fst f g) (pa-fst' f g) = id2 (co1 (pa f g) fst)
 
 coh pa-snd {a b c : .} (f : a → b) (g : a → c) : co1 (pa f g) snd → g
+coh pa-snd' {a b c : .} (f : a → b) (g : a → c) : g → co1 (pa f g) snd
+coh pa-snd-invl {a b c : .} (f : a → b) (g : a → c) : co2 (pa-snd' f g) (pa-snd f g) = id2 g
+coh pa-snd-invr {a b c : .} (f : a → b) (g : a → c) : co2 (pa-snd f g) (pa-snd' f g) = id2 (co1 (pa f g) snd)
+
+# Uniqueness
+coh pa-eta {a b c : .} (f : a → b × c) : f → pa (co1 f fst) (co1 f snd)
+coh pa-eta' {a b c : .} (f : a → b × c) : pa (co1 f fst) (co1 f snd) → f
+
+coh pa-eta-invl {a b c : .} (f : a → b × c) : co2 (pa-eta' f) (pa-eta f) = id2 (pa (co1 f fst) (co1 f snd))
+coh pa-eta-invr {a b c : .} (f : a → b × c) : co2 (pa-eta f) (pa-eta' f) = id2 f
+
+# TODO
+ncoh pa-eta-can {a b c : .} {f : a → b × c} (α : f → pa (co1 f fst) (co1 f snd)) : α = pa-eta f
 
 # Pairing
 coh pa2 {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g'
 
-coh pa-eta {a b c : .} (f : a → b × c) : f → pa (co1 f fst) (co1 f snd)
 
 # coh pa-eta-inv {a b c : .} (f : a → b × c) : pa (co1 f fst) (co1 f snd) → f
 
