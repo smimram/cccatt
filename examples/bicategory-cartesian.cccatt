@@ -84,7 +84,7 @@ let pa2† {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 
 
 # U1
 ncoh pa2†-fst {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) fst) (pa-fst f g) = α
-# let pa2†-fst {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) fst) (pa-fst f g) = α := # FILLHERE
+let pa2†-fst {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) fst) (pa-fst f g) = α := _ # FILLHERE
 
 # pa2†-snd
 
