@@ -98,10 +98,11 @@ let pa-eta-fst' {a b c : .} (h : a → b × c) : co21 (pa-eta h) fst = pa-fst' (
 # U1
 ncoh pa2†-fst {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) fst) (pa-fst f g) = α
 let pa2†-fst {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) fst) (pa-fst f g) = α :=
-  co3 (co32 (co21co2 (pa-eta h) (pa2 α β) fst) (pa-fst f g))
-      (co3 (co32 (co32 (pa-eta-fst' h) (co21 (pa2 α β) fst)) (pa-fst f g))
-           (co3 (assoc2 (pa-fst' (co1 h fst) (co1 h snd)) (co21 (pa2 α β) fst) (pa-fst f g))
-                (pa2-fst α β)))
+  co3^4
+    (co32 (co21co2 (pa-eta h) (pa2 α β) fst) (pa-fst f g))
+    (co32 (co32 (pa-eta-fst' h) (co21 (pa2 α β) fst)) (pa-fst f g))
+    (assoc2 (pa-fst' (co1 h fst) (co1 h snd)) (co21 (pa2 α β) fst) (pa-fst f g))
+    (pa2-fst α β)
 
 # pa2†-snd
 
