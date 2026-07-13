@@ -127,17 +127,15 @@ let pa2†-snd {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : 
 # U2
 ncoh pa2†-eta {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : h → pa f g) : α = pa2† (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g))
 let pa2†-eta {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : h → pa f g) : α = pa2† (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g)) :=
-  co3
-    (co3
-      (pa2-eta α)
-      (co232
-        (pa-eta h)
-        (pa3
-          (inv3 (co2-cancelr (pa-fst f g) (pa-fst' f g) (pa-fst-invr f g) (pa2†-fst (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g)))))
-          (inv3 (co2-cancelr (pa-snd f g) (pa-snd' f g) (pa-snd-invr f g) (pa2†-snd (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g)))))
-        )
-        (pa-eta' (pa f g))
+  co3^3
+    (pa2-eta α)
+    (co232
+      (pa-eta h)
+      (pa3
+        (inv3 (co2-cancelr (pa-fst f g) (pa-fst' f g) (pa-fst-invr f g) (pa2†-fst (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g)))))
+        (inv3 (co2-cancelr (pa-snd f g) (pa-snd' f g) (pa-snd-invr f g) (pa2†-snd (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g)))))
       )
+      (pa-eta' (pa f g))
     )
     (inv3 (pa2-eta (pa2† (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g)))))
 
