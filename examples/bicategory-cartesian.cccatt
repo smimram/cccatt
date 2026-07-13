@@ -14,8 +14,8 @@ coh term {a : .} : a → 1
 
 coh term-can {a : .} (f : a → 1) : f → term
 coh term-can' {a : .} (f : a → 1) : term → f
-coh term-can-invl {a : .} (f : a → 1) : co2 (term-can' f) (term-can f) = id2 term
-coh term-can-invr {a : .} (f : a → 1) : co2 (term-can f) (term-can' f) = id2 f
+# coh term-can-invl {a : .} (f : a → 1) : co2 (term-can' f) (term-can f) = id2 term
+# coh term-can-invr {a : .} (f : a → 1) : co2 (term-can f) (term-can' f) = id2 f
 
 # This one is a coherence or derivable
 # coh term2 {a : .} (f g : a → 1) : f → g
@@ -54,6 +54,17 @@ coh pa-snd' {a b c : .} (f : a → b) (g : a → c) : g → co1 (pa f g) snd
 coh pa-snd-invl {a b c : .} (f : a → b) (g : a → c) : co2 (pa-snd' f g) (pa-snd f g) = id2 g
 coh pa-snd-invr {a b c : .} (f : a → b) (g : a → c) : co2 (pa-snd f g) (pa-snd' f g) = id2 (co1 (pa f g) snd)
 
+# Pairing
+coh pa2 {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g'
+
+coh pa2-fst {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2-3 (pa-fst' f g) (co21 (pa2 α β) fst) (pa-fst f' g') = α
+coh pa2-snd {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2-3 (pa-snd' f g) (co21 (pa2 α β) snd) (pa-snd f' g') = β
+# # Square variant
+# coh pa2-fst {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2 (co21 (pa2 α β) fst) (pa-fst f' g') = co2 (pa-fst f g) α
+# coh pa2-snd {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2 (co21 (pa2 α β) snd) (pa-snd f' g') = co2 (pa-snd f g) β
+
+coh pa3 {a b c : .} {f f' : a → b} {g g' : a → c} {α α' : f → f'} {β β' : g → g'} (p : α = α') (q : β = β') : pa2 α β = pa2 α' β'
+
 # Uniqueness
 coh pa-eta {a b c : .} (f : a → b × c) : f → pa (co1 f fst) (co1 f snd)
 coh pa-eta' {a b c : .} (f : a → b × c) : pa (co1 f fst) (co1 f snd) → f
@@ -61,11 +72,14 @@ coh pa-eta' {a b c : .} (f : a → b × c) : pa (co1 f fst) (co1 f snd) → f
 coh pa-eta-invl {a b c : .} (f : a → b × c) : co2 (pa-eta' f) (pa-eta f) = id2 (pa (co1 f fst) (co1 f snd))
 coh pa-eta-invr {a b c : .} (f : a → b × c) : co2 (pa-eta f) (pa-eta' f) = id2 f
 
-# TODO
-ncoh pa-eta-can {a b c : .} {f : a → b × c} (α : f → pa (co1 f fst) (co1 f snd)) : α = pa-eta f
+# Error: in file bicategory-cartesian.cccatt line 75 characters 84-113: got
+# pa[co1[pa[f,g],fst[]],co1[pa[f,g],snd[]]] → pa[co1[pa[f',g'],fst[]],co1[pa[f',g'],snd[]]]
+# pa[f,g] → pa[f',g']
 
-# Pairing
-coh pa2 {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g'
+# coh pa2-eta {a b c : .} {f f' : a → b} {g g' : a → c} (α : pa f g → pa f' g') : α = pa2 (co21 α fst) (co21 α snd)
+
+# # TODO
+# ncoh pa-eta-can {a b c : .} {f : a → b × c} (α : f → pa (co1 f fst) (co1 f snd)) : α = pa-eta f
 
 
 # coh pa-eta-inv {a b c : .} (f : a → b × c) : pa (co1 f fst) (co1 f snd) → f
@@ -73,11 +87,9 @@ coh pa2 {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g �
 # p†
 let pa2' {a b c : .} {f : a → b} {g : a → c} (h : a → b × c) (α : co1 h fst → f) (β : co1 h snd → g) : h → pa f g := co2 (pa-eta h) (pa2 α β)
 
-coh pa2-id2 {a b c : .} (f : a → b) (g : a → c) : pa2 (id2 f) (id2 g) → id2 (pa f g)
+# coh pa2-id2 {a b c : .} (f : a → b) (g : a → c) : pa2 (id2 f) (id2 g) → id2 (pa f g)
 
 # coh pa2-co12 {a' a b c : .} (h : a' → a) {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co12 h (pa2 α β) = pa2 (co12 h α) (co12 h β)
-
-
 
 
 # # U1
