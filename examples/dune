@@ -21,6 +21,8 @@
    (run ../src/cccatt.exe bicategory.cccatt)
    (run ../src/cccatt.exe bicategory-cartesian.cccatt)
    (run ../src/cccatt.exe bicategory-cartesian-closed.cccatt)
+   (run ../src/cccatt.exe bicategory-cartesian-reversible.cccatt)
+   (run ../src/cccatt.exe bicategory-cartesian-closed-reversible.cccatt)
   )
  )
 )
