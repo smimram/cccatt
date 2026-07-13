@@ -99,7 +99,7 @@ coh co31 {a b c : .} {f f' : a → b} {α α' : f → f'} (p : α = α') (g : b 
 
 coh co32 {a b : .} {f f' f'' : a → b} {α α' : f → f'} (p : α = α') (β : f' → f'') : co2 α β = co2 α' β
 
-coh co23 {a b : .} {f f' f'' : a → b} {α : f → f'} {β β' : f' → f''} (p : β = β') : co2 α β = co2 α β'
+coh co23 {a b : .} {f f' f'' : a → b} (α : f → f') {β β' : f' → f''} (p : β = β') : co2 α β = co2 α β'
 
 coh co32- {a b c : .} {f f' : a → b} {α α' : f → f'} (p : α = α') {g g' : b → c} (β : g → g') : co2- α β = co2- α' β
 

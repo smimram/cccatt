@@ -85,17 +85,15 @@ let pa2† {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 
 # Triangle law: the fst-component of pa-eta's naturality agrees with pa-fst'
 coh tl2-fst {a b c : .} (f : a → b × c) : co2 (co21 (pa-eta f) fst) (pa-fst _ _) = id2 (co1 f fst)
 
-coh co2congr {a b : .} {f g h : a → b} (α : f → g) {β β' : g → h} (p : β = β') : co2 α β = co2 α β'
-
 let pa-eta-fst' {a b c : .} (h : a → b × c) : co21 (pa-eta h) fst = pa-fst' (co1 h fst) (co1 h snd) :=
   co3
     (co3
       (inv3 (co3 (assoc2 (co21 (pa-eta h) fst) (pa-fst (co1 h fst) (co1 h snd)) (pa-fst' (co1 h fst) (co1 h snd)))
-                 (co3 (co2congr (co21 (pa-eta h) fst) (pa-fst-invr (co1 h fst) (co1 h snd)))
+                 (co3 (co23 (co21 (pa-eta h) fst) (pa-fst-invr (co1 h fst) (co1 h snd)))
                       (unitr2 (co21 (pa-eta h) fst)))))
       (co32 (co3 (tl2-fst h) (inv3 (pa-fst-invl (co1 h fst) (co1 h snd)))) (pa-fst' (co1 h fst) (co1 h snd))))
     (co3 (assoc2 (pa-fst' (co1 h fst) (co1 h snd)) (pa-fst (co1 h fst) (co1 h snd)) (pa-fst' (co1 h fst) (co1 h snd)))
-         (co3 (co2congr (pa-fst' (co1 h fst) (co1 h snd)) (pa-fst-invr (co1 h fst) (co1 h snd)))
+         (co3 (co23 (pa-fst' (co1 h fst) (co1 h snd)) (pa-fst-invr (co1 h fst) (co1 h snd)))
               (unitr2 (pa-fst' (co1 h fst) (co1 h snd)))))
 
 # U1
