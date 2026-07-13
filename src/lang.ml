@@ -206,11 +206,13 @@ and check tenv env e a =
   match e.desc, a.desc with
   (* Allow casting under implicit arrows. *)
   | Abs(`Implicit,x,a,t), Pi(`Implicit,x',a',b) when x = x' (* TODO: alpha? *) ->
+    let a = check tenv env a (mk ~pos:a.pos Type) in
+    let av = eval env a in
     (
-      try unify tenv env a a';
-      with Unification -> raise (Type_error (a.pos, a, a'))
+      try unify tenv env av a';
+      with Unification -> raise (Type_error (a.pos, av, a'))
     );
-    let t = check ((x,a)::tenv) ((x,var x)::env) t b in
+    let t = check ((x,av)::tenv) ((x,var x)::env) t b in
     mk ~pos:e.pos (Abs(`Implicit,x,a,t))
   | _ ->
     let e, b = infer tenv env e in
