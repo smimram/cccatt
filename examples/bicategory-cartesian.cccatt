@@ -124,17 +124,6 @@ let pa2†-snd {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : 
     (assoc2 (pa-snd' (co1 h fst) (co1 h snd)) (co21 (pa2 α β) snd) (pa-snd f g))
     (pa2-snd α β)
 
-# Cancellation of an invertible 2-cell on the right
-let co2-cancelr {a b : .} {f g h : a → b} {α β : f → g} (γ : g → h) (γ' : h → g) (q : co2 γ γ' = id2 g) (p : co2 α γ = co2 β γ) : α = β :=
-  co3^7
-    (inv3 (unitr2 α))
-    (inv3 (co23 α q))
-    (inv3 (assoc2 α γ γ'))
-    (co32 p γ')
-    (assoc2 β γ γ')
-    (co23 β q)
-    (unitr2 β)
-
 # U2
 ncoh pa2†-eta {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : h → pa f g) : α = pa2† (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g))
 let pa2†-eta {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : h → pa f g) : α = pa2† (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g)) :=

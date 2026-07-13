@@ -111,8 +111,20 @@ coh co32 {a b : .} {f f' f'' : a → b} {α α' : f → f'} (p : α = α') (β :
 
 coh co23 {a b : .} {f f' f'' : a → b} (α : f → f') {β β' : f' → f''} (p : β = β') : co2 α β = co2 α β'
 
+coh co232 {a b : .} {f f' f'' f''' : a → b} (α : f → f') {β β' : f' → f''} (p : β = β') (γ : f'' → f''') : co2^3 α β γ = co2^3 α β' γ
+
 coh co32- {a b c : .} {f f' : a → b} {α α' : f → f'} (p : α = α') {g g' : b → c} (β : g → g') : co2- α β = co2- α' β
 
 coh co23- {a b c : .} {f f' : a → b} (α : f → f') {g g' : b → c} {β β' : g → g'} (p : β = β') : co2- α β = co2- α β'
 
 coh inv3 {a b : .} {f g : a → b} {α β : f → g} (p : α = β) : β = α
+
+let co2-cancelr {a b : .} {f g h : a → b} {α β : f → g} (γ : g → h) (γ' : h → g) (q : co2 γ γ' = id2 g) (p : co2 α γ = co2 β γ) : α = β :=
+  co3^7
+    (inv3 (unitr2 α))
+    (inv3 (co23 α q))
+    (inv3 (assoc2 α γ γ'))
+    (co32 p γ')
+    (assoc2 β γ γ')
+    (co23 β q)
+    (unitr2 β)
