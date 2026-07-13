@@ -141,6 +141,7 @@ let pa2†-eta {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : 
 
 # cong
 ncoh pa2†-cong {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} {α α' : co1 h fst → f} {β β' : co1 h snd → g} (p : α = α') (q : β = β') : pa2† α β = pa2† α' β'
+let pa2†-cong {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} {α α' : co1 h fst → f} {β β' : co1 h snd → g} (p : α = α') (q : β = β') : pa2† α β = pa2† α' β' := co23 (pa-eta h) (pa3 p q)
 
 # # TODO
 # ncoh pa-eta-can {a b c : .} {f : a → b × c} (α : f → pa (co1 f fst) (co1 f snd)) : α = pa-eta f
