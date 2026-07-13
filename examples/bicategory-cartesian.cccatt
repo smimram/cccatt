@@ -145,27 +145,13 @@ let pa2†-eta {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : 
 ncoh pa2†-cong {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} {α α' : co1 h fst → f} {β β' : co1 h snd → g} (p : α = α') (q : β = β') : pa2† α β = pa2† α' β'
 let pa2†-cong {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} {α α' : co1 h fst → f} {β β' : co1 h snd → g} (p : α = α') (q : β = β') : pa2† α β = pa2† α' β' := co23 (pa-eta h) (pa3 p q)
 
-# # TODO
+## Admissible rules
+
 # ncoh pa-eta-can {a b c : .} {f : a → b × c} (α : f → pa (co1 f fst) (co1 f snd)) : α = pa-eta f
 
-
-# coh pa2-id2 {a b c : .} (f : a → b) (g : a → c) : pa2 (id2 f) (id2 g) → id2 (pa f g)
+coh pa2-id2 {a b c : .} (f : a → b) (g : a → c) : pa2 (id2 f) (id2 g) → id2 (pa f g)
 
 # coh pa2-co12 {a' a b c : .} (h : a' → a) {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co12 h (pa2 α β) = pa2 (co12 h α) (co12 h β)
-
-
-# # U1
-# coh pa2-fst {a b c : .} {f : a → b} {g : a → c} (h : a → b × c) (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2 h α β) fst) (pa-fst f g) = α
-
-# coh pa2-snd {a b c : .} {f : a → b} {g : a → c} (h : a → b × c) (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2 h α β) snd) (pa-snd f g) = β
-
-# # U2
-# coh pa2-eta {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : h → pa f g) : α = pa2 h (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g))
-
-# # cong
-# coh pa2-cong {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} {α α' : co1 h fst → f} {β β' : co1 h snd → g} (_ : α → α') (_ : β → β') : pa2 h α β = pa2 h α' β'
-
-## Admissible rules
 
 # functoriality
 coh paf {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g'
