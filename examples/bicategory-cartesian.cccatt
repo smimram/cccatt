@@ -72,11 +72,9 @@ coh pa-eta' {a b c : .} (f : a → b × c) : pa (co1 f fst) (co1 f snd) → f
 coh pa-eta-invl {a b c : .} (f : a → b × c) : co2 (pa-eta' f) (pa-eta f) = id2 (pa (co1 f fst) (co1 f snd))
 coh pa-eta-invr {a b c : .} (f : a → b × c) : co2 (pa-eta f) (pa-eta' f) = id2 f
 
-# Error: in file bicategory-cartesian.cccatt line 75 characters 84-113: got
-# pa[co1[pa[f,g],fst[]],co1[pa[f,g],snd[]]] → pa[co1[pa[f',g'],fst[]],co1[pa[f',g'],snd[]]]
-# pa[f,g] → pa[f',g']
-
-# coh pa2-eta {a b c : .} {f f' : a → b} {g g' : a → c} (α : pa f g → pa f' g') : α = pa2 (co21 α fst) (co21 α snd)
+coh pa2-eta {a b c : .} {f g : a → b × c} (α : f → g) : α = co2-3 (pa-eta f) (pa2 (co21 α fst) (co21 α snd)) (pa-eta' g)
+# Square variant
+# coh pa2-eta {a b c : .} {f g : a → b × c} (α : f → g) : co2 α (pa-eta g) = co2 (pa-eta f) (pa2 (co21 α fst) (co21 α snd))
 
 # # TODO
 # ncoh pa-eta-can {a b c : .} {f : a → b × c} (α : f → pa (co1 f fst) (co1 f snd)) : α = pa-eta f
@@ -103,9 +101,10 @@ let pa2' {a b c : .} {f : a → b} {g : a → c} (h : a → b × c) (α : co1 h 
 # # cong
 # coh pa2-cong {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} {α α' : co1 h fst → f} {β β' : co1 h snd → g} (_ : α → α') (_ : β → β') : pa2 h α β = pa2 h α' β'
 
-# # Admissible rules
+## Admissible rules
 
-# coh paf {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g'
+# functoriality
+coh paf {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g'
 # let paf {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g' := pa2 {a} {b} {c} {f'} {g'} (pa f g) (co2 (pa-fst f g) α) (co2 (pa-snd f g) β)
 
 # # TODO: show that other are also derivable
