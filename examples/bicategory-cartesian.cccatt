@@ -85,6 +85,9 @@ let pa2† {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 
 # Triangle law: the fst-component of pa-eta's naturality agrees with pa-fst'
 coh tl2-fst {a b c : .} (f : a → b × c) : co2 (co21 (pa-eta f) fst) (pa-fst _ _) = id2 (co1 f fst)
 
+# Triangle law: the snd-component of pa-eta's naturality agrees with pa-snd'
+coh tl2-snd {a b c : .} (f : a → b × c) : co2 (co21 (pa-eta f) snd) (pa-snd _ _) = id2 (co1 f snd)
+
 let pa-eta-fst' {a b c : .} (h : a → b × c) : co21 (pa-eta h) fst = pa-fst' (co1 h fst) (co1 h snd) :=
   co3^7
     (inv3 (unitr2 (co21 (pa-eta h) fst)))
@@ -95,6 +98,16 @@ let pa-eta-fst' {a b c : .} (h : a → b × c) : co21 (pa-eta h) fst = pa-fst' (
     (co23 (pa-fst' (co1 h fst) (co1 h snd)) (pa-fst-invr (co1 h fst) (co1 h snd)))
     (unitr2 (pa-fst' (co1 h fst) (co1 h snd)))
 
+let pa-eta-snd' {a b c : .} (h : a → b × c) : co21 (pa-eta h) snd = pa-snd' (co1 h fst) (co1 h snd) :=
+  co3^7
+    (inv3 (unitr2 (co21 (pa-eta h) snd)))
+    (inv3 (co23 (co21 (pa-eta h) snd) (pa-snd-invr (co1 h fst) (co1 h snd))))
+    (inv3 (assoc2 (co21 (pa-eta h) snd) (pa-snd (co1 h fst) (co1 h snd)) (pa-snd' (co1 h fst) (co1 h snd))))
+    (co32 (co3 (tl2-snd h) (inv3 (pa-snd-invl (co1 h fst) (co1 h snd)))) (pa-snd' (co1 h fst) (co1 h snd)))
+    (assoc2 (pa-snd' (co1 h fst) (co1 h snd)) (pa-snd (co1 h fst) (co1 h snd)) (pa-snd' (co1 h fst) (co1 h snd)))
+    (co23 (pa-snd' (co1 h fst) (co1 h snd)) (pa-snd-invr (co1 h fst) (co1 h snd)))
+    (unitr2 (pa-snd' (co1 h fst) (co1 h snd)))
+
 # U1
 ncoh pa2†-fst {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) fst) (pa-fst f g) = α
 let pa2†-fst {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) fst) (pa-fst f g) = α :=
@@ -104,10 +117,15 @@ let pa2†-fst {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : 
     (assoc2 (pa-fst' (co1 h fst) (co1 h snd)) (co21 (pa2 α β) fst) (pa-fst f g))
     (pa2-fst α β)
 
-let pa2†-snd {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) snd) (pa-snd f g) = β := _
+let pa2†-snd {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) snd) (pa-snd f g) = β :=
+  co3^4
+    (co32 (co21co2 (pa-eta h) (pa2 α β) snd) (pa-snd f g))
+    (co32 (co32 (pa-eta-snd' h) (co21 (pa2 α β) snd)) (pa-snd f g))
+    (assoc2 (pa-snd' (co1 h fst) (co1 h snd)) (co21 (pa2 α β) snd) (pa-snd f g))
+    (pa2-snd α β)
 
 # cong
-# coh pa2† {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} {α α' : co1 h fst → f} {β β' : co1 h snd → g} (p : α = α') (q : β = β') : pa2† α β = pa2† α' β'
+# coh pa2†-cong {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} {α α' : co1 h fst → f} {β β' : co1 h snd → g} (p : α = α') (q : β = β') : pa2† α β = pa2† α' β'
 
 
 
