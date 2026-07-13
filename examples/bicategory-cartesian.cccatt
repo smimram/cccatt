@@ -104,7 +104,7 @@ let pa2†-fst {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : 
     (assoc2 (pa-fst' (co1 h fst) (co1 h snd)) (co21 (pa2 α β) fst) (pa-fst f g))
     (pa2-fst α β)
 
-# pa2†-snd
+let pa2†-snd {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) snd) (pa-snd f g) = β := _
 
 # cong
 # coh pa2† {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} {α α' : co1 h fst → f} {β β' : co1 h snd → g} (p : α = α') (q : β = β') : pa2† α β = pa2† α' β'
