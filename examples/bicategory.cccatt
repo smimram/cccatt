@@ -89,8 +89,14 @@ coh pentagon {a b c d e : .} (f : a → b) (g : b → c) (h : c → d) (i : d �
 
 ## Helper functions
 
+let co2- {a b c : .} {f f' : a → b} {g g' : b → c} (α : f → f') (β : g → g') : co1 f g → co1 f' g' := co2 (co21 α g) (co12 f' β)
+
 let co2-3 {a b : .} {f1 f2 f3 f4 : a → b} (α : f1 → f2) (β : f2 → f3) (γ : f3 → f4) := co2 α (co2 β γ)
 
 coh co3 {a b : .} {f g : a → b} {α β γ : f → g} (p : α = β) (q : β = γ) : α = γ
+
+coh co31 {a b c : .} {f f' : a → b} {α α' : f → f'} (p : α = α') (g : b → c) : co21 α g = co21 α' g
+
+coh co32 {a b c : .} {f f' : a → b} {α α' : f → f'} (p : α = α') {g g' : b → c} (β : g → g') : co2- α β = co2- α' β
 
 coh inv3 {a b : .} {f g : a → b} {α β : f → g} (p : α = β) : β = α

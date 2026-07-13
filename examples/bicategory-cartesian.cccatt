@@ -76,14 +76,20 @@ coh pa2-eta {a b c : .} {f g : a → b × c} (α : f → g) : α = co2-3 (pa-eta
 # Square variant
 # coh pa2-eta {a b c : .} {f g : a → b × c} (α : f → g) : co2 α (pa-eta g) = co2 (pa-eta f) (pa2 (co21 α fst) (co21 α snd))
 
+## Derivable laws
+
+# p†
+ncoh pa2† {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : h → pa f g
+let pa2† {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : h → pa f g := co2 (pa-eta h) (pa2 α β)
+
+# U1
+ncoh pa2†-fst {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) fst) (pa-fst f g) = α
+# let pa2†-fst {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) fst) (pa-fst f g) = α := co3 (co32 _ (pa-fst f g)) _
+
+
 # # TODO
 # ncoh pa-eta-can {a b c : .} {f : a → b × c} (α : f → pa (co1 f fst) (co1 f snd)) : α = pa-eta f
 
-
-# coh pa-eta-inv {a b c : .} (f : a → b × c) : pa (co1 f fst) (co1 f snd) → f
-
-# p†
-let pa2' {a b c : .} {f : a → b} {g : a → c} (h : a → b × c) (α : co1 h fst → f) (β : co1 h snd → g) : h → pa f g := co2 (pa-eta h) (pa2 α β)
 
 # coh pa2-id2 {a b c : .} (f : a → b) (g : a → c) : pa2 (id2 f) (id2 g) → id2 (pa f g)
 
