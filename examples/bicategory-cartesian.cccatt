@@ -124,8 +124,34 @@ let pa2†-snd {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : 
     (assoc2 (pa-snd' (co1 h fst) (co1 h snd)) (co21 (pa2 α β) snd) (pa-snd f g))
     (pa2-snd α β)
 
+# Cancellation of an invertible 2-cell on the right
+let co2-cancelr {a b : .} {u v w : a → b} {x y : u → v} (r : v → w) (r' : w → v) (rr' : co2 r r' = id2 v) (p : co2 x r = co2 y r) : x = y :=
+  co3^7
+    (inv3 (unitr2 x))
+    (inv3 (co23 x rr'))
+    (inv3 (assoc2 x r r'))
+    (co32 p r')
+    (assoc2 y r r')
+    (co23 y rr')
+    (unitr2 y)
+
 # U2
 ncoh pa2†-eta {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : h → pa f g) : α = pa2† (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g))
+let pa2†-eta {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : h → pa f g) : α = pa2† (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g)) :=
+  co3
+    (co3
+      (pa2-eta α)
+      (co23 (pa-eta h)
+        (co32
+          (pa3
+            (inv3 (co2-cancelr (pa-fst f g) (pa-fst' f g) (pa-fst-invr f g) (pa2†-fst (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g)))))
+            (inv3 (co2-cancelr (pa-snd f g) (pa-snd' f g) (pa-snd-invr f g) (pa2†-snd (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g)))))
+          )
+          (pa-eta' (pa f g))
+        )
+      )
+    )
+    (inv3 (pa2-eta (pa2† (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g)))))
 
 # cong
 ncoh pa2†-cong {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} {α α' : co1 h fst → f} {β β' : co1 h snd → g} (p : α = α') (q : β = β') : pa2† α β = pa2† α' β'
