@@ -57,8 +57,8 @@ coh pa-snd-invr {a b c : .} (f : a → b) (g : a → c) : co2 (pa-snd f g) (pa-s
 # Pairing
 coh pa2 {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g'
 
-coh pa2-fst {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2-3 (pa-fst' f g) (co21 (pa2 α β) fst) (pa-fst f' g') = α
-coh pa2-snd {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2-3 (pa-snd' f g) (co21 (pa2 α β) snd) (pa-snd f' g') = β
+coh pa2-fst {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2^3 (pa-fst' f g) (co21 (pa2 α β) fst) (pa-fst f' g') = α
+coh pa2-snd {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2^3 (pa-snd' f g) (co21 (pa2 α β) snd) (pa-snd f' g') = β
 # # Square variant
 # coh pa2-fst {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2 (co21 (pa2 α β) fst) (pa-fst f' g') = co2 (pa-fst f g) α
 # coh pa2-snd {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2 (co21 (pa2 α β) snd) (pa-snd f' g') = co2 (pa-snd f g) β
@@ -72,7 +72,7 @@ coh pa-eta' {a b c : .} (f : a → b × c) : pa (co1 f fst) (co1 f snd) → f
 coh pa-eta-invl {a b c : .} (f : a → b × c) : co2 (pa-eta' f) (pa-eta f) = id2 (pa (co1 f fst) (co1 f snd))
 coh pa-eta-invr {a b c : .} (f : a → b × c) : co2 (pa-eta f) (pa-eta' f) = id2 f
 
-coh pa2-eta {a b c : .} {f g : a → b × c} (α : f → g) : α = co2-3 (pa-eta f) (pa2 (co21 α fst) (co21 α snd)) (pa-eta' g)
+coh pa2-eta {a b c : .} {f g : a → b × c} (α : f → g) : α = co2^3 (pa-eta f) (pa2 (co21 α fst) (co21 α snd)) (pa-eta' g)
 # Square variant
 # coh pa2-eta {a b c : .} {f g : a → b × c} (α : f → g) : co2 α (pa-eta g) = co2 (pa-eta f) (pa2 (co21 α fst) (co21 α snd))
 
@@ -85,7 +85,6 @@ let pa2† {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 
 # Triangle law: the fst-component of pa-eta's naturality agrees with pa-fst'
 coh tl2-fst {a b c : .} (f : a → b × c) : co2 (co21 (pa-eta f) fst) (pa-fst _ _) = id2 (co1 f fst)
 
-coh co2congl {a b : .} {f g h : a → b} {α α' : f → g} (p : α = α') (β : g → h) : co2 α β = co2 α' β
 coh co2congr {a b : .} {f g h : a → b} (α : f → g) {β β' : g → h} (p : β = β') : co2 α β = co2 α β'
 
 let pa-eta-fst' {a b c : .} (h : a → b × c) : co21 (pa-eta h) fst = pa-fst' (co1 h fst) (co1 h snd) :=
@@ -94,7 +93,7 @@ let pa-eta-fst' {a b c : .} (h : a → b × c) : co21 (pa-eta h) fst = pa-fst' (
       (inv3 (co3 (assoc2 (co21 (pa-eta h) fst) (pa-fst (co1 h fst) (co1 h snd)) (pa-fst' (co1 h fst) (co1 h snd)))
                  (co3 (co2congr (co21 (pa-eta h) fst) (pa-fst-invr (co1 h fst) (co1 h snd)))
                       (unitr2 (co21 (pa-eta h) fst)))))
-      (co2congl (co3 (tl2-fst h) (inv3 (pa-fst-invl (co1 h fst) (co1 h snd)))) (pa-fst' (co1 h fst) (co1 h snd))))
+      (co32 (co3 (tl2-fst h) (inv3 (pa-fst-invl (co1 h fst) (co1 h snd)))) (pa-fst' (co1 h fst) (co1 h snd))))
     (co3 (assoc2 (pa-fst' (co1 h fst) (co1 h snd)) (pa-fst (co1 h fst) (co1 h snd)) (pa-fst' (co1 h fst) (co1 h snd)))
          (co3 (co2congr (pa-fst' (co1 h fst) (co1 h snd)) (pa-fst-invr (co1 h fst) (co1 h snd)))
               (unitr2 (pa-fst' (co1 h fst) (co1 h snd)))))
@@ -102,8 +101,8 @@ let pa-eta-fst' {a b c : .} (h : a → b × c) : co21 (pa-eta h) fst = pa-fst' (
 # U1
 ncoh pa2†-fst {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) fst) (pa-fst f g) = α
 let pa2†-fst {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) fst) (pa-fst f g) = α :=
-  co3 (co2congl (co21co2 (pa-eta h) (pa2 α β) fst) (pa-fst f g))
-      (co3 (co2congl (co2congl (pa-eta-fst' h) (co21 (pa2 α β) fst)) (pa-fst f g))
+  co3 (co32 (co21co2 (pa-eta h) (pa2 α β) fst) (pa-fst f g))
+      (co3 (co32 (co32 (pa-eta-fst' h) (co21 (pa2 α β) fst)) (pa-fst f g))
            (co3 (assoc2 (pa-fst' (co1 h fst) (co1 h snd)) (co21 (pa2 α β) fst) (pa-fst f g))
                 (pa2-fst α β)))
 
