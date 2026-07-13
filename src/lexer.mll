@@ -21,7 +21,11 @@ let utf8 s lexbuf = advance_pos (String.length s - utf8_length s) lexbuf
 }
 
 let space = ' ' | '\t' | '\r'
-let greek = "α" | "β" | "γ"
+let greek =
+    "α" | "β" | "γ" | "δ" | "ε" | "ζ" | "η" | "θ" | "ι" | "κ" | "λ" | "μ"
+  | "ν" | "ξ" | "ο" | "π" | "ρ" | "ς" | "σ" | "τ" | "υ" | "φ" | "χ" | "ψ" | "ω"
+  | "Α" | "Β" | "Γ" | "Δ" | "Ε" | "Ζ" | "Η" | "Θ" | "Ι" | "Κ" | "Λ" | "Μ"
+  | "Ν" | "Ξ" | "Ο" | "Π" | "Ρ" | "Σ" | "Τ" | "Υ" | "Φ" | "Χ" | "Ψ" | "Ω"
 let symbol = "†"
 let first_letter = ['_''a'-'z''A'-'Z'] | greek | symbol
 let letter = first_letter | ['-''+''0'-'9''\'']
