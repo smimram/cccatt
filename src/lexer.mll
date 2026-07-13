@@ -21,7 +21,9 @@ let utf8 s lexbuf = advance_pos (String.length s - utf8_length s) lexbuf
 }
 
 let space = ' ' | '\t' | '\r'
-let first_letter = ['_''a'-'z''A'-'Z'] | "α" | "β" | "γ"
+let greek = "α" | "β" | "γ"
+let symbol = "†"
+let first_letter = ['_''a'-'z''A'-'Z'] | greek | symbol
 let letter = first_letter | ['-''+''0'-'9''\'']
 
 rule token = parse
