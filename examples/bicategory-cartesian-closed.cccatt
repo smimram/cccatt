@@ -19,19 +19,38 @@ coh app {a b : .} : (a ⇒ b) × a → b
 # ϵ-intro
 coh beta {a b c : .} (f : a × b → c) : co1 (pa (co1 fst (abs f)) snd) app → f
 
-# # e†-intro
-# coh abs2 {a b c : .} (f : a × b → c)
-
 ## Alternative version as meta-operations
 
 coh abs {u a b : .} (f : u × a → b) : u → a ⇒ b
 
+coh abs2 {u a b : .} {f f' : u × a → b} (α : f → f') : abs f → abs f'
+
+coh abs3 {u a b : .} {f f' : u × a → b} {α α' : f → f'} (p : α = α') : abs2 α = abs2 α'
+
 coh app {u a b : .} (f : u → a ⇒ b) (x : u → a) : (u → b)
+
+coh app2 {u a b : .} {f f' : u → a ⇒ b} {x x' : u → a} (α : f → f') (β : x → x') : app f x → app f' x'
+
+coh app3 {u a b : .} {f f' : u → a ⇒ b} {x x' : u → a} {α α' : f → f'} {β β' : x → x'} (p : α = α') (q : β = β') : app2 α β = app2 α' β'
 
 # # Weakening
 # coh wk {u a b : .} (f : u → b) : u × a → b
 # let wk {u a b : .} (f : u → b) : u × a → b := co1 fst f
 
 coh beta {u a b : .} (f : u × a → b) : app (co1 fst (abs f)) snd → f
+coh beta' {u a b : .} (f : u × a → b) : f → app (co1 fst (abs f)) snd
+
+coh beta-invl {u a b : .} (f : u × a → b) : co2 (beta' f) (beta f) = id2 f
+coh beta-invr {u a b : .} (f : u × a → b) : co2 (beta f) (beta' f) = id2 (app (co1 fst (abs f)) snd)
 
 coh eta {u a b : .} (f : u → a ⇒ b) : f → abs (app (co1 fst f) snd)
+coh eta' {u a b : .} (f : u → a ⇒ b) : abs (app (co1 fst f) snd) → f
+
+coh eta-invl {u a b : .} (f : u → a ⇒ b) : co2 (eta f) (eta' f) = id2 f
+coh eta-invr {u a b : .} (f : u → a ⇒ b) : co2 (eta' f) (eta f) = id2 (abs (app (co1 fst f) snd))
+
+# naturality of the counit
+coh beta-nat {u a b : .} {f f' : u × a → b} (α : f → f') : co2 (beta f) α = co2 (app2 (co12 fst (abs2 α)) (id2 snd)) (beta f')
+
+# naturality of the unit
+coh eta-nat {u a b : .} {f f' : u → a ⇒ b} (α : f → f') : co2 α (eta f') = co2 (eta f) (abs2 (app2 (co12 fst α) (id2 snd)))
