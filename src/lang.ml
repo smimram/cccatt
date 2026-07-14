@@ -6,7 +6,7 @@ open Term
 
 exception Unification
 exception Type_error of Pos.t * t * t (* at pos got type a instead of b *)
-  
+
 (** Make sure that two values are equal (and raise [Unification] if this cannot be the case). *)
 (* The first argument is the alpha-conversion to apply to t *)
 let rec unify tenv env ?(alpha=[]) t t' =
@@ -29,13 +29,21 @@ let rec unify tenv env ?(alpha=[]) t t' =
     let tenv = (x',eval env a)::tenv in
     let env = (x',var x')::env in
     unify tenv env ~alpha:((x,x')::alpha) b b'
-  | Coh (n, l, a, s), Coh (n', l', a', s') ->
+  | Coh (n, l, a, s, cache), Coh (n', l', a', s', cache') ->
     (* TODO: we could also identify same coherences with different names *)
     if n <> n' then raise Unification;
-    if List.length l <> List.length l' then raise Unification;
-    (* TODO: take the beginning of the context in account in tenv? *)
-    List.iter2 (fun (i,x,a) (i',x',a') -> if i <> i' || x <> x' then raise Unification; unify tenv env a a') l l';
-    unify tenv env a a';
+    (* cache is shared by every occurrence of a given coherence declaration (see [coh_cache] in
+       Term): when both sides come from the same declaration (the overwhelmingly common case),
+       it is physically the same cell, so comparing l and a is a no-op that we can skip - this
+       matters because that comparison would otherwise re-walk, on every single use of every
+       coherence, the full context/type of every coherence it depends on. *)
+    if cache != cache' then
+      (
+        if List.length l <> List.length l' then raise Unification;
+        (* TODO: take the beginning of the context in account in tenv? *)
+        List.iter2 (fun (i,x,a) (i',x',a') -> if i <> i' || x <> x' then raise Unification; unify tenv env a a') l l';
+        unify tenv env a a'
+      );
     if List.length s <> List.length s' then raise Unification;
     List.iter2 (fun (x,t) (x',t') -> if x <> x' then raise Unification; unify tenv env t t') s s'
   | Meta { value = Some t; _ }, _ -> unify tenv env t t'
@@ -63,15 +71,19 @@ and eval env e =
   let mk ?(pos=e.pos) = mk ~pos in
   let var ?(pos=e.pos) = var ~pos in
   match e.desc with
-  | Coh (n, l, a, s) ->
+  | Coh (n, l, a, s, cache) ->
     let l, a =
-      let env = ref env in
-      let l = List.map (fun (i,x,a) -> let a = eval !env a in env := (x, var x) :: !env; i,x,a) l in
-      let a = eval !env a in
-      l, a
+      match cache.coh_evaluated with
+      | Some (l, a) -> l, a
+      | None ->
+        let env = ref env in
+        let l = List.map (fun (i,x,a) -> let a = eval !env a in env := (x, var x) :: !env; i,x,a) l in
+        let a = eval !env a in
+        cache.coh_evaluated <- Some (l, a);
+        l, a
     in
     let s = List.map (fun (x,t) -> x, eval env t) s in
-    mk (Coh (n, l, a, s))
+    mk (Coh (n, l, a, s, cache))
   | Var x ->
     (
       match List.assoc_opt x env with
@@ -116,23 +128,39 @@ and infer tenv env (e:Term.t) =
   (* printf "  env : %s\n%!" (string_of_context env); *)
   (* printf "\n"; *)
   match e.desc with
-  | Coh (n, l, a, s) ->
+  | Coh (n, l, a, s, cache) ->
     (* NOTE: we don't check s because we always start with the identity substitution and trust invariants *)
     let env' = s@env in
+    (* Once a coherence has been elaborated and shown to be a valid pasting scheme, re-inferring
+       it (which happens repeatedly, e.g. every time a metavariable gets resolved against an
+       already-elaborated coherence value) is bound to reach the exact same conclusion: cache it
+       instead of re-checking every argument type and re-running Pasting.check from scratch.
+       Once [coh_evaluated] is set (see [eval] below), l and a are already a fully resolved,
+       closed value (no bare [App] left to reduce): re-checking it is then a pure no-op, so we
+       reuse it as-is in preference to [coh_inferred], which only holds the very first (not yet
+       evaluated) elaboration, from right before the coherence's declaration gets evaluated. *)
     let l, a =
-      let l' = ref [] in
-      let rec aux tenv env = function
-        | (i,x,a)::l ->
-          let a = check tenv env a (mk ~pos:a.pos Type) in
-          l' := (i,x,a) :: !l';
-          aux ((x,eval env a)::tenv) ((x,var ~pos:a.pos x)::env) l
-        | [] -> check tenv env a (mk ~pos:a.pos Type)
-      in
-      let a = aux tenv env' l in
-      List.rev !l', a
+      match cache.coh_evaluated with
+      | Some (l, a) -> l, a
+      | None ->
+        match cache.coh_inferred with
+        | Some (l, a) -> l, a
+        | None ->
+          let l' = ref [] in
+          let rec aux tenv env = function
+            | (i,x,a)::l ->
+              let a = check tenv env a (mk ~pos:a.pos Type) in
+              l' := (i,x,a) :: !l';
+              aux ((x,eval env a)::tenv) ((x,var ~pos:a.pos x)::env) l
+            | [] -> check tenv env a (mk ~pos:a.pos Type)
+          in
+          let a = aux tenv env' l in
+          let l = List.rev !l' in
+          Pasting.check ~pos (List.map (fun (_,x,a) -> x,a) l) a;
+          cache.coh_inferred <- Some (l, a);
+          l, a
     in
-    Pasting.check ~pos (List.map (fun (_,x,a) -> x,a) l) a;
-    mk ~pos (Coh (n, l, a, s)), eval env' a
+    mk ~pos (Coh (n, l, a, s, cache)), eval env' a
   | Var x ->
     (
       match List.assoc_opt x tenv with

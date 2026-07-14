@@ -11,7 +11,7 @@ type t =
   }
 
 and desc =
-  | Coh  of string * (icit * string * t) list * t * substitution (** coherence *)
+  | Coh  of string * (icit * string * t) list * t * substitution * coh_cache (** coherence *)
   | Var  of string (** variable *)
   | Abs  of icit * string * t * t (** abstraction *)
   | App  of icit * t * t (** application *)
@@ -40,6 +40,20 @@ and meta =
     ty : t;
   }
 
+(** The context and type of a coherence are entirely determined by its declaration and never
+    change afterwards, but they do get recomputed along the way (elaborated by [Lang.infer], then
+    evaluated by [Lang.eval]): this cache, shared by every occurrence of a given coherence (i.e.
+    physically the same for all of them), is where those results get memoized instead of being
+    recomputed (recursively, since a coherence's context/type can itself mention other
+    coherences) on every single use of the coherence. *)
+and coh_cache =
+  {
+    mutable coh_inferred  : ((icit * string * t) list * t) option; (** result of [Lang.infer], as checked by [Pasting.check] *)
+    mutable coh_evaluated : ((icit * string * t) list * t) option; (** result of [Lang.eval] *)
+  }
+
+let fresh_coh_cache () = { coh_inferred = None; coh_evaluated = None }
+
 let rec is_pi e =
   match e.desc with
   | Pi _ -> true
@@ -59,7 +73,7 @@ let rec to_string ?(pa=false) e =
   (* | Coh (l, a) -> Printf.sprintf "coh[%s|%s]" (List.map (fun (x,a) -> Printf.sprintf "%s:%s" x (to_string a)) l |> String.concat ",") (to_string a) *)
   (* | Coh _ -> "coh" *)
   (* | Coh (n,_,_,s) -> Printf.sprintf "%s[%s]" n (String.concat ", " @@ List.map (fun (x,t) -> Printf.sprintf "%s=%s" x (to_string t)) s) *)
-  | Coh (n,l,_,s) -> Printf.sprintf "%s[%s]" n (String.concat "," @@ List.filter_map Fun.id @@ List.map2 (fun (i,_,_) (_,t) -> if i = `Explicit then Some (to_string t) else None) l s)
+  | Coh (n,l,_,s,_) -> Printf.sprintf "%s[%s]" n (String.concat "," @@ List.filter_map Fun.id @@ List.map2 (fun (i,_,_) (_,t) -> if i = `Explicit then Some (to_string t) else None) l s)
   | Var x -> x
   | Abs (i, x, a, t) ->
     if i = `Implicit then
@@ -133,7 +147,7 @@ let abs_coh ?pos name l a =
     | (i,x,a)::l -> mk (Abs (i,x, a, aux l))
     | [] ->
       let s = List.map (fun (_,x,_) -> x, var ?pos x) l in
-      mk (Coh (name, l, a, s))
+      mk (Coh (name, l, a, s, fresh_coh_cache ()))
   in
   aux l
 
@@ -207,7 +221,7 @@ let rec has_fv x e =
   | One
   | Obj
   | Type -> false
-  | Coh (_,_,_,s) -> List.exists (fun (_,t) -> has_fv x t) s
+  | Coh (_,_,_,s,_) -> List.exists (fun (_,t) -> has_fv x t) s
   | _ -> error ~pos:e.pos "has_fv: handle %s" (to_string e)
 
 let is_var e =
@@ -234,7 +248,7 @@ let is_metavariable e =
 let metavariables e =
   let rec aux e acc =
     match e.desc with
-    | Coh (_, _, _, s) -> List.fold_left (fun acc (_,t) -> aux t acc) acc s
+    | Coh (_, _, _, s, _) -> List.fold_left (fun acc (_,t) -> aux t acc) acc s
     | Var _ -> acc
     | Abs (_, _, a, t) -> acc |> aux a |> aux t
     | App (_, t, u) -> acc |> aux t |> aux u
@@ -291,7 +305,7 @@ let free_variable_names a =
     | Op a -> fv |> aux a
     | Id (a, t, u) -> fv |> aux a |> aux t |> aux u
     | App (_, t, u) -> fv |> aux t |> aux u
-    | Coh (_,_,_,s) -> List.fold_left (fun fv (_,t) -> aux t fv) fv s
+    | Coh (_,_,_,s,_) -> List.fold_left (fun fv (_,t) -> aux t fv) fv s
     | _ -> failure a.pos "TODO: fv handle %s" (to_string a)
   in
   aux a []

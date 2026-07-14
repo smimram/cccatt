@@ -432,9 +432,9 @@ let check ~pos l a =
     | Obj -> e
     | Op a -> mk (Op (rewrite a))
     | App (i, t, u) -> mk (App (i, rewrite t, rewrite u))
-    | Coh (n, l, a, s) ->
+    | Coh (n, l, a, s, cache) ->
       let s = List.map (fun (x,t) -> x, rewrite t) s in
-      mk (Coh (n, l, a, s))
+      mk (Coh (n, l, a, s, cache))
     | Meta { value = Some t; _ } -> rewrite t
     | Meta { value = None; _ } -> error ~pos:e.pos "unresolved metvariable %s when checking pasting conditions" (to_string e)
     | _ -> error ~pos:e.pos "TODO: in rewrite handle %s" (to_string e)
