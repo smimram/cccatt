@@ -13,7 +13,25 @@ coh abs {a b c : .} (f : a × b → c) : a → b ⇒ c
 # eval
 coh app {a b : .} : (a ⇒ b) × a → b
 
-# coh beta {a b c : .} (f : a × b → c) : co1 (paf (abs f) id1) app → f
+# F f is app (co1 fst f) snd
+# G f is abs f
 
-# # ϵ-intro
-# # coh beta {a b c : .} (f : a × b => c) : app (abs f) = f
+# ϵ-intro
+coh beta {a b c : .} (f : a × b → c) : co1 (pa (co1 fst (abs f)) snd) app → f
+
+# # e†-intro
+# coh abs2 {a b c : .} (f : a × b → c)
+
+## Alternative version as meta-operations
+
+coh abs {u a b : .} (f : u × a → b) : u → a ⇒ b
+
+coh app {u a b : .} (f : u → a ⇒ b) (x : u → a) : (u → b)
+
+# # Weakening
+# coh wk {u a b : .} (f : u → b) : u × a → b
+# let wk {u a b : .} (f : u → b) : u × a → b := co1 fst f
+
+coh beta {u a b : .} (f : u × a → b) : app (co1 fst (abs f)) snd → f
+
+coh eta {u a b : .} (f : u → a ⇒ b) : f → abs (app (co1 fst f) snd)
