@@ -81,7 +81,7 @@ coh tens {a a' b b' : .} (f : a -> a') (g : b -> b') : a * b -> a' * b'
 - cartesian categories
 - cartesian closed categories
 
-You can also change the dimension by typing something as
+You can also change the dimension by typing something like
 
 ```
 #-# dimension: 2
