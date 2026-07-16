@@ -64,12 +64,7 @@ and eval env e =
   let var ?(pos=e.pos) = var ~pos in
   match e.desc with
   | Coh (n, l, a, s) ->
-    let l, a =
-      let env = ref env in
-      let l = List.map (fun (i,x,a) -> let a = eval !env a in env := (x, var x) :: !env; i,x,a) l in
-      let a = eval !env a in
-      l, a
-    in
+    (* l and a are already in normal form (established in infer), so only the substitution s needs to be evaluated here. *)
     let s = List.map (fun (x,t) -> x, eval env t) s in
     mk (Coh (n, l, a, s))
   | Var x ->
@@ -132,7 +127,14 @@ and infer tenv env (e:Term.t) =
       List.rev !l', a
     in
     Pasting.check ~pos (List.map (fun (_,x,a) -> x,a) l) a;
-    mk ~pos (Coh (n, l, a, s)), eval env' a
+    (* Normalize l and a once, for good, so that eval never has to re-evaluate them (they are closed w.r.t. the coherence context, only s depends on the ambient environment). *)
+    let l', a' =
+      let env = ref env in
+      let l = List.map (fun (i,x,a) -> let a = eval !env a in env := (x, var x) :: !env; i,x,a) l in
+      let a = eval !env a in
+      l, a
+    in
+    mk ~pos (Coh (n, l', a', s)), eval env' a
   | Var x ->
     (
       match List.assoc_opt x tenv with
