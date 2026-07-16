@@ -1,6 +1,6 @@
 # CCCaTT
 
-A type theory for **unbiased cartesian closed categories** and variants with other structures (monoidal, cartesian, etc.) and with higher dimensions. We provide a small proof assistant which you can also try online.
+A type theory for **unbiased cartesian closed categories** and variants with other structures (monoidal, cartesian, etc.) and with higher dimensions. We provide a small proof assistant which you can also [try online](https://smimram.github.io/cccatt/).
 
 ## Presentation
 
@@ -93,7 +93,7 @@ which will switch to bicategories (equipped with the structure corresponding to 
 coh vcomp {a b : .} {f g h : a -> b} (α : f -> g) (β : g → h) : f -> h
 ```
 
-Have a look a the [examples](examples/) or the online demo for more illustrations.
+Have a look a the [examples](examples/) or the [online demo](https://smimram.github.io/cccatt/) for more illustrations.
 
 ## Options
 
@@ -102,6 +102,10 @@ The following options can be set
 - `mode`: set the underlying theory (`monoidal`, `cartesian closed`, etc.),
 - `dimension`: set the number of directed dimensions,
 - `elements`: set whether types have elements (i.e. whether `x:a` makes sense for `a:*`), disabled by default.
+
+## Theory
+
+The theory is available in [this paper](http://www.lix.polytechnique.fr/Labo/Samuel.Mimram/docs/mimram_cccatt.pdf).
 
 ## Some examples
 
@@ -112,6 +116,12 @@ The following options can be set
 ## Emacs mode
 
 The Emacs mode can be loaded by adding
+
+```
+(use-package cccatt-mode :commands cccatt-mode :vc (:url "https://github.com/smimram/cccatt.git" :rev :last-release))
+```
+
+to you `.emacs` file, or
 
 ```
 (require 'cccatt-mode "~/path/to/cccatt-mode.el")

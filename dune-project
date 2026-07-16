@@ -2,7 +2,13 @@
 (name cccatt)
 (version 0.2.0)
 (generate_opam_files true)
+(source (github smimram/cccatt))
+(authors "Samuel Mimram <samuel.mimram@polytechnique.edu>")
+(maintainers "Samuel Mimram <samuel.mimram@polytechnique.edu>")
 (license GPL-3.0)
+(homepage https://smimram.github.io/cccatt/)
+(bug_reports https://github.com/smimram/cccatt/issues)
+(documentation https://smimram.github.io/cccatt/)
 (using menhir 3.0)
 
 (package
