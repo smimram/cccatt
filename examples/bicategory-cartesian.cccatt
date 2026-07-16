@@ -134,8 +134,8 @@ let pa2†-eta {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : 
     (co232
       (pa-eta h)
       (pa3
-        (inv3 (co2-cancelr (pa-fst f g) (pa-fst' f g) (pa-fst-invr f g) (pa2†-fst (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g)))))
-        (inv3 (co2-cancelr (pa-snd f g) (pa-snd' f g) (pa-snd-invr f g) (pa2†-snd (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g)))))
+        (inv3 (co2-cancelr (pa2†-fst (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g))) (pa-fst-invr f g)))
+        (inv3 (co2-cancelr (pa2†-snd (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g))) (pa-snd-invr f g)))
       )
       (pa-eta' (pa f g))
     )

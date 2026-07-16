@@ -124,7 +124,7 @@ coh co23- {a b c : .} {f f' : a → b} (α : f → f') {g g' : b → c} {β β' 
 
 coh inv3 {a b : .} {f g : a → b} {α β : f → g} (p : α = β) : β = α
 
-let co2-cancelr {a b : .} {f g h : a → b} {α β : f → g} (γ : g → h) (γ' : h → g) (q : co2 γ γ' = id2 g) (p : co2 α γ = co2 β γ) : α = β :=
+let co2-cancelr {a b : .} {f g h : a → b} {α β : f → g} {γ : g → h} {γ' : h → g} (p : co2 α γ = co2 β γ) (q : co2 γ γ' = id2 g) : α = β :=
   co3^7
     (inv3 (unitr2 α))
     (inv3 (co23 α q))
