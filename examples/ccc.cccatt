@@ -32,13 +32,13 @@ coh unitl {a b : .} (f : a → b) : comp id f = f
 coh unitr {a b : .} (f : a → b) : comp f id = f
 
 # E2
-coh term-rule {a : .} (f : a → 1) : f = term
+coh term2 {a : .} (f : a → 1) : f = term
 
 # E3a
-coh comp-fst {a b c : .} (f : a → b) (g : a → c) : comp (pairing f g) fst = f
+coh pairing-fst {a b c : .} (f : a → b) (g : a → c) : comp (pairing f g) fst = f
 
 # E3b
-coh comp-snd {a b c : .} (f : a → b) (g : a → c) : comp (pairing f g) snd = g
+coh pairing-snd {a b c : .} (f : a → b) (g : a → c) : comp (pairing f g) snd = g
 
 # E3c
 coh pairing-eta {a b c : .} (h : a → b × c) : pairing (comp h fst) (comp h snd) = h
