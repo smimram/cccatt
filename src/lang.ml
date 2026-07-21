@@ -23,6 +23,7 @@ let rec unify tenv env ?(alpha=[]) t t' =
   | Prod (a, b), Prod (a', b') -> unify tenv env a a'; unify tenv env b b'
   | One, One -> ()
   | Op a, Op a' -> unify tenv env a a'
+  | Id (a, t, u), Id (a', t', u') -> unify tenv env a a'; unify tenv env t t'; unify tenv env u u'
   | Pi (i, x, a, b), Pi (i', x', a', b') ->
     if i <> i' then raise Unification;
     unify tenv env a a';

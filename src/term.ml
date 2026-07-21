@@ -84,7 +84,7 @@ let rec to_string ?(pa=false) e =
   | One -> "1"
   | Op a -> "! " ^ to_string ~pa:true a
   | Id (a, t, u) ->
-    Printf.sprintf "(%s = %s : %s)" (to_string ~pa:true t) (to_string ~pa:true u) (to_string ~pa:true a) |> pa
+    Printf.sprintf "(%s ⇔ %s : %s)" (to_string ~pa:true t) (to_string ~pa:true u) (to_string ~pa:true a) |> pa
   | Meta m ->
     (
       match m.value with
