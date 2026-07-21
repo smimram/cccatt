@@ -63,4 +63,26 @@ coh prod2 {a b c : .} : ap (ap S (ap K (ap S (ap K (ap S (ap K P2)))))) (ap (ap 
 
 coh prodext {a b c : .} : ap (ap S (ap (ap S (ap K S)) (ap (ap S (ap K (ap S (ap K P)))) (ap S (ap K P1))))) (ap S (ap K P2)) ⇔ I {a ⇒ b * c}
 
-coh term : ap K T ⇔{1 ⇒ 1} I
+coh term {a : .} : ap K (ap K T) ⇔{(a ⇒ 1) ⇒ (a ⇒ 1)} I
+
+## Derived rules
+
+# coh comp {a b c : .} (f : a ⇒ b) (g : b ⇒ c) : a ⇒ c
+let comp {a b c : .} (f : a ⇒ b) (g : b ⇒ c) : a ⇒ c := ap2 (ap (ap S (ap K S)) K) g f
+
+coh refl {a : .} {t : a} : t ⇔ t
+
+coh trans {a : .} {t u v : a} (p : t ⇔ u) (q : u ⇔ v) : t ⇔ v
+
+coh sym {a : .} {t u : a} (p : t ⇔ u) : u ⇔ t
+
+coh cong-ap {a b : .} {t t' : a ⇒ b} {x x' : a} (p : t ⇔ t') (q : x ⇔ x') : ap t x ⇔ ap t' x'
+
+# coh term' {a : .} (f : a ⇒ 1) : f ⇔ ap K T
+let term' {a : .} (f : a ⇒ 1) : f ⇔ ap K T := trans (sym (I-red f)) (trans (cong-ap (sym term) refl) (K-red (ap K T) f))
+
+# coh term'' {a : .} (f : 1) : f ⇔{1} T
+let term'' {a : .} (t : 1) : t ⇔{1} T := trans (sym (K-red t T)) (trans (cong-ap (term' (ap K t)) refl) (K-red T T))
+
+# coh term''' : ap K T ⇔{1 ⇒ 1} I
+let term''' : ap K T ⇔{1 ⇒ 1} I := sym (term' I)
