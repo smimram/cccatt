@@ -129,8 +129,8 @@ coh pa2-id2 {a b c : .} (f : a → b) (g : a → c) : pa2 (id2 f) (id2 g) → id
 # coh pa2-co12 {a' a b c : .} (h : a' → a) {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co12 h (pa2 α β) = pa2 (co12 h α) (co12 h β)
 
 # functoriality
-coh paf {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g'
-# let paf {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g' := pa2 {a} {b} {c} {f'} {g'} (pa f g) (co2 (pa-fst f g) α) (co2 (pa-snd f g) β)
+# coh paf {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g'
+let paf {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g' := pa2† (co2 (pa-fst f g) α) (co2 (pa-snd f g) β)
 
 # # TODO: show that other are also derivable
 
