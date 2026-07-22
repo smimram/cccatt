@@ -29,8 +29,13 @@ coh eta' {a b c : .} (f : a → b ⇒ c) : abs (co1 (F1 b f) app) → f
 coh eta-invl {a b c : .} (f : a → b ⇒ c) : co2 (eta' f) (eta f) = id2 _
 coh eta-invr {a b c : .} (f : a → b ⇒ c) : co2 (eta f) (eta' f) = id2 _
 
-# coh eta-eps {a b c : .} (f : a → b ⇒ c) : co21 (F2 b (eta f)) app = 
+coh eta-eps {a b c : .} (f : a → b ⇒ c) : co21 (F2 b (eta f)) app = eps' (co1 (F1 b f) app)
 
+coh abs2 {a b c : .} {f g : a × b → c} (α : f → g) : abs f → abs g
+
+coh eta-nat {a b c : .} {f g : a × b → c} (α : f → g) : co2 (eps f) α = co2 (co21 (F2 b (abs2 α)) app) (eps g)
+
+coh eps-nat {a b c : .} {f g : a → b ⇒ c} (α : f → g) : co2 (eta f) (abs2 (co21 (F2 b α) app)) = co2 α (eta g)
 
 
 
