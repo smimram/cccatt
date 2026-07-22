@@ -20,6 +20,20 @@ let F2 (a : .) {x y : .} {f g : x → y} (α : f → g) : F1 a f → F1 a g := p
 
 # ϵ-intro
 coh eps {a b c : .} (f : a × b → c) : co1 (F1 b (abs f)) app → f
+coh eps' {a b c : .} (f : a × b → c) : f → co1 (F1 b (abs f)) app
+coh eps-invl {a b c : .} (f : a × b → c) : co2 (eps' f) (eps f) = id2 _
+coh eps-invr {a b c : .} (f : a × b → c) : co2 (eps f) (eps' f) = id2 _
+
+coh eta {a b c : .} (f : a → b ⇒ c) : f → abs (co1 (F1 b f) app)
+coh eta' {a b c : .} (f : a → b ⇒ c) : abs (co1 (F1 b f) app) → f
+coh eta-invl {a b c : .} (f : a → b ⇒ c) : co2 (eta' f) (eta f) = id2 _
+coh eta-invr {a b c : .} (f : a → b ⇒ c) : co2 (eta f) (eta' f) = id2 _
+
+# coh eta-eps {a b c : .} (f : a → b ⇒ c) : co21 (F2 b (eta f)) app = 
+
+
+
+
 
 ## Alternative version as meta-operations
 
