@@ -13,8 +13,9 @@ coh abs {a b c : .} (f : a × b → c) : a → b ⇒ c
 # eval
 coh app {a b : .} : (a ⇒ b) × a → b
 
-# F f is app (co1 fst f) snd
-# G f is abs f
+# Our functor
+# let F0 {a : .} {x : .} : . := x × a
+# let F1 {a : .} {x y : .} (f : x → y) : x × a → y × a := paf f id
 
 # ϵ-intro
 coh beta {a b c : .} (f : a × b → c) : co1 (pa (co1 fst (abs f)) snd) app → f
