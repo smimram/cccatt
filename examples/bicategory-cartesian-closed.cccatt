@@ -13,9 +13,10 @@ coh abs {a b c : .} (f : a × b → c) : a → b ⇒ c
 # eval
 coh app {a b : .} : (a ⇒ b) × a → b
 
-# Our functor
-# let F0 {a : .} {x : .} : . := x × a
-# let F1 {a : .} {x y : .} (f : x → y) : x × a → y × a := paf f id
+# Our left adjoint
+let F0 {a : .} (x : .) : . := x × a
+let F1 {a : .} {x y : .} (f : x → y) : F0 x → F0 y := pa (co1 fst f) snd
+let F2 {a : .} {x y : .} {f g : x → y} (α : f → g) : F1 f → F1 g := pa2 (co12 fst α) (id2 snd)
 
 # ϵ-intro
 coh beta {a b c : .} (f : a × b → c) : co1 (pa (co1 fst (abs f)) snd) app → f
