@@ -292,6 +292,7 @@ let free_variable_names a =
     | Id (a, t, u) -> fv |> aux a |> aux t |> aux u
     | App (_, t, u) -> fv |> aux t |> aux u
     | Coh (_,_,_,s) -> List.fold_left (fun fv (_,t) -> aux t fv) fv s
+    | Meta _ -> failure a.pos "found metavariable %s when trying to compute free variables" (to_string a)
     | _ -> failure a.pos "TODO: fv handle %s" (to_string a)
   in
   aux a []
