@@ -19,7 +19,8 @@ let F1 {a : .} {x y : .} (f : x → y) : F0 x → F0 y := pa (co1 fst f) snd
 let F2 {a : .} {x y : .} {f g : x → y} (α : f → g) : F1 f → F1 g := pa2 (co12 fst α) (id2 snd)
 
 # ϵ-intro
-coh beta {a b c : .} (f : a × b → c) : co1 (pa (co1 fst (abs f)) snd) app → f
+# coh eps {a b c : .} (f : a × b → c) : co1 (F1 (abs f)) app → f
+coh eps {a b c : .} (f : a × b → c) : co1 (pa (co1 fst (abs f)) snd) app → f
 
 ## Alternative version as meta-operations
 
