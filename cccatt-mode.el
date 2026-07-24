@@ -102,6 +102,9 @@ output of the typechecker in a window."
       (display-buffer buffer '((display-buffer-reuse-window
                                 display-buffer-below-selected)
                                (window-height . 0.3)))
+      ;; Jump to the location of the first error, when there is one.
+      (with-current-buffer buffer
+        (ignore-errors (next-error 1 t)))
       (message "CCCaTT typechecking failed"))))
 
 (defvar cccatt-mode-map
