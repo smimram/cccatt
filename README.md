@@ -128,3 +128,5 @@ to you `.emacs` file, or
 ```
 
 if you have cloned the repository locally.
+
+The mode should provide you with syntax coloration and allows you to typecheck by typing `C-c C-l`.
