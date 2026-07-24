@@ -26,19 +26,19 @@ coh co12 {a b c : .} (f : a → b) {g g' : b → c}  (α : g → g') : co1 f g �
 coh co21 {a b c : .} {f f' : a → b} (α : f → f') (g : b → c) : co1 f g → co1 f' g
 
 # left unitor
-coh unitl {a b : .} (f : a → b) : co1 id1 f → f
+coh unitl  {a b : .} (f : a → b) : co1 id1 f → f
 
 # inverse of left unitor
 coh unitl' {a b : .} (f : a → b) : f → co1 id1 f
 
 # right unitor
-coh unitr {a b : .} (f : a → b) : co1 f id1 → f
+coh unitr  {a b : .} (f : a → b) : co1 f id1 → f
 
 # inverse of right unitor
 coh unitr' {a b : .} (f : a → b) : f → co1 f id1
 
 # associativiy
-coh assoc {a b c d : .} (f : a → b) (g : b → c) (h : c → d) : co1 (co1 f g) h → co1 f (co1 g h)
+coh assoc  {a b c d : .} (f : a → b) (g : b → c) (h : c → d) : co1 (co1 f g) h → co1 f (co1 g h)
 
 # inverse of associativity
 coh assoc' {a b c d : .} (f : a → b) (g : b → c) (h : c → d) : co1 f (co1 g h) → co1 (co1 f g) h

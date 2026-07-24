@@ -12,7 +12,7 @@ include "bicategory"
 
 coh term {a : .} : a → 1
 
-coh term-can {a : .} (f : a → 1) : f → term
+coh term-can  {a : .} (f : a → 1) : f → term
 coh term-can' {a : .} (f : a → 1) : term → f
 # coh term-can-invl {a : .} (f : a → 1) : co2 (term-can' f) (term-can f) = id2 term
 # coh term-can-invr {a : .} (f : a → 1) : co2 (term-can f) (term-can' f) = id2 f
@@ -28,11 +28,11 @@ coh term-can2 {a : .} {f g : a → 1} (α : f → g) : α = term2 f g
 
 # This one is not a coherence, but derivable
 ncoh term3 {a : .} {f g : a → 1} (α β : f → g) : α = β
-let term3 {a : .} {f g : a → 1} (α β : f → g) : α = β := co3 (term-can2 α) (inv3 (term-can2 β))
+let  term3 {a : .} {f g : a → 1} (α β : f → g) : α = β := co3 (term-can2 α) (inv3 (term-can2 β))
 
 # This one is not a coherence, but derivable
 ncoh term-can2' {a : .} {f : a → 1} (α : f → term) : α = term-can f
-let term-can2' {a : .} {f : a → 1} (α : f → term) : α = term-can f := term3 α (term-can f)
+let  term-can2' {a : .} {f : a → 1} (α : f → term) : α = term-can f := term3 α (term-can f)
 
 ## Products
 
@@ -44,18 +44,18 @@ coh snd {a b : .} : a × b → b
 coh pa {a b c : .} (f : a → b) (g : a → c) : a → b × c
 
 # Pairing reduction (ϖ)
-coh pa-fst {a b c : .} (f : a → b) (g : a → c) : co1 (pa f g) fst → f
-coh pa-fst' {a b c : .} (f : a → b) (g : a → c) : f → co1 (pa f g) fst
+coh pa-fst      {a b c : .} (f : a → b) (g : a → c) : co1 (pa f g) fst → f
+coh pa-fst'     {a b c : .} (f : a → b) (g : a → c) : f → co1 (pa f g) fst
 coh pa-fst-invl {a b c : .} (f : a → b) (g : a → c) : co2 (pa-fst' f g) (pa-fst f g) = id2 f
 coh pa-fst-invr {a b c : .} (f : a → b) (g : a → c) : co2 (pa-fst f g) (pa-fst' f g) = id2 (co1 (pa f g) fst)
 
-coh pa-snd {a b c : .} (f : a → b) (g : a → c) : co1 (pa f g) snd → g
-coh pa-snd' {a b c : .} (f : a → b) (g : a → c) : g → co1 (pa f g) snd
+coh pa-snd      {a b c : .} (f : a → b) (g : a → c) : co1 (pa f g) snd → g
+coh pa-snd'     {a b c : .} (f : a → b) (g : a → c) : g → co1 (pa f g) snd
 coh pa-snd-invl {a b c : .} (f : a → b) (g : a → c) : co2 (pa-snd' f g) (pa-snd f g) = id2 g
 coh pa-snd-invr {a b c : .} (f : a → b) (g : a → c) : co2 (pa-snd f g) (pa-snd' f g) = id2 (co1 (pa f g) snd)
 
 # Pairing
-coh pa2 {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g'
+coh pa2     {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : pa f g → pa f' g'
 
 coh pa2-fst {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2^3 (pa-fst' f g) (co21 (pa2 α β) fst) (pa-fst f' g') = α
 coh pa2-snd {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2^3 (pa-snd' f g) (co21 (pa2 α β) snd) (pa-snd f' g') = β
@@ -66,14 +66,13 @@ coh pa2-snd {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : 
 coh pa3 {a b c : .} {f f' : a → b} {g g' : a → c} {α α' : f → f'} {β β' : g → g'} (p : α = α') (q : β = β') : pa2 α β = pa2 α' β'
 
 # Uniqueness
-coh pa-eta {a b c : .} (f : a → b × c) : f → pa (co1 f fst) (co1 f snd)
-coh pa-eta' {a b c : .} (f : a → b × c) : pa (co1 f fst) (co1 f snd) → f
-
+coh pa-eta      {a b c : .} (f : a → b × c) : f → pa (co1 f fst) (co1 f snd)
+coh pa-eta'     {a b c : .} (f : a → b × c) : pa (co1 f fst) (co1 f snd) → f
 coh pa-eta-invl {a b c : .} (f : a → b × c) : co2 (pa-eta' f) (pa-eta f) = id2 (pa (co1 f fst) (co1 f snd))
 coh pa-eta-invr {a b c : .} (f : a → b × c) : co2 (pa-eta f) (pa-eta' f) = id2 f
 
-coh pa-eta-fst {a b c : .} (f : a → b × c) : co21 (pa-eta f) fst = pa-fst' (co1 f fst) (co1 f snd)
-coh pa-eta-snd {a b c : .} (f : a → b × c) : co21 (pa-eta f) snd = pa-snd' (co1 f fst) (co1 f snd)
+coh pa-eta-fst  {a b c : .} (f : a → b × c) : co21 (pa-eta f) fst = pa-fst' (co1 f fst) (co1 f snd)
+coh pa-eta-snd  {a b c : .} (f : a → b × c) : co21 (pa-eta f) snd = pa-snd' (co1 f fst) (co1 f snd)
 
 coh pa2-eta {a b c : .} {f g : a → b × c} (α : f → g) : α = co2^3 (pa-eta f) (pa2 (co21 α fst) (co21 α snd)) (pa-eta' g)
 # Square variant
@@ -83,11 +82,11 @@ coh pa2-eta {a b c : .} {f g : a → b × c} (α : f → g) : α = co2^3 (pa-eta
 
 # p†
 ncoh pa2† {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : h → pa f g
-let pa2† {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : h → pa f g := co2 (pa-eta h) (pa2 α β)
+let  pa2† {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : h → pa f g := co2 (pa-eta h) (pa2 α β)
 
 # U1
 ncoh pa2†-fst {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) fst) (pa-fst f g) = α
-let pa2†-fst {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) fst) (pa-fst f g) = α :=
+let  pa2†-fst {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : co1 h fst → f) (β : co1 h snd → g) : co2 (co21 (pa2† α β) fst) (pa-fst f g) = α :=
   co3^4
     (co32 (co21co2 (pa-eta h) (pa2 α β) fst) (pa-fst f g))
     (co32 (co32 (pa-eta-fst h) (co21 (pa2 α β) fst)) (pa-fst f g))
@@ -103,7 +102,7 @@ let pa2†-snd {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : 
 
 # U2
 ncoh pa2†-eta {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : h → pa f g) : α = pa2† (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g))
-let pa2†-eta {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : h → pa f g) : α = pa2† (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g)) :=
+let  pa2†-eta {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : h → pa f g) : α = pa2† (co2 (co21 α fst) (pa-fst f g)) (co2 (co21 α snd) (pa-snd f g)) :=
   co3^3
     (pa2-eta α)
     (co232
@@ -118,7 +117,7 @@ let pa2†-eta {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} (α : 
 
 # cong
 ncoh pa2†-cong {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} {α α' : co1 h fst → f} {β β' : co1 h snd → g} (p : α = α') (q : β = β') : pa2† α β = pa2† α' β'
-let pa2†-cong {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} {α α' : co1 h fst → f} {β β' : co1 h snd → g} (p : α = α') (q : β = β') : pa2† α β = pa2† α' β' := co23 (pa-eta h) (pa3 p q)
+let  pa2†-cong {a b c : .} {f : a → b} {g : a → c} {h : a → b × c} {α α' : co1 h fst → f} {β β' : co1 h snd → g} (p : α = α') (q : β = β') : pa2† α β = pa2† α' β' := co23 (pa-eta h) (pa3 p q)
 
 ## Admissible rules
 
