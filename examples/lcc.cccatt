@@ -1,0 +1,39 @@
+#
+# Locally cartesian closed categories
+#
+# NOTE: this is not *yet* implemented...
+#
+#-# mode: locally cartesian closed
+#-# dimension: 1
+
+coh K {a : .} {b : a -> .} (x : a) (y : b x) : a
+
+coh Kβ {a : .} {b : a -> .} (x : a) (y : b x) : K x y = x
+
+coh pairing {A : .} {B : A -> .} (x : A) (y : B x) : Σ (x : A) (B x)
+
+# (x : a) (y : b x) -> Σ (z : a) (b z)
+# Σ (f : (x : a) (y : b x) -> a) ((x : a) (y : b x) -> b (f x y))
+#
+# must be pasting:
+# - (x : a) (y : b x) -> a
+#   K ≡ λ x y . x
+# - (x : a) (y : b x) -> b (K x y)
+#   λf x y . y
+#   which works because x = K x y (which is a coherence Kβ)
+
+coh fst {A : .} {B : A -> .} (p : Σ A B) : A
+
+# must be pasting: (x : A) (y : B x) -> A
+# this is K above
+
+coh snd {A : .} {B : A -> .} (p : Σ A B) : B (fst p)
+
+# must be pasting: (x : A) (y : B x) -> B (fst (pairing x y))
+# NOTE: we need to have pairing in order to currify
+
+coh abs {A : .} {B : A -> .} {C : Σ A B -> .} (f : (p : Σ (x : A) (B x)) => C p) : (x : A) => (y : B x) => C (pairing x y)
+
+# must be pasting
+# - (f : (x : A) -> (y : B x) -> C (pairing' x y)) -> (x : A) -> (y : B x) -> C (pairing x y)
+#   λ f x y . f x y
