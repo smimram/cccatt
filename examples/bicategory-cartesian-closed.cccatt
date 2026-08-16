@@ -28,6 +28,8 @@ coh eta-invl {a b c : .} (f : a → b ⇒ c) : co2 (eta' f) (eta f) = id2 _
 coh eta-invr {a b c : .} (f : a → b ⇒ c) : co2 (eta f) (eta' f) = id2 _
 
 coh eta-eps  {a b c : .} (f : a → b ⇒ c) : co21 (F2 b (eta f)) app = eps' (co1 (F1 b f) app)
+# Variant without eps' (interderivable by inverse laws)
+coh eta-eps-var  {a b c : .} (f : a → b ⇒ c) : co2 (co21 (F2 b (eta f)) app) (eps (co1 (F1 b f) app)) = id2 _
 
 coh abs2 {a b c : .} {f g : a × b → c} (α : f → g) : abs f → abs g
 
