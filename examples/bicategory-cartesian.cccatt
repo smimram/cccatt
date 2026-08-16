@@ -59,9 +59,9 @@ coh pa2     {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : 
 
 coh pa2-fst {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2^3 (pa-fst' f g) (co21 (pa2 α β) fst) (pa-fst f' g') = α
 coh pa2-snd {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2^3 (pa-snd' f g) (co21 (pa2 α β) snd) (pa-snd f' g') = β
-# # Square variant
-# coh pa2-fst {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2 (co21 (pa2 α β) fst) (pa-fst f' g') = co2 (pa-fst f g) α
-# coh pa2-snd {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2 (co21 (pa2 α β) snd) (pa-snd f' g') = co2 (pa-snd f g) β
+# Square variant (interderivable)
+coh pa2-fst-sq {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2 (co21 (pa2 α β) fst) (pa-fst f' g') = co2 (pa-fst f g) α
+coh pa2-snd-sq {a b c : .} {f f' : a → b} {g g' : a → c} (α : f → f') (β : g → g') : co2 (co21 (pa2 α β) snd) (pa-snd f' g') = co2 (pa-snd f g) β
 
 coh pa3 {a b c : .} {f f' : a → b} {g g' : a → c} {α α' : f → f'} {β β' : g → g'} (p : α = α') (q : β = β') : pa2 α β = pa2 α' β'
 
