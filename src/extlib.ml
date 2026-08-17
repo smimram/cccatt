@@ -4,6 +4,14 @@
 module List = struct
   include List
 
+  (* Backward compatibility. *)
+  let find_index p =
+    let rec aux i = function
+      | a::l -> if p a then Some i else aux (i+1) l
+      | [] -> None
+    in
+    aux 0
+
   (** Like assoc, but key is the second component. *)
   let rec assoc' x = function
     | (v,y)::_ when x = y -> v
