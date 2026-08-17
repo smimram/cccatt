@@ -83,7 +83,7 @@ let set_orientation d =
   orientation := d
 
 (** When set to [true], we use the order on cells in order to determine whether we are pasting. *)
-let ordered = ref false
+let ordered = ref true
 
 let set_ordered o =
   message "%susing the order of variables for checking pasting schemes" (if o then "" else "not ");

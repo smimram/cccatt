@@ -563,12 +563,16 @@ let check ~pos l a =
             let l' = List.map snd l' in
             let is_src x = List.exists (fun (x',_) -> x = x') l' in
             let is_tgt x = List.exists (fun (_,x') -> x = x') l' in
+            (* Source and target of the pasting scheme. *)
             let src = List.filter (fun (x,_) -> not (is_tgt x)) l in
             let tgt = List.filter (fun (x,_) -> not (is_src x)) l in
+            (* Variable removed from the source and target. *)
+            let del_src = List.filter (fun (x,_) -> is_tgt x) l |> List.map fst |> SS.of_list in
+            let del_tgt = List.filter (fun (x,_) -> is_src x) l |> List.map fst |> SS.of_list in
             let s, t = arr a in
             let () =
-              let err_src = SS.diff (fv s) (SS.of_list @@ List.map fst src) in
-              let err_tgt = SS.diff (fv t) (SS.of_list @@ List.map fst tgt) in
+              let err_src = SS.inter (fv s) del_src in
+              let err_tgt = SS.inter (fv t) del_tgt in
               if not (SS.is_empty err_src) then failure s.pos "source is not allowed to use those variables: %s" (String.concat ", " @@ SS.elements err_src);
               if not (SS.is_empty err_tgt) then failure t.pos "target is not allowed to use those variables: %s" (String.concat ", " @@ SS.elements err_tgt)
             in
