@@ -116,3 +116,8 @@ module String = struct
     let n = String.index s c in
     String.sub s 0 n , String.sub s (n+1) (String.length s - n-1)
 end
+
+(* Backward compatibility. *)
+module Pair = struct
+  let map f g (x, y) = f x, g y
+end
