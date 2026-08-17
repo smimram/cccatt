@@ -1,0 +1,15 @@
+#-# mode: cartesian closed
+#-# ordered: true
+
+# This one is fine
+coh bla (a b : .) (f g h : a → b) (α : f → g) (β : g → h) : f → h
+
+# This one is morally fine but not accepted because we do not declare variables
+# in the right order
+ncoh bla (a b : .) (f g h : a → b) (β : g → h) (α : f → g) : f → h
+
+# This one is wrong (h is there)
+ncoh bla (a b : .) (f g h : a → b) (α : f → g) : f → g
+
+# This one is wrong in an oriented setting
+ncoh bla (a b : .) (f g : a → b) (α : f → g) : g → f

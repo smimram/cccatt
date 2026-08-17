@@ -543,62 +543,97 @@ let check ~pos l a =
       aux a
     in
     (* printf "after contraction: %s\n%!" (to_string (pis_explicit l a)); *)
-    let rec aux n l a =
-      (* Printf.printf "aux %d : %s ⊢ %s\n%!" n (string_of_context l) (to_string a); *)
-      (* For 1-dimensional context use traditional pasting scheme verification. *)
-      if n <= 1 then check1 ~pos l a
-      else
-        (* Consider top dimensional cells as equations. *)
-        let l, eq = List.partition (fun (_,a) -> dim a < n) l in
-        (* NOTE: these checks are included in acyclicity below, but we get better positions in errors. *)
-        List.iter (fun (r,a) -> let x, y = arr a in if x = y then error ~pos:a.pos "%s is a loop" r) eq;
-        List.iter_unordered_pairs
-          (fun (r,a) (r',a') ->
-             let x, y = arr a in
-             let x', y' = arr a' in
-             if x = x' then error ~pos:a'.pos "%s has the same source as %s" r' r;
-             if y = y' then error ~pos:a'.pos "%s has the same target as %s" r' r;
-          ) eq;
-        let eq = List.map (fun (_,a) -> let x, y = arr a in var x, var y) eq in
-        (* Check that equations are acyclic. *)
-        (
-          let trans eq =
-            let ans = ref eq in
-            let add r = if not (List.mem r !ans) then ans := r :: !ans in
-            List.iter_unordered_pairs (fun (x,y) (x',y') ->
-                if y = x' then add (x,y');
-                if y' = x then add (x',y)
-              ) eq;
-            !ans
-          in
-          let rec aux eq =
-            let eq' = trans eq in
-            if List.length eq' <> List.length eq then aux eq'
-            else eq
-          in
-          List.iter (fun (x,y) -> if x = y then error ~pos "cycle in equations") (aux eq)
-        );
-        (* TODO: check that eq is acyclic *)
-        let srcs = List.map fst eq in
-        let tgts = List.map snd eq in
-        (* Compute the source and the target. *)
-        let src = List.filter (fun (x,_) -> not (List.mem x tgts)) l in
-        let tgt = List.filter (fun (x,_) -> not (List.mem x srcs)) l in
-        (* Make sure that the source and target types are pasting. *)
-        aux (n-1) src (pred a);
-        aux (n-1) tgt (pred a);
-        (* Make sure that the source target don't use removed variables (ideally, we should make sure that we can type in the source/target environment, but we cannot do that here). *)
-        let vars =
-          SS.union
-            (SS.inter (fv @@ fst @@ arr a) (SS.of_list tgts))
-            (SS.inter (fv @@ snd @@ arr a) (SS.of_list srcs))
-        in
-        (* Printf.printf "aux with %d : %s ⊢ %s\n%!" n (string_of_context l) (to_string a); *)
-        if not (SS.is_empty vars) then failure pos "not allowed to use those variables in source / target: %s" (String.concat ", " @@ SS.elements vars)
-    in
     let n = dim a in
     List.iter (fun (_,a) -> if dim a > n then failure a.pos "type %s has dimension %d but trying to construct a term of dimension %d" (to_string a) (dim a) n) l;
-    aux n l a
+
+    if !Settings.ordered then
+      (
+        (* We make sure that variables in the context are sorted by dimension. *)
+        (* ignore @@ List.fold_left (fun n (_x,a) -> let n' = dim a in if n' < n then failure a.pos "variables are supposed to be of increasing dimension"; n') 0 l; *)
+        let rec aux l a =
+          (* Index of a variable in the context. *)
+          let index x = Option.get @@ List.find_index (fun (x',_) -> x = x') l in
+          let n = dim a in
+          if n <= 1 then check1 ~pos l a
+          else
+            let l, l' = List.partition (fun (_,a) -> dim a < n) l in
+            let l' = List.map (fun (_,a) -> a.pos, Pair.map var var @@ arr a) l' in
+            List.iter (fun (pos,(x,y)) -> if not (index x < index y) then failure pos "source should be a variable defined before the target") l';
+            List.iter_consecutive_pairs (fun (_,(_,x)) (pos,(y,_)) -> if not (index x <= index y) then failure pos "source should be a variable defined after the target of previous variable") l';
+            let l' = List.map snd l' in
+            let is_src x = List.exists (fun (x',_) -> x = x') l' in
+            let is_tgt x = List.exists (fun (_,x') -> x = x') l' in
+            let src = List.filter (fun (x,_) -> not (is_tgt x)) l in
+            let tgt = List.filter (fun (x,_) -> not (is_src x)) l in
+            let s, t = arr a in
+            let () =
+              let err_src = SS.diff (fv s) (SS.of_list @@ List.map fst src) in
+              let err_tgt = SS.diff (fv t) (SS.of_list @@ List.map fst tgt) in
+              if not (SS.is_empty err_src) then failure s.pos "source is not allowed to use those variables: %s" (String.concat ", " @@ SS.elements err_src);
+              if not (SS.is_empty err_tgt) then failure t.pos "target is not allowed to use those variables: %s" (String.concat ", " @@ SS.elements err_tgt)
+            in
+            let a' = pred a in
+            (* NOTE: this is a nice formulation, but we are checking many times iterated sources and targets (which is useless by the globular relations) *)
+            aux src a';
+            aux tgt a'
+        in
+        aux l a
+      )
+    else
+      let rec aux n l a =
+        (* Printf.printf "aux %d : %s ⊢ %s\n%!" n (string_of_context l) (to_string a); *)
+        (* For 1-dimensional context use traditional pasting scheme verification. *)
+        if n <= 1 then check1 ~pos l a
+        else
+          (* Consider top dimensional cells as equations. *)
+          let l, eq = List.partition (fun (_,a) -> dim a < n) l in
+          (* NOTE: these checks are included in acyclicity below, but we get better positions in errors. *)
+          List.iter (fun (r,a) -> let x, y = arr a in if x = y then error ~pos:a.pos "%s is a loop" r) eq;
+          List.iter_unordered_pairs
+            (fun (r,a) (r',a') ->
+               let x, y = arr a in
+               let x', y' = arr a' in
+               if x = x' then error ~pos:a'.pos "%s has the same source as %s" r' r;
+               if y = y' then error ~pos:a'.pos "%s has the same target as %s" r' r;
+            ) eq;
+          let eq = List.map (fun (_,a) -> let x, y = arr a in var x, var y) eq in
+          (* Check that equations are acyclic. *)
+          (
+            let trans eq =
+              let ans = ref eq in
+              let add r = if not (List.mem r !ans) then ans := r :: !ans in
+              List.iter_unordered_pairs (fun (x,y) (x',y') ->
+                  if y = x' then add (x,y');
+                  if y' = x then add (x',y)
+                ) eq;
+              !ans
+            in
+            let rec aux eq =
+              let eq' = trans eq in
+              if List.length eq' <> List.length eq then aux eq'
+              else eq
+            in
+            List.iter (fun (x,y) -> if x = y then error ~pos "cycle in equations") (aux eq)
+          );
+          (* TODO: check that eq is acyclic *)
+          let srcs = List.map fst eq in
+          let tgts = List.map snd eq in
+          (* Compute the source and the target. *)
+          let src = List.filter (fun (x,_) -> not (List.mem x tgts)) l in
+          let tgt = List.filter (fun (x,_) -> not (List.mem x srcs)) l in
+          (* Make sure that the source and target types are pasting. *)
+          aux (n-1) src (pred a);
+          aux (n-1) tgt (pred a);
+          (* Make sure that the source target don't use removed variables (ideally, we should make sure that we can type in the source/target environment, but we cannot do that here). *)
+          let vars =
+            SS.union
+              (SS.inter (fv @@ fst @@ arr a) (SS.of_list tgts))
+              (SS.inter (fv @@ snd @@ arr a) (SS.of_list srcs))
+          in
+          (* Printf.printf "aux with %d : %s ⊢ %s\n%!" n (string_of_context l) (to_string a); *)
+          if not (SS.is_empty vars) then failure pos "not allowed to use those variables in source / target: %s" (String.concat ", " @@ SS.elements vars)
+      in
+      aux n l a
 
 (** Check whether a type in a context is a pasting scheme. *)
 (* Here, we cleanup the variable declarations and call the above. *)

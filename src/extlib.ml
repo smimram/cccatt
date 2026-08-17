@@ -48,7 +48,10 @@ module List = struct
       List.iter (f x) l;
       iter_unordered_pairs f l
     | [] -> ()
-    
+
+  let rec iter_consecutive_pairs f = function
+    | x::y::l -> f x y; iter_consecutive_pairs f (y::l)
+    | [_] | [] -> ()
 end
 
 (** Positions in the source code. *)
