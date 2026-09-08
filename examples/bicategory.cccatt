@@ -29,19 +29,19 @@ coh co21 {a b c : .} {f f' : a → b} (α : f → f') (g : b → c) : co1 f g �
 coh unitl  {a b : .} (f : a → b) : co1 id1 f → f
 
 # inverse of left unitor
-coh unitl' {a b : .} (f : a → b) : f → co1 id1 f
+coh unitl⁻ {a b : .} (f : a → b) : f → co1 id1 f
 
 # right unitor
 coh unitr  {a b : .} (f : a → b) : co1 f id1 → f
 
 # inverse of right unitor
-coh unitr' {a b : .} (f : a → b) : f → co1 f id1
+coh unitr⁻ {a b : .} (f : a → b) : f → co1 f id1
 
 # associativiy
 coh assoc  {a b c d : .} (f : a → b) (g : b → c) (h : c → d) : co1 (co1 f g) h → co1 f (co1 g h)
 
 # inverse of associativity
-coh assoc' {a b c d : .} (f : a → b) (g : b → c) (h : c → d) : co1 f (co1 g h) → co1 (co1 f g) h
+coh assoc⁻ {a b c d : .} (f : a → b) (g : b → c) (h : c → d) : co1 f (co1 g h) → co1 (co1 f g) h
 
 ## Axioms
 
@@ -71,17 +71,17 @@ coh co21assoc {a b c d : .} {f f' : a → b} (α : f → f') (g : b → c) (h : 
 
 coh xch {a b c : .} {f f' : a → b} {g g' : b → c} (α : f → f') (β : g → g') : co2 (co21 α g) (co12 f' β) = co2 (co12 f β) (co21 α g')
 
-coh unitl-invr {a b : .} (f : a → b) : co2 (unitl f) (unitl' f) = id2 _
+coh unitl-invr {a b : .} (f : a → b) : co2 (unitl f) (unitl⁻ f) = id2 _
 
-coh unitl-invl {a b : .} (f : a → b) : co2 (unitl' f) (unitl f) = id2 _
+coh unitl-invl {a b : .} (f : a → b) : co2 (unitl⁻ f) (unitl f) = id2 _
 
-coh unitr-invr {a b : .} (f : a → b) : co2 (unitr f) (unitr' f) = id2 _
+coh unitr-invr {a b : .} (f : a → b) : co2 (unitr f) (unitr⁻ f) = id2 _
 
-coh unitr-invl {a b : .} (f : a → b) : co2 (unitr' f) (unitr f) = id2 _
+coh unitr-invl {a b : .} (f : a → b) : co2 (unitr⁻ f) (unitr f) = id2 _
 
-coh assoc-invl {a b c d : .} (f : a → b) (g : b → c) (h : c → d) : co2 (assoc f g h) (assoc' f g h) = id2 _
+coh assoc-invl {a b c d : .} (f : a → b) (g : b → c) (h : c → d) : co2 (assoc f g h) (assoc⁻ f g h) = id2 _
 
-coh assoc-invr {a b c d : .} (f : a → b) (g : b → c) (h : c → d) : co2 (assoc' f g h) (assoc f g h) = id2 _
+coh assoc-invr {a b c d : .} (f : a → b) (g : b → c) (h : c → d) : co2 (assoc⁻ f g h) (assoc f g h) = id2 _
 
 coh invl-invr {a b c : .} (f : a → b) (g : b → c) : co2 (assoc f id1 g) (co12 f (unitl g)) = co21 (unitr f) g
 
