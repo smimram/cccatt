@@ -82,6 +82,13 @@ let set_orientation d =
   !orientation_callback d;
   orientation := d
 
+(** When set to [true], we use the order on cells in order to determine whether we are pasting. *)
+let ordered = ref true
+
+let set_ordered o =
+  message "%susing the order of variables for checking pasting schemes" (if o then "" else "not ");
+  ordered := o
+
 let parse s =
   let k, v = String.split_on_first_char ':' s in
   let k = String.trim k in
@@ -110,6 +117,8 @@ let parse s =
     set_dim n
   | "elements" ->
     set_elements @@ bool_of_string v
+  | "ordered" ->
+    set_ordered @@ bool_of_string v
   | "reversible" ->
     (
       match v with

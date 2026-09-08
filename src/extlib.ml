@@ -4,6 +4,14 @@
 module List = struct
   include List
 
+  (* Backward compatibility. *)
+  let find_index p =
+    let rec aux i = function
+      | a::l -> if p a then Some i else aux (i+1) l
+      | [] -> None
+    in
+    aux 0
+
   (** Like assoc, but key is the second component. *)
   let rec assoc' x = function
     | (v,y)::_ when x = y -> v
@@ -48,7 +56,10 @@ module List = struct
       List.iter (f x) l;
       iter_unordered_pairs f l
     | [] -> ()
-    
+
+  let rec iter_consecutive_pairs f = function
+    | x::y::l -> f x y; iter_consecutive_pairs f (y::l)
+    | [_] | [] -> ()
 end
 
 (** Positions in the source code. *)
@@ -104,4 +115,9 @@ module String = struct
   let split_on_first_char c s =
     let n = String.index s c in
     String.sub s 0 n , String.sub s (n+1) (String.length s - n-1)
+end
+
+(* Backward compatibility. *)
+module Pair = struct
+  let map f g (x, y) = f x, g y
 end
