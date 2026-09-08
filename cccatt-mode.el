@@ -19,6 +19,12 @@
 (defvar cccatt-output-buffer-name "*cccatt*"
   "Name of the buffer holding the output of the CCCaTT typechecker.")
 
+(defcustom cccatt-default-input-method "TeX"
+  "Input method automatically activated in CCCaTT buffers.
+Set to nil to disable automatic activation."
+  :type '(choice (const :tag "None" nil) string)
+  :group 'cccatt)
+
 (defvar cccatt-font-lock-keywords
  '(
    ("#.*" . 'font-lock-comment-face)
@@ -120,6 +126,8 @@ output of the typechecker in a window."
   (set (make-local-variable 'comment-start-skip) "#+\\s-*")
   (set (make-local-variable 'font-lock-defaults) '(cccatt-font-lock-keywords))
   (setq mode-name "CCCaTT")
+  (when cccatt-default-input-method
+    (set-input-method cccatt-default-input-method))
 )
 
 (provide 'cccatt-mode)
