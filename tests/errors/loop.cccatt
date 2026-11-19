@@ -1,0 +1,8 @@
+#-# mode: category
+#-# dimension: 2
+#-# ordered: false
+
+# A top-dimensional cell cannot be a loop. The check used to compare source and
+# target together with their source positions, and thus never triggered.
+
+coh bad (x y : .) (f : x → y) (α : f → f) : f → f

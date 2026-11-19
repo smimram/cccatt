@@ -1,0 +1,10 @@
+#-# mode: plain
+
+# In plain mode, a coherence is a hypothesis of the context. Types used to be
+# compared together with their source positions, so that nothing was accepted.
+
+coh id (x y : .) (f : x → y) : x → y
+coh snd (x y z : .) (f : x → y) (g : y → z) : y → z
+
+ncoh rev (x y : .) (f : x → y) : y → x
+ncoh comp (x y z : .) (f : x → y) (g : y → z) : x → z
