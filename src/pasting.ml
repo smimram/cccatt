@@ -597,8 +597,8 @@ let check ~pos l a =
             (fun (r,a) (r',a') ->
                let x, y = arr a in
                let x', y' = arr a' in
-               if x = x' then error ~pos:a'.pos "%s has the same source as %s" r' r;
-               if y = y' then error ~pos:a'.pos "%s has the same target as %s" r' r;
+               if var x = var x' then error ~pos:a'.pos "%s has the same source as %s" r' r;
+               if var y = var y' then error ~pos:a'.pos "%s has the same target as %s" r' r;
             ) eq;
           let eq = List.map (fun (_,a) -> let x, y = arr a in var x, var y) eq in
           (* Check that equations are acyclic. *)
