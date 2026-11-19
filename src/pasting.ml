@@ -20,8 +20,15 @@ let check1 ~pos l a =
 
   | `Plain ->
 
+    let get_arr a =
+      match (unmeta a).desc with
+      | Arr (o, t, u) when is_obj o && is_var t && is_var u -> t, u
+      | _ -> failure a.pos "arrow between variables expected"
+    in
     let l = List.map snd l in
-    if not (List.mem a l) then failure pos "cannot produce %s" (to_string a)
+    let l = List.map get_arr l in
+    let t, u = get_arr a in
+    if not (List.exists (fun (t',u') -> eq_var t t' && eq_var u u') l) then failure pos "cannot produce %s" (to_string a)
 
   | `Category ->
 
