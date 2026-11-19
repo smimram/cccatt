@@ -20,8 +20,15 @@ let check1 ~pos l a =
 
   | `Plain ->
 
+    let get_arr a =
+      match (unmeta a).desc with
+      | Arr (o, t, u) when is_obj o && is_var t && is_var u -> t, u
+      | _ -> failure a.pos "arrow between variables expected"
+    in
     let l = List.map snd l in
-    if not (List.mem a l) then failure pos "cannot produce %s" (to_string a)
+    let l = List.map get_arr l in
+    let t, u = get_arr a in
+    if not (List.exists (fun (t',u') -> eq_var t t' && eq_var u u') l) then failure pos "cannot produce %s" (to_string a)
 
   | `Category ->
 
@@ -520,15 +527,10 @@ let check ~pos l a =
       | Arr (a, _, _) -> a
       | _ -> assert false
     in
-    let var x =
-      match (unmeta x).desc with
-      | Var x -> x
-      | _ -> error ~pos:x.pos "variable expected but we have %s" (to_string a)
-    in
     (* Contract all rules above the maximal dimension, so that we are reversible. *)
     let l, a =
       let rw, l = List.partition (fun (_,a) -> dim a > !Settings.dimension) l in
-      let rw = List.map (fun (_,a) -> let x, b = arr a in let x = var x in x, b) rw in
+      let rw = List.map (fun (_,a) -> let x, b = arr a in let x = var_name x in x, b) rw in
       let rw = List.fold_left add_rule [] rw in
       let l =
         let rw = List.map fst rw in
@@ -557,7 +559,7 @@ let check ~pos l a =
           if n <= 1 then check1 ~pos l a
           else
             let l, l' = List.partition (fun (_,a) -> dim a < n) l in
-            let l' = List.map (fun (_,a) -> a.pos, Pair.map var var @@ arr a) l' in
+            let l' = List.map (fun (_,a) -> a.pos, Pair.map var_name var_name @@ arr a) l' in
             List.iter (fun (pos,(x,y)) -> if not (index x < index y) then failure pos "source should be a variable defined before the target") l';
             List.iter_consecutive_pairs (fun (_,(_,x)) (pos,(y,_)) -> if not (index x <= index y) then failure pos "source should be a variable defined after the target of previous variable") l';
             let l' = List.map snd l' in
@@ -592,15 +594,15 @@ let check ~pos l a =
           (* Consider top dimensional cells as equations. *)
           let l, eq = List.partition (fun (_,a) -> dim a < n) l in
           (* NOTE: these checks are included in acyclicity below, but we get better positions in errors. *)
-          List.iter (fun (r,a) -> let x, y = arr a in if x = y then error ~pos:a.pos "%s is a loop" r) eq;
+          List.iter (fun (r,a) -> let x, y = arr a in if eq_var x y then error ~pos:a.pos "%s is a loop" r) eq;
           List.iter_unordered_pairs
             (fun (r,a) (r',a') ->
                let x, y = arr a in
                let x', y' = arr a' in
-               if x = x' then error ~pos:a'.pos "%s has the same source as %s" r' r;
-               if y = y' then error ~pos:a'.pos "%s has the same target as %s" r' r;
+               if eq_var x x' then error ~pos:a'.pos "%s has the same source as %s" r' r;
+               if eq_var y y' then error ~pos:a'.pos "%s has the same target as %s" r' r;
             ) eq;
-          let eq = List.map (fun (_,a) -> let x, y = arr a in var x, var y) eq in
+          let eq = List.map (fun (_,a) -> let x, y = arr a in var_name x, var_name y) eq in
           (* Check that equations are acyclic. *)
           (
             let trans eq =

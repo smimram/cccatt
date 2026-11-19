@@ -1,0 +1,8 @@
+#-# mode: cartesian closed
+#-# dimension: 3
+#-# ordered: false
+
+# The following was accepted whereas it should not because we have two 2-cells
+# with the same source (bug #15).
+
+coh bad (a b : .) (f g : a → b) (α : f → g) (β : f → g) : α → β
