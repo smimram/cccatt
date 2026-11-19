@@ -259,19 +259,19 @@ let metavariables e =
 
 let has_metavariable m e = List.mem m (metavariables e)
 
-(** Make sure that two variables are equal. *)
-let eq_var a b =
-  match (unmeta a).desc, (unmeta b).desc with
-  | Var a, Var b -> a = b
-  | _ -> assert false
-
-let compare_var a b =
-  match (unmeta a).desc, (unmeta b).desc with
-  | Var a, Var b -> compare a b
-  | _ -> assert false
-
 let failure pos fmt =
   Printf.ksprintf (fun s -> failwith "%s: %s" (Pos.to_string pos) s) fmt
+
+(** Name of a variable. *)
+let var_name a =
+  match (unmeta a).desc with
+  | Var x -> x
+  | _ -> failure a.pos "variable expected but we have %s" (to_string a)
+
+(** Make sure that two variables are equal. *)
+let eq_var a b = var_name a = var_name b
+
+let compare_var a b = compare (var_name a) (var_name b)
 
 let rec dim e =
   match (unmeta e).desc with
